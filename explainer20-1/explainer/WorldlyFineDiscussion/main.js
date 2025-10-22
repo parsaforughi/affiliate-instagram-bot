@@ -298,8 +298,26 @@ async function askGPT(userMessage, userContext, conversationHistory = []) {
     // Handle array response format [{ message, sendLink }]
     const responseData = Array.isArray(data) ? data[0] : data;
     
+    // Extract message text
+    let messageText = responseData.message || responseData.response || responseData.text || JSON.stringify(data);
+    
+    // Clean up: If message contains JSON, extract the actual text
+    try {
+      // Check if message looks like JSON
+      if (messageText.trim().startsWith('{') || messageText.trim().startsWith('[')) {
+        const parsed = JSON.parse(messageText);
+        messageText = parsed.response || parsed.message || parsed.text || messageText;
+      }
+    } catch (e) {
+      // If parsing fails, check for incomplete JSON like: { "response": "text
+      const match = messageText.match(/"(?:response|message|text)"\s*:\s*"([^"]+)"/);
+      if (match) {
+        messageText = match[1];
+      }
+    }
+    
     return {
-      message: responseData.message || responseData.response || responseData.text || JSON.stringify(data),
+      message: messageText,
       sendLink: responseData.sendLink || false,
       detectedTone: responseData.detectedTone || 'casual',
       userName: responseData.userName || null,
