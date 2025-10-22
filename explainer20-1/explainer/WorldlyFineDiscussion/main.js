@@ -295,11 +295,14 @@ async function askGPT(userMessage, userContext, conversationHistory = []) {
     console.log("✅ Response received from n8n");
     console.log("📦 n8n response data:", JSON.stringify(data));
     
+    // Handle array response format [{ message, sendLink }]
+    const responseData = Array.isArray(data) ? data[0] : data;
+    
     return {
-      message: data.message || data.response || data.text || JSON.stringify(data),
-      sendLink: data.sendLink || false,
-      detectedTone: data.detectedTone || 'casual',
-      userName: data.userName || null,
+      message: responseData.message || responseData.response || responseData.text || JSON.stringify(data),
+      sendLink: responseData.sendLink || false,
+      detectedTone: responseData.detectedTone || 'casual',
+      userName: responseData.userName || null,
     };
   } catch (err) {
     console.error("n8n Webhook Error:", err.message);
