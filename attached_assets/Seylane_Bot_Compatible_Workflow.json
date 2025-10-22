@@ -1,0 +1,174 @@
+{
+  "name": "Seylane Bot Compatible",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "replit",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "seylane-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build messages array for Gemini\nconst body = $input.item.json.body || {};\nconst userMessage = body.userMessage || \"\";\nconst conversationHistory = body.conversationHistory || [];\nconst systemPrompt = body.systemPrompt || \"\";\nconst affiliateLink = body.affiliateLink || \"\";\n\n// Build messages\nconst messages = [];\nconversationHistory.forEach(msg => {\n  messages.push({\n    role: msg.role === \"user\" ? \"user\" : \"model\",\n    parts: [{ text: msg.content }]\n  });\n});\n\n// Add current user message\nmessages.push({\n  role: \"user\",\n  parts: [{ text: userMessage }]\n});\n\nreturn {\n  messages: messages,\n  systemPrompt: systemPrompt,\n  affiliateLink: affiliateLink,\n  userMessage: userMessage\n};"
+      },
+      "id": "prepare-data",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash-exp",
+          "mode": "list",
+          "cachedResultName": "Gemini 2.0 Flash"
+        },
+        "messages": "={{ $json.messages }}",
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "={{ $json.systemPrompt }}",
+          "maxOutputTokens": 250,
+          "temperature": 0.8,
+          "timeout": 30000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [680, 300],
+      "id": "gemini-node",
+      "name": "Gemini AI",
+      "continueOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UT1iahfaFNxVbfVf",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract and clean Gemini response\nlet messageText = \"\";\n\ntry {\n  const raw = $input.item.json;\n  \n  // Multiple extraction paths\n  if (raw.response) {\n    messageText = raw.response;\n  } else if (raw[0]?.content?.parts?.[0]?.text) {\n    messageText = raw[0].content.parts[0].text;\n  } else if (raw.content?.parts?.[0]?.text) {\n    messageText = raw.content.parts[0].text;\n  } else if (raw.message) {\n    messageText = raw.message;\n  } else if (raw.text) {\n    messageText = raw.text;\n  } else {\n    messageText = JSON.stringify(raw);\n  }\n  \n  // Clean the text\n  messageText = String(messageText).trim();\n  \n  // Remove JSON wrapper if present\n  if (messageText.startsWith('{') || messageText.startsWith('[')) {\n    try {\n      const parsed = JSON.parse(messageText);\n      messageText = parsed.response || parsed.message || parsed.text || messageText;\n    } catch (e) {\n      const match = messageText.match(/\"(?:response|message|text)\"\\s*:\\s*\"([^\"]+)\"/s);\n      if (match) messageText = match[1];\n    }\n  }\n  \n  // Remove markdown\n  messageText = messageText.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  \n  // Remove surrounding quotes\n  if (messageText.startsWith('\"') && messageText.endsWith('\"')) {\n    messageText = messageText.slice(1, -1);\n  }\n  \n  // Unescape\n  messageText = messageText.replace(/\\\\n/g, '\\n').replace(/\\\\\"/g, '\"');\n  \n} catch (error) {\n  messageText = \"سلام 🌿 پیامت رو دیدم - می‌تونی یکم بیشتر بگی تا بتونم درست کمکت کنم؟\";\n}\n\n// Detect affiliate keywords\nconst sendLink = (\n  messageText.includes('افیلیت') ||\n  messageText.includes('همکار') ||\n  messageText.includes('ثبت نام') ||\n  messageText.includes('کد تخفیف') ||\n  messageText.includes('کوپن')\n);\n\nreturn {\n  message: messageText || \"سلام 🌿 چطور می‌تونم کمکت کنم؟\",\n  sendLink: sendLink\n};"
+      },
+      "id": "format-output",
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fallback when Gemini fails\nreturn {\n  message: \"سلام 🌿 پیامت رو دیدم - می‌تونی یکم بیشتر بگی تا بتونم درست کمکت کنم؟\",\n  sendLink: false\n};"
+      },
+      "id": "fallback",
+      "name": "Fallback Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond",
+      "name": "Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Gemini AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini AI": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fallback Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Output": {
+      "main": [
+        [
+          {
+            "node": "Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fallback Response": {
+      "main": [
+        [
+          {
+            "node": "Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-22T18:15:00.000Z",
+  "versionId": "compatible-v1"
+}
