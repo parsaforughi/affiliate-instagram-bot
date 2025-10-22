@@ -272,7 +272,7 @@ async function askGPT(userMessage, userContext, conversationHistory = []) {
 
     console.log("🌐 Sending to n8n webhook...");
     
-    const res = await fetch("https://parsaforughi.app.n8n.cloud/webhook-test/replit", {
+    const res = await fetch("https://parsaforughi.app.n8n.cloud/webhook/replit", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
