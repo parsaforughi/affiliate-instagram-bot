@@ -1,0 +1,31 @@
+modules = ["nodejs-20"]
+
+[nix]
+channel = "stable-25_05"
+packages = ["chromium"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Instagram Bot"
+
+[[workflows.workflow]]
+name = "Instagram Bot"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd WorldlyFineDiscussion && node main.js"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[agent]
+expertMode = true
