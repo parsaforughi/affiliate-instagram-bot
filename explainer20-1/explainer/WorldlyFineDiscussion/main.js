@@ -925,33 +925,22 @@ async function runSelfTest(page) {
         continue;
       }
 
-      // Process only top 2 UNREAD conversations (reduced to prevent GPT overload)
-      const toProcess = unreadConvs.slice(0, 2);
-      console.log(`⚡ Processing ${toProcess.length} unread conversations...`);
+      // Process ONLY ONE conversation at a time
+      const conv = unreadConvs[0]; // Take only the first unread conversation
+      console.log(`⚡ Processing 1 unread conversation...`);
       
-      let processedCount = 0;
-      for (const conv of toProcess) {
-        const result = await processConversation(page, conv, messageCache, userContextManager, perfMonitor);
-        
-        // If we successfully processed a message, increment counter and add delay to prevent GPT overload
-        if (result.processed) {
-          processedCount++;
-          console.log(`✅ Processed: ${processedCount} messages in this cycle`);
-          
-          // Add delay between GPT calls to prevent rate limiting
-          if (processedCount < toProcess.length) {
-            console.log(`⏱️ 3 second delay to prevent GPT overload...`);
-            await delay(3000);
-          }
-        }
-        
-        // Go back to inbox after each
-        await page.goto("https://www.instagram.com/direct/inbox/", {
-          waitUntil: "networkidle2",
-          timeout: 15000
-        });
-        await delay(2000);
+      const result = await processConversation(page, conv, messageCache, userContextManager, perfMonitor);
+      
+      if (result.processed) {
+        console.log(`✅ Processed message successfully`);
       }
+      
+      // Go back to inbox
+      await page.goto("https://www.instagram.com/direct/inbox/", {
+        waitUntil: "networkidle2",
+        timeout: 15000
+      });
+      await delay(2000);
 
       // Show stats
       const stats = perfMonitor.getStats();
