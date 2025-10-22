@@ -848,9 +848,9 @@ async function runSelfTest(page) {
       loopCount++;
       console.log(`\n🔄 Check #${loopCount} - ${new Date().toLocaleTimeString()}`);
 
-      // Check message requests every 10 loops
+      // Check message requests every 20 loops (less frequent)
       requestCheckCounter++;
-      if (requestCheckCounter >= 10) {
+      if (requestCheckCounter >= 20) {
         await checkMessageRequests(page);
         await page.goto("https://www.instagram.com/direct/inbox/", {
           waitUntil: "networkidle2",
@@ -858,11 +858,14 @@ async function runSelfTest(page) {
         });
         await delay(2000);
         requestCheckCounter = 0;
+      } else if (loopCount % 5 === 0) {
+        // Only reload every 5th loop to reduce Instagram's detection
+        await page.reload({ waitUntil: "networkidle2", timeout: 15000 });
+        await delay(1500);
+      } else {
+        // Just wait without reloading
+        await delay(500);
       }
-
-      // Refresh inbox
-      await page.reload({ waitUntil: "networkidle2", timeout: 15000 });
-      await delay(1500);
 
       // Dismiss popups
       await page.evaluate(() => {
@@ -875,19 +878,25 @@ async function runSelfTest(page) {
       await delay(500);
 
       // Check for Instagram error page and retry
-      const hasError = await page.evaluate(() => {
-        return document.body.innerText.includes('Something went wrong') || 
-               document.body.innerText.includes('There\'s an issue');
+      const pageInfo = await page.evaluate(() => {
+        return {
+          hasError: document.body.innerText.includes('Something went wrong') || 
+                   document.body.innerText.includes('There\'s an issue'),
+          url: window.location.href,
+          title: document.title
+        };
       });
       
-      if (hasError) {
-        console.log('⚠️ Instagram error page detected - reloading...');
-        await delay(2000);
+      if (pageInfo.hasError) {
+        console.log(`⚠️ Instagram error page detected at: ${pageInfo.url}`);
+        console.log(`   Page title: ${pageInfo.title}`);
+        await delay(3000);
+        console.log('   Attempting to navigate back to inbox...');
         await page.goto("https://www.instagram.com/direct/inbox/", {
           waitUntil: "networkidle2",
           timeout: 20000
         });
-        await delay(3000);
+        await delay(5000);
         continue; // Skip this loop iteration
       }
 
