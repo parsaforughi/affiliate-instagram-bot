@@ -1,0 +1,253 @@
+{
+  "name": "Seylane Bot - Stable v2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "replit",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "📩 Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "seylane-stable-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.body.messages }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valid-input",
+      "name": "✅ Valid Input?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract last user message\nconst messages = $input.item.json.body.messages || [];\n\nlet userMessage = \"سلام\";\nfor (let i = messages.length - 1; i >= 0; i--) {\n  if (messages[i].role === \"user\") {\n    userMessage = messages[i].content || \"\";\n    break;\n  }\n}\n\n// Clean message\nuserMessage = userMessage.trim().replace(/[\\u0000-\\u001F\\u007F-\\u009F]/g, '');\n\nreturn {\n  userMessage: userMessage,\n  systemPrompt: $input.item.json.body.systemPrompt || \"\",\n  affiliateLink: $input.item.json.body.affiliateLink || \"\"\n};"
+      },
+      "id": "extract-message",
+      "name": "🔍 Extract Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash-exp",
+          "mode": "list",
+          "cachedResultName": "Gemini 2.0 Flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.userMessage }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "={{ $json.systemPrompt }}",
+          "maxOutputTokens": 250,
+          "temperature": 0.8,
+          "timeout": 30000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [900, 200],
+      "id": "gemini-ai",
+      "name": "🤖 Gemini AI",
+      "continueOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UT1iahfaFNxVbfVf",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Clean Gemini response and extract pure text\nlet messageText = \"\";\n\ntry {\n  const raw = $input.item.json;\n  \n  // Try multiple paths to find the response\n  if (raw[0]?.content?.parts?.[0]?.text) {\n    messageText = raw[0].content.parts[0].text;\n  } else if (raw.content?.parts?.[0]?.text) {\n    messageText = raw.content.parts[0].text;\n  } else if (typeof raw === \"string\") {\n    messageText = raw;\n  } else if (raw.message) {\n    messageText = raw.message;\n  } else {\n    messageText = JSON.stringify(raw);\n  }\n  \n  // Clean the text\n  messageText = messageText.trim();\n  \n  // Remove JSON formatting if present\n  if (messageText.startsWith('{') || messageText.startsWith('[')) {\n    try {\n      const parsed = JSON.parse(messageText);\n      messageText = parsed.response || parsed.message || parsed.text || messageText;\n    } catch (e) {\n      // Try regex extraction for incomplete JSON\n      const match = messageText.match(/\"(?:response|message|text)\"\\s*:\\s*\"([^\"]+)\"/s);\n      if (match) {\n        messageText = match[1];\n      }\n    }\n  }\n  \n  // Remove markdown code blocks\n  messageText = messageText.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n  \n  // Remove quotes if the entire string is quoted\n  if (messageText.startsWith('\"') && messageText.endsWith('\"')) {\n    messageText = messageText.slice(1, -1);\n  }\n  \n  // Unescape characters\n  messageText = messageText.replace(/\\\\n/g, '\\n').replace(/\\\\\"/g, '\"');\n  \n} catch (error) {\n  messageText = \"سلام 🌿 پیامت رو دیدم - می‌تونی یکم بیشتر بگی تا بتونم درست کمکت کنم؟\";\n}\n\n// Detect if affiliate link should be sent\nconst sendLink = (\n  messageText.includes('افیلیت') ||\n  messageText.includes('همکار') ||\n  messageText.includes('ثبت نام') ||\n  messageText.includes('کد تخفیف')\n);\n\nreturn {\n  message: messageText || \"سلام 🌿 چطور می‌تونم کمکت کنم؟\",\n  sendLink: sendLink\n};"
+      },
+      "id": "format-response",
+      "name": "✨ Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fallback response when AI fails\nreturn {\n  message: \"سلام 🌿 پیامت رو دیدم - می‌تونی یکم بیشتر بگی تا بتونم درست کمکت کنم؟\",\n  sendLink: false\n};"
+      },
+      "id": "fallback-response",
+      "name": "⚠️ Fallback",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Invalid input response\nreturn {\n  message: \"سلام 🌿 چطور می‌تونم کمکت کنم؟\",\n  sendLink: false\n};"
+      },
+      "id": "invalid-input",
+      "name": "❌ Invalid Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-webhook",
+      "name": "📤 Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "📩 Webhook": {
+      "main": [
+        [
+          {
+            "node": "✅ Valid Input?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✅ Valid Input?": {
+      "main": [
+        [
+          {
+            "node": "🔍 Extract Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "❌ Invalid Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 Extract Message": {
+      "main": [
+        [
+          {
+            "node": "🤖 Gemini AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini AI": {
+      "main": [
+        [
+          {
+            "node": "✨ Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "⚠️ Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✨ Format Response": {
+      "main": [
+        [
+          {
+            "node": "📤 Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚠️ Fallback": {
+      "main": [
+        [
+          {
+            "node": "📤 Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "❌ Invalid Input": {
+      "main": [
+        [
+          {
+            "node": "📤 Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-22T18:00:00.000Z",
+  "versionId": "stable-v2"
+}
