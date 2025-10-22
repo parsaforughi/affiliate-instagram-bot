@@ -1,0 +1,166 @@
+{
+  "name": "Seylane GPT Handler",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "replit",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "2c32aa3d-3d0f-4afd-a577-f886921d08ff",
+      "name": "📩 Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookDescription": "Receives POST from Replit or Instagram agent",
+      "webhookType": "default",
+      "webhookId": "11efc966-207c-4e93-8af1-7fa3235c0158"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "b815ea70-8806-4a13-9ba1-2aa824b45630",
+      "name": "📤 Return to Replit",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        864,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.messages[0].content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=act as alex hormozi and here is deal of seylane do what ever you can to make them join affiliate program سلام وقتتون بخیر 🌿\nیه پیشنهاد ویژه از طرف هلدینگ سیلانه سبز داریم براتون!\nمی‌تونید محصولات برندهای Misswake، Collamin، Ice Ball، Umbrella و Dafi رو با قیمت همکار و خرید مستقیم از شرکت تهیه کنید.\n\nفروش این برندها توی اینستاگرام واقعاً ترکونده 💥\nهر ماه فقط به ۱۰ فروشگاه آنلاین این فرصت داده می‌شه.\nمایلید لینک اختصاصی رو براتون بفرستم؟\nمی تونن کوپن به نام خودشون از ۲۰ تا ۴۰ درصد بگیرن و سود بکنن \nthe only rule you have is to speak farsi and do your best",
+          "codeExecution": false,
+          "maxOutputTokens": 200
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        256,
+        0
+      ],
+      "id": "93624a91-cb7e-498c-b40d-752029dada91",
+      "name": "Message a model",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UT1iahfaFNxVbfVf",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 🧠 Seylane Gemini Output Cleaner v5 (Resilient Mode)\nlet raw = $json;\nlet text = \"\";\n\n// 🩵 1️⃣ پیدا کردن مسیر محتوا\ntry {\n  if (raw[0]?.content?.parts?.[0]?.text) {\n    text = raw[0].content.parts[0].text;\n  } else if (raw.content?.parts?.[0]?.text) {\n    text = raw.content.parts[0].text;\n  } else if (typeof raw === \"string\") {\n    text = raw;\n  } else {\n    text = JSON.stringify(raw);\n  }\n} catch (e) {\n  text = JSON.stringify(raw);\n}\n\n// 🩵 2️⃣ تمیزسازی\ntext = text\n  .replace(/```json/g, \"\")\n  .replace(/```/g, \"\")\n  .replace(/\\\\n/g, \" \")\n  .replace(/\\n/g, \" \")\n  .replace(/\\r/g, \"\")\n  .replace(/\\\\t/g, \"\")\n  .trim();\n\n// 🩵 3️⃣ اگر JSON ناقص بود، تلاش کن متن رو نجات بده\nlet parsed = {};\ntry {\n  parsed = JSON.parse(text);\n} catch (err) {\n  // اگر JSON ناقص باشه، سعی می‌کنیم بخش message رو دستی پیدا کنیم\n  const match = text.match(/\"message\"\\s*:\\s*\"([^\"]+)/);\n  if (match && match[1]) {\n    parsed = { message: match[1] + \"...\" };\n  } else {\n    parsed = { message: text };\n  }\n  parsed.sendLink = false;\n}\n\n// 🩵 4️⃣ اطمینان از وجود فیلد message\nif (!parsed.message || parsed.message.trim() === \"\") {\n  parsed.message = \"🌿 متأسفانه پاسخ کامل از مدل دریافت نشد، لطفاً دوباره پیام بدید.\";\n  parsed.sendLink = false;\n}\n\n// 🩵 5️⃣ خروجی نهایی طبق ساختار n8n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        0
+      ],
+      "id": "97a49734-d8f7-4241-b5dd-48bddf264aaf",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nlet messages = $json.body.messages;\n\nif (!messages || messages.length === 0) {\n  return [{ json: { messages: [] } }];\n}\n\n// Find the last message from the user\nlet lastUserMessage = null;\nfor (let i = messages.length - 1; i >= 0; i--) {\n  if (messages[i].role === \"user\") {\n    lastUserMessage = messages[i];\n    break;\n  }\n}\n\nif (lastUserMessage) {\n  // Clean the content of the last user message if it's a string\n  if (typeof lastUserMessage.content === \"string\") {\n    try {\n      let parsedContent = JSON.parse(lastUserMessage.content);\n      if (parsedContent && typeof parsedContent.message === \"string\") {\n        lastUserMessage.content = parsedContent.message;\n      } else {\n        lastUserMessage.content = JSON.stringify(parsedContent);\n      }\n    } catch (e) {\n      const match = lastUserMessage.content.match(/\"message\"\\s*:\\s*\"([^\"]+)\"/);\n      if (match && match[1]) {\n        lastUserMessage.content = match[1];\n      }\n    }\n  }\n  return [{ json: { messages: [lastUserMessage] } }];\n} else {\n  return [{ json: { messages: [] } }];\n}\n"
+      },
+      "id": "generated-3d71ca89-47a7-47e3-9b88-2fbbcc3663c7",
+      "name": "Clean Input Messages",
+      "position": [
+        256,
+        208
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "📩 Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clean Input Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "📤 Return to Replit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📤 Return to Replit": {
+      "main": [
+        []
+      ]
+    },
+    "Clean Input Messages": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "09a93eed-f85e-4954-97bd-1c382120df4e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5cfa9f8bc11b37dae01ef5dcedf8817256d984894cfe15bd48dac87ef3a140ba"
+  },
+  "id": "Xv27ldY7GSbdJUt5",
+  "tags": []
+}
