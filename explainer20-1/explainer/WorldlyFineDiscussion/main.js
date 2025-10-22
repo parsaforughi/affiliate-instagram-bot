@@ -755,9 +755,20 @@ async function runSelfTest(page) {
       "--disable-dev-shm-usage",
       "--single-process",
       "--no-zygote",
+      "--disable-blink-features=AutomationControlled",
+      "--disable-features=IsolateOrigins,site-per-process",
     ],
   });
   const page = await browser.newPage();
+  
+  // Set realistic viewport and user agent
+  await page.setViewport({ width: 1366, height: 768 });
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+
+  // Set extra headers
+  await page.setExtraHTTPHeaders({
+    'Accept-Language': 'en-US,en;q=0.9',
+  });
 
   if (INSTA_SESSION) {
     console.log("🍪 Using session cookie...");
@@ -768,12 +779,17 @@ async function runSelfTest(page) {
       path: "/",
       httpOnly: true,
       secure: true,
+      sameSite: "None",
     });
+    console.log("✅ Session cookie set");
   }
 
   console.log("📱 Navigating to Instagram...");
-  await page.goto("https://www.instagram.com/", { waitUntil: "networkidle2" });
-  await delay(3000);
+  await page.goto("https://www.instagram.com/", { 
+    waitUntil: "networkidle2",
+    timeout: 30000
+  });
+  await delay(5000);
 
   const loggedIn = await page.evaluate(
     () => !!document.querySelector('a[href*="/direct/inbox"]'),
@@ -858,6 +874,28 @@ async function runSelfTest(page) {
       });
       await delay(500);
 
+      // Check for Instagram error page and retry
+      const hasError = await page.evaluate(() => {
+        return document.body.innerText.includes('Something went wrong') || 
+               document.body.innerText.includes('There\'s an issue');
+      });
+      
+      if (hasError) {
+        console.log('⚠️ Instagram error page detected - reloading...');
+        await delay(2000);
+        await page.goto("https://www.instagram.com/direct/inbox/", {
+          waitUntil: "networkidle2",
+          timeout: 20000
+        });
+        await delay(3000);
+        continue; // Skip this loop iteration
+      }
+
+      // Take screenshot for debugging
+      if (loopCount === 1 || loopCount % 20 === 0) {
+        await takeScreenshot(page, `inbox_check_${loopCount}`);
+      }
+      
       // Extract UNREAD conversations only
       const conversations = await extractUnreadConversations(page);
       const unreadConvs = conversations.filter(c => c.hasUnread);
