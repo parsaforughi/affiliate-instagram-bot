@@ -7,16 +7,6 @@
     "messageHistory": [
       {
         "role": "user",
-        "content": "سلام شرایط افیلیت به چه صورته ؟",
-        "timestamp": 1761154221951
-      },
-      {
-        "role": "assistant",
-        "content": "سلام 🌿 پیامت رو دیدم - می‌تونی یکم بیشتر بگی تا بتونم درست کمکت کنم؟",
-        "timestamp": 1761154224724
-      },
-      {
-        "role": "user",
         "content": "سلام با میسویک هم همکاری دارید ؟",
         "timestamp": 1761155726359
       },
@@ -104,10 +94,20 @@
         "role": "assistant",
         "content": "{\"error\":\"Service unavailable - try again later or consider setting this node to retry automatically (in the node settings)\"}",
         "timestamp": 1761197612249
+      },
+      {
+        "role": "user",
+        "content": "با چه برند هایی کار میکنید ؟",
+        "timestamp": 1761197949842
+      },
+      {
+        "role": "assistant",
+        "content": "سلام ارمان عزیز! خیلی خوشحالم که اینجایی 😊 آماده‌ام تا هر سوالی درباره همکاری با سیلانه داری جواب بدم. بگو ببینم چطوری میتونم کمکت کنم؟",
+        "timestamp": 1761197954466
       }
     ],
     "firstSeen": 1761111012068,
-    "lastSeen": 1761197612249
+    "lastSeen": 1761197954466
   },
   "BAHARE| sent an attachment.": {
     "username": "BAHARE| sent an attachment.",
