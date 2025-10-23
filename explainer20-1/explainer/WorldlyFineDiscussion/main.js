@@ -197,7 +197,7 @@ class PerformanceMonitor {
 }
 
 // ========================================
-// N8N WEBHOOK INTEGRATION (GPT Processing via n8n)
+// OPENAI DIRECT INTEGRATION
 // ========================================
 async function askGPT(userMessage, userContext, conversationHistory = []) {
   const systemPrompt = `
@@ -325,63 +325,45 @@ async function askGPT(userMessage, userContext, conversationHistory = []) {
 
     messages.push({ role: "user", content: userMessage });
 
-    console.log("🌐 Sending to n8n webhook...");
+    console.log("🤖 Sending to OpenAI...");
     
-    const res = await fetch("https://parsaforughi.app.n8n.cloud/webhook/replit", {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        userMessage: userMessage,
-        userContext: userContext,
-        conversationHistory: conversationHistory,
-        systemPrompt: systemPrompt,
-        affiliateLink: AFFILIATE_LINK,
+        model: "gpt-4o-mini",
         messages: messages,
+        temperature: 0.8,
+        response_format: { type: "json_object" },
       }),
     });
 
     if (!res.ok) {
-      throw new Error(`n8n webhook error: ${res.status} ${res.statusText}`);
+      const errorText = await res.text();
+      throw new Error(`OpenAI API error: ${res.status} - ${errorText}`);
     }
 
     const data = await res.json();
-    console.log("✅ Response received from n8n");
-    console.log("📦 n8n response data:", JSON.stringify(data));
+    console.log("✅ Response received from OpenAI");
     
-    // Handle array response format [{ message, sendLink }]
-    const responseData = Array.isArray(data) ? data[0] : data;
+    const rawContent = data.choices[0].message.content;
+    console.log("📦 OpenAI response:", rawContent);
     
-    // Extract message text
-    let messageText = responseData.message || responseData.response || responseData.text || JSON.stringify(data);
-    
-    // Clean up: If message contains JSON, extract the actual text
-    try {
-      // Check if message looks like JSON
-      if (messageText.trim().startsWith('{') || messageText.trim().startsWith('[')) {
-        const parsed = JSON.parse(messageText);
-        messageText = parsed.response || parsed.message || parsed.text || messageText;
-      }
-    } catch (e) {
-      // If parsing fails, check for incomplete JSON like: { "response": "text
-      const match = messageText.match(/"(?:response|message|text)"\s*:\s*"([^"]+)"/);
-      if (match) {
-        messageText = match[1];
-      }
-    }
+    const parsed = JSON.parse(rawContent);
     
     return {
-      message: messageText,
-      sendLink: responseData.sendLink || false,
-      detectedTone: responseData.detectedTone || 'casual',
-      userName: responseData.userName || null,
+      message: parsed.message || "سلام 🌿",
+      sendLink: parsed.sendLink || false,
+      detectedTone: parsed.detectedTone || 'casual',
+      userName: parsed.userName || null,
     };
   } catch (err) {
-    console.error("n8n Webhook Error:", err.message);
-    // FAIL-SAFE RESPONSE - IN PERSIAN (bot still responds in Persian to users)
+    console.error("OpenAI Error:", err.message);
     return {
-      message: `سلام 🌿 پیامت رو دیدم - می‌تونی یکم بیشتر بگی تا بتونم درست کمکت کنم؟`,
+      message: `سلام ${userContext.name || userContext.username} عزیز 🌿 پیامت رو دیدم، می‌تونی یکم بیشتر بگی تا بتونم بهتر کمکت کنم؟`,
       sendLink: false,
       detectedTone: 'casual',
       userName: null,
