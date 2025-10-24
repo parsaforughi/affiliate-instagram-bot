@@ -199,7 +199,20 @@ class PerformanceMonitor {
 // ========================================
 // OPENAI DIRECT INTEGRATION
 // ========================================
-async function askGPT(userMessage, userContext, conversationHistory = []) {
+async function askGPT(userMessages, userContext, conversationHistory = []) {
+  // Support both single message (string) and multiple messages (array)
+  const messages = Array.isArray(userMessages) ? userMessages : [userMessages];
+  const userMessage = messages.length === 1 ? messages[0] : messages.join('\n');
+  
+  // If multiple messages, create a combined context for OpenAI
+  let multiMessageContext = '';
+  if (messages.length > 1) {
+    multiMessageContext = `\n\n⚠️ کاربر ${messages.length} پیام پشت سرهم فرستاده:\n`;
+    messages.forEach((msg, idx) => {
+      multiMessageContext += `پیام ${idx + 1}: "${msg}"\n`;
+    });
+    multiMessageContext += `\nباید به همه این پیام‌ها در یک یا چند پاسخ جامع پاسخ بدی.`;
+  }
   const systemPrompt = `
 🌿 تو نماینده باهوش، گرم و انسانی برند «سیلانه» هستی
 
@@ -329,6 +342,7 @@ async function askGPT(userMessage, userContext, conversationHistory = []) {
 - همیشه به فارسی پاسخ بده
 
 🌿 Seylane AI – Always Human, Always Helpful
+${multiMessageContext}
 `;
 
   try {
@@ -541,11 +555,31 @@ async function processConversation(page, conv, messageCache, userContextManager,
       let lastIncomingMessage = "";
       let lastIncomingMessageId = "";
       let allUserMessages = [];
+      let unreadMessages = [];
       let messageTimestamp = null;
+      let lastBotMessageIndex = -1;
 
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
 
+      // First pass: find the last bot message
+      for (let i = messageContainers.length - 1; i >= 0; i--) {
+        const container = messageContainers[i];
+        const messageDiv = container.querySelector('div[dir="auto"]');
+        
+        if (!messageDiv) continue;
+        
+        const isOutgoing = container.querySelector('div[style*="justify-content: flex-end"]') !== null ||
+                          container.querySelector('div[style*="flex-end"]') !== null ||
+                          container.style.justifyContent === 'flex-end';
+        
+        if (isOutgoing) {
+          lastBotMessageIndex = i;
+          break;
+        }
+      }
+
+      // Second pass: collect all user messages after last bot message
       for (let i = messageContainers.length - 1; i >= 0; i--) {
         const container = messageContainers[i];
         const messageDiv = container.querySelector('div[dir="auto"]');
@@ -585,6 +619,11 @@ async function processConversation(page, conv, messageCache, userContextManager,
           if (isToday) {
             allUserMessages.unshift(messageText);
           }
+
+          // Collect unread messages (after last bot message)
+          if (i > lastBotMessageIndex && isToday) {
+            unreadMessages.unshift(messageText);
+          }
         }
         
         if (allUserMessages.length >= 10) break;
@@ -599,13 +638,14 @@ async function processConversation(page, conv, messageCache, userContextManager,
         lastMessage: lastIncomingMessage,
         lastMessageId: lastIncomingMessageId,
         allMessages: allUserMessages.slice(-10),
+        unreadMessages: unreadMessages,
         conversationId,
         messageTimestamp: messageTimestamp ? messageTimestamp.toISOString() : null,
         isTodayMessage: !!lastIncomingMessage,
       };
     }, MY_USERNAME, conv.username);
 
-    const { username, bio, lastMessage, lastMessageId, allMessages, conversationId, messageTimestamp, isTodayMessage } = conversationData;
+    const { username, bio, lastMessage, lastMessageId, allMessages, unreadMessages, conversationId, messageTimestamp, isTodayMessage } = conversationData;
 
     // Validate username is not our own (robust check for variations)
     const isOwnAccount = !username || 
@@ -627,6 +667,15 @@ async function processConversation(page, conv, messageCache, userContextManager,
     }
     
     console.log(`📨 Last message: "${lastMessage.substring(0, 50)}${lastMessage.length > 50 ? '...' : ''}"`);
+    if (unreadMessages && unreadMessages.length > 0) {
+      console.log(`📬 Unread messages count: ${unreadMessages.length}`);
+      if (unreadMessages.length > 1) {
+        console.log(`📝 All unread messages:`);
+        unreadMessages.forEach((msg, idx) => {
+          console.log(`   ${idx + 1}. "${msg.substring(0, 60)}${msg.length > 60 ? '...' : ''}"`);
+        });
+      }
+    }
     if (messageTimestamp) {
       console.log(`🕒 Message time: ${new Date(messageTimestamp).toLocaleString('en-US')}`);
     }
@@ -647,8 +696,11 @@ async function processConversation(page, conv, messageCache, userContextManager,
 
     const conversationHistory = userContextManager.getRecentMessages(username, 8);
 
+    // Use unread messages if available (multiple messages), otherwise use last message
+    const messagesToProcess = (unreadMessages && unreadMessages.length > 0) ? unreadMessages : [lastMessage];
+    
     // Generate AI response
-    const response = await askGPT(lastMessage, userContext, conversationHistory);
+    const response = await askGPT(messagesToProcess, userContext, conversationHistory);
     
     console.log(`🤖 [${username}] Response ready`);
 
@@ -660,7 +712,10 @@ async function processConversation(page, conv, messageCache, userContextManager,
       userContextManager.updateContext(username, { tone: response.detectedTone });
     }
 
-    userContextManager.addMessage(username, 'user', lastMessage);
+    // Save all unread messages to context
+    messagesToProcess.forEach(msg => {
+      userContextManager.addMessage(username, 'user', msg);
+    });
 
     // Send reply
     const textarea = await page.$('textarea[placeholder*="Message"], textarea[aria-label*="Message"], div[contenteditable="true"]');
