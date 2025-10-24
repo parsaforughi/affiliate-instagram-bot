@@ -586,31 +586,40 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 مثال 2 (کاربر گفت "بله بفرست"):
 {
   "responses": [{
-    "message": "حتماً! الان برات میفرستم:",
+    "message": "حتماً! الان میفرستم:",
     "sendLink": false,
     "sendProductInfo": true,
     "productLink": "https://luxirana.com/?s=بلیچینگ"
   }]
 }
 
-🚫🚫🚫 قانون مهم - هرگز لینک یا URL یا markdown link توی "message" نذار:
-این کارها ممنوع است:
+مثال 3 (کاربر گفت "دوباره بفرست"):
+{
+  "responses": [{
+    "message": "البته! یه بار دیگه براتون میذارم:",
+    "sendLink": false,
+    "sendProductInfo": true,
+    "productLink": "https://luxirana.com/?s=خمیردندان"
+  }]
+}
+
+🚫🚫🚫 فوق العاده مهم - هرگز هیچ URL/لینکی توی "message" نباید باشه:
+❌❌ غلط - این کارها ممنوع:
 ❌ "message": "اینم لینکش: https://..."
 ❌ "message": "🔗 [لینک محصول](https://...)"
+❌ "message": "اینم دوباره لینک:\n\n🔗 [لینک](https://...)"
 ❌ "message": "![عکس](https://...)"
-❌ "message": "اینم دوباره لینک محصول:\n\n🔗 [لینک](https://...)"
-❌ هیچ چیزی که شبیه https:// یا http:// باشه نباید توی "message" باشه
+❌ "message": "اینم لینک محصول خمیردندان بلیچینگ:\n\n🔗 [لینک](https://...)"
 
-این کارها درست است:
+✅✅ صحیح - فقط متن ساده:
 ✅ "message": "حتماً! الان میفرستم:"
-✅ "message": "البته! لینکش رو برات میذارم:"
-✅ "message": "قیمت 287,000 تومان است. میخوای لینکش رو بفرستم؟"
-✅ لینک فقط توی "productLink" میره، هیچ‌وقت توی "message"
+✅ "message": "البته! براتون میذارم:"
+✅ "message": "یه بار دیگه لینک رو میفرستم:"
 
-⚠️ وقتی sendProductInfo=true است:
-- "message" فقط یک جمله کوتاه (مثلاً "حتماً! الان میفرستم:")
-- URL کامل فقط توی "productLink"
-- سیستم خودش لینک رو جدا میفرسته، تو نباید بفرستی
+⚠️⚠️ قانون اصلی:
+- توی "message" فقط متن بنویس، هیچ لینکی نذار
+- لینک فقط توی "productLink" میره
+- از لینک کوتاه توی productContext استفاده کن
 
 📜 قوانین رفتاری:
 • هیچ پیامی بی‌پاسخ نماند
