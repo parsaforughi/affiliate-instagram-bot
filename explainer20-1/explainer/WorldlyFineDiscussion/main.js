@@ -964,13 +964,20 @@ async function processConversation(page, conv, messageCache, userContextManager,
       await textarea.click();
       await delay(300);
       
-      await textarea.type(response.message, { delay: 25 });
+      // Combine message and link into one message if link is needed
+      let fullMessage = response.message;
+      if (response.sendLink) {
+        fullMessage += `\n\n${AFFILIATE_LINK}`;
+        console.log(`🔗 [${username}] Including affiliate link in message...`);
+      }
+      
+      await textarea.type(fullMessage, { delay: 25 });
       await delay(300);
       
       await page.keyboard.press("Enter");
       console.log(`✅ [${username}] Response sent!`);
 
-      userContextManager.addMessage(username, 'assistant', response.message);
+      userContextManager.addMessage(username, 'assistant', fullMessage);
 
       // Mark as greeted today if this was first message of the day
       if (!hasGreetedToday) {
@@ -979,20 +986,6 @@ async function processConversation(page, conv, messageCache, userContextManager,
       }
 
       await delay(1500);
-
-      if (response.sendLink) {
-        console.log(`🔗 [${username}] Sending affiliate link...`);
-        await delay(800);
-        
-        await textarea.click();
-        await delay(300);
-        await textarea.type(AFFILIATE_LINK, { delay: 20 });
-        await delay(300);
-        await page.keyboard.press("Enter");
-        
-        console.log(`✅ [${username}] Affiliate link sent!`);
-        await delay(1000);
-      }
 
       perfMonitor.trackResponse(startTime);
 
