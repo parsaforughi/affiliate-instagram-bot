@@ -393,9 +393,6 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
         results.forEach(product => {
           productSearchContext += `• ${product.name} - ${product.price} تومان (${product.brand})\n`;
           productSearchContext += `  لینک: ${product.productUrl}\n`;
-          if (product.imageUrl) {
-            productSearchContext += `  عکس: ${product.imageUrl}\n`;
-          }
         });
         break; // Only search for first matching term
       }
@@ -564,8 +561,7 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
       "message": "متن پاسخ به فارسی - طبیعی و انسانی",
       "sendLink": true/false,
       "sendProductInfo": false,
-      "productLink": "لینک محصول (فقط برای آماده کردن)",
-      "productImages": ["لینک عکس"] یا null
+      "productLink": "لینک محصول (فقط برای آماده کردن)"
     }
   ],
   "detectedTone": "formal/casual/playful/professional",
@@ -574,28 +570,26 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 
 ⚠️ توضیح فیلدها:
 • sendLink: فقط برای لینک افیلیت/همکاری (true = میخواد ثبت‌نام کنه)
-• sendProductInfo: true = الان لینک و عکس محصول رو بفرست، false = هنوز نفرست
-• productLink/productImages: همیشه آماده کن ولی فقط وقتی sendProductInfo=true بفرست
+• sendProductInfo: true = الان لینک محصول رو بفرست (بعد از پیام)، false = هنوز نفرست
+• productLink: همیشه آماده کن ولی فقط وقتی sendProductInfo=true بفرست
 
 مثال 1 (سوال اول درباره محصول):
 {
   "responses": [{
-    "message": "قیمت بلیچینگ 287,000 تومان است. میخوای لینک و عکسشو بفرستم؟",
+    "message": "قیمت بلیچینگ 287,000 تومان است. میخوای لینک محصول رو برات بفرستم؟",
     "sendLink": false,
     "sendProductInfo": false,
-    "productLink": "https://luxirana.com/product/123",
-    "productImages": ["https://...png"]
+    "productLink": "https://luxirana.com/?s=بلیچینگ"
   }]
 }
 
 مثال 2 (کاربر گفت "بله بفرست"):
 {
   "responses": [{
-    "message": "حتماً! اینم لینک و عکسش:",
+    "message": "حتماً! اینم لینکش:",
     "sendLink": false,
     "sendProductInfo": true,
-    "productLink": "https://luxirana.com/product/123",
-    "productImages": ["https://...png"]
+    "productLink": "https://luxirana.com/?s=بلیچینگ"
   }]
 }
 
@@ -612,10 +606,10 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 ⭐ همیشه آخر پیامت یه سوال engagement داشته باش که مکالمه رو ادامه‌دار کنه:
 
 🛍️ نمونه سوالات برای محصولات:
-⚠️ توجه: هنوز لینک/عکس نفرست! فقط بپرس:
-• "میخوای لینک و عکسشو بفرستم تا بیشتر با این محصول فوق العادمون آشنا بشی؟"
-• "می‌خوای عکس و لینک محصول رو برات بفرستم؟"
-• "قیمت مناسبه، نه؟ میخوای لینکش رو برات بذارم؟"
+⚠️ توجه: هنوز لینک نفرست! فقط بپرس:
+• "میخوای لینک محصول رو برات بفرستم؟"
+• "می‌خوای لینکش رو برات بذارم؟"
+• "قیمت مناسبه، نه؟ میخوای لینک محصول رو بفرستم؟"
 • "نمونه‌های دیگه‌ای هم می‌خوای ببینی؟"
 
 🤝 نمونه سوالات برای همکاری:
@@ -623,17 +617,19 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 • "آماده‌ای شروع کنی؟"
 • "می‌خوای راجع به نحوه همکاری بیشتر توضیح بدم؟"
 
-⚠️⚠️⚠️ فوق مهم - فلوی ارسال لینک/عکس محصول:
+⚠️⚠️⚠️ فوق مهم - فلوی ارسال لینک محصول:
 پیام 1 (سوال درباره محصول):
   → فقط قیمت و توضیحات بده
-  → سوال engagement بپرس: "میخوای لینک و عکسشو بفرستم؟"
-  → productLink و productImages رو آماده کن (ولی نفرست!)
+  → سوال engagement بپرس: "میخوای لینک محصول رو برات بفرستم؟"
+  → productLink رو آماده کن (ولی نفرست!)
   → sendLink: false
+  → sendProductInfo: false
 
 پیام 2 (کاربر "بله" گفت):
-  → حالا لینک و عکس رو بفرست
-  → productLink و productImages رو توی پیام بذار
+  → حالا فقط لینک محصول رو بفرست (بعد از پیام)
+  → productLink رو بذار
   → sendLink: false (چون محصوله، نه همکاری)
+  → sendProductInfo: true
 
 ⚠️ نکات حیاتی:
 - هر پاسخ باید متفاوت باشد
@@ -1107,22 +1103,12 @@ async function processConversation(page, conv, messageCache, userContextManager,
           console.log(`🔗 [${username}] Including affiliate link in message ${i + 1}...`);
         }
         
-        // Add product link/images ONLY if sendProductInfo is true
-        if (resp.sendProductInfo === true) {
-          if (resp.productLink) {
-            fullMessage += `\n\n🔗 لینک محصول:\n${resp.productLink}`;
-            console.log(`🛍️ [${username}] Including product link in message ${i + 1}...`);
-          }
-          
-          if (resp.productImages && Array.isArray(resp.productImages) && resp.productImages.length > 0) {
-            fullMessage += `\n\n📸 عکس محصول:`;
-            resp.productImages.forEach((img, idx) => {
-              fullMessage += `\n${img}`;
-            });
-            console.log(`📸 [${username}] Including ${resp.productImages.length} product image(s) in message ${i + 1}...`);
-          }
-        } else if (resp.productLink || resp.productImages) {
-          console.log(`ℹ️ [${username}] Product info prepared but not sent (sendProductInfo=${resp.sendProductInfo})`);
+        // Add product link ONLY if sendProductInfo is true
+        if (resp.sendProductInfo === true && resp.productLink) {
+          fullMessage += `\n\n${resp.productLink}`;
+          console.log(`🛍️ [${username}] Including product link in message ${i + 1}...`);
+        } else if (resp.productLink) {
+          console.log(`ℹ️ [${username}] Product link prepared but not sent (sendProductInfo=${resp.sendProductInfo})`);
         }
         
         await textarea.type(fullMessage, { delay: 25 });
