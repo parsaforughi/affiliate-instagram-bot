@@ -44,6 +44,114 @@ const AFFILIATE_LINK = "https://affiliate.luxirana.com/account/login";
 const MY_USERNAME = INSTAGRAM_USERNAME || "luxirana"; // Our bot account name
 
 // ========================================
+// NAME TRANSLATION (English to Persian)
+// ========================================
+const NAME_TRANSLATIONS = {
+  // Common Iranian names
+  'ali': 'علی',
+  'mohammad': 'محمد',
+  'mohammed': 'محمد',
+  'reza': 'رضا',
+  'hassan': 'حسن',
+  'hossein': 'حسین',
+  'hussein': 'حسین',
+  'mehdi': 'مهدی',
+  'mahdi': 'مهدی',
+  'amir': 'امیر',
+  'arman': 'ارمان',
+  'armin': 'آرمین',
+  'salar': 'سالار',
+  'sina': 'سینا',
+  'pouria': 'پوریا',
+  'pourya': 'پوریا',
+  'pouya': 'پویا',
+  'soheil': 'سهیل',
+  'soroush': 'سروش',
+  'farhad': 'فرهاد',
+  'behnam': 'بهنام',
+  'behrouz': 'بهروز',
+  'omid': 'امید',
+  'milad': 'میلاد',
+  'navid': 'نوید',
+  'saeed': 'سعید',
+  'said': 'سعید',
+  'ehsan': 'احسان',
+  'iman': 'ایمان',
+  'babak': 'بابک',
+  'bijan': 'بیژن',
+  'dariush': 'داریوش',
+  'kian': 'کیان',
+  'kiarash': 'کیارش',
+  'kamran': 'کامران',
+  'kaveh': 'کاوه',
+  'peyman': 'پیمان',
+  'hooman': 'هومن',
+  'human': 'هومن',
+  
+  // Female names
+  'sara': 'سارا',
+  'sarah': 'سارا',
+  'maryam': 'مریم',
+  'mariam': 'مریم',
+  'mary': 'مریم',
+  'fatima': 'فاطمه',
+  'fatemeh': 'فاطمه',
+  'zahra': 'زهرا',
+  'aida': 'آیدا',
+  'ayda': 'آیدا',
+  'nazanin': 'نازنین',
+  'niloofar': 'نیلوفر',
+  'niloufar': 'نیلوفر',
+  'mina': 'مینا',
+  'neda': 'ندا',
+  'negar': 'نگار',
+  'parisa': 'پریسا',
+  'pari': 'پری',
+  'shadi': 'شادی',
+  'shirin': 'شیرین',
+  'yasmin': 'یاسمین',
+  'yasaman': 'یاسمن',
+  'yasi': 'یاسی',
+  'dorsa': 'درسا',
+  'deniz': 'دنیز',
+  'elham': 'الهام',
+  'hana': 'هانا',
+  'hannah': 'حنا',
+  'setareh': 'ستاره',
+  'bahar': 'بهار',
+  'nasim': 'نسیم',
+};
+
+// Function to translate English name to Persian
+function translateNameToPersian(name) {
+  if (!name || typeof name !== 'string') return name;
+  
+  // Clean the name
+  const cleanName = name.trim().toLowerCase();
+  
+  // Don't translate if it's a brand/shop name
+  const brandKeywords = ['shop', 'store', 'brand', 'official', 'team', 'hub', 'page', 'luxury', 'collection'];
+  for (const keyword of brandKeywords) {
+    if (cleanName.includes(keyword)) {
+      return name; // Return original
+    }
+  }
+  
+  // Check if it's already in Persian (contains Persian characters)
+  if (/[\u0600-\u06FF]/.test(name)) {
+    return name; // Already Persian
+  }
+  
+  // Try to translate
+  if (NAME_TRANSLATIONS[cleanName]) {
+    return NAME_TRANSLATIONS[cleanName];
+  }
+  
+  // If not found, return original
+  return name;
+}
+
+// ========================================
 // USER CONTEXT STORAGE
 // ========================================
 class UserContextManager {
@@ -239,6 +347,11 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   if (hasGreetedToday) {
     greetingContext = `\n\n⚠️ مهم: تو امروز قبلاً به این کاربر سلام کردی، پس دیگه سلام نکن! مستقیم وارد جواب سوالش شو.`;
   }
+
+  // Translate name to Persian if needed
+  const persianName = translateNameToPersian(userContext.name || userContext.username);
+  const displayName = persianName || userContext.name || 'هنوز مشخص نیست';
+
   const systemPrompt = `
 🌿 تو نماینده باهوش، گرم و انسانی برند «سیلانه» هستی
 
@@ -249,7 +362,7 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 
 👤 پروفایل کاربر:
 - نام کاربری: ${userContext.username}
-- نام: ${userContext.name || 'هنوز مشخص نیست'}
+- نام: ${displayName}
 - بیو: ${userContext.bio || 'هنوز مشخص نیست'}
 - لحن: ${userContext.tone || 'صمیمانه'}
 - تاریخچه گفتگو: ${conversationHistory.length} پیام
@@ -360,12 +473,13 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 
 ⚠️ نکات حیاتی:
 - هر پاسخ باید متفاوت باشد
-- از نام کاربر (${userContext.name || userContext.username}) به طور طبیعی استفاده کن
+- از نام کاربر (${displayName}) به طور طبیعی استفاده کن
 - به سوالات مشخص (سود، برندها، نحوه کار) پاسخ‌های کامل و دقیق بده
 - وقتی کسی می‌پرسه "چقدر سود داره" حتماً اعداد و درصد بگو (۲۰-۴۰٪)
 - وقتی کسی می‌پرسه "چه برندهایی دارید" همه ۵ برند رو با توضیح بگو
 - گرم، حرفه‌ای و انسانی باش
 - همیشه به فارسی پاسخ بده
+- اگر اسم کاربر انگلیسی هست و معادل فارسی داره، حتماً از نام فارسی استفاده کن
 
 🌿 Seylane AI – Always Human, Always Helpful
 ${multiMessageContext}
@@ -414,16 +528,22 @@ ${greetingContext}
     
     const parsed = JSON.parse(rawContent);
     
+    // Translate extracted name to Persian if needed
+    let extractedName = parsed.userName || null;
+    if (extractedName) {
+      extractedName = translateNameToPersian(extractedName);
+    }
+    
     return {
       message: parsed.message || "سلام 🌿",
       sendLink: parsed.sendLink || false,
       detectedTone: parsed.detectedTone || 'casual',
-      userName: parsed.userName || null,
+      userName: extractedName,
     };
   } catch (err) {
     console.error("OpenAI Error:", err.message);
     return {
-      message: `سلام ${userContext.name || userContext.username} عزیز 🌿 پیامت رو دیدم، می‌تونی یکم بیشتر بگی تا بتونم بهتر کمکت کنم؟`,
+      message: `سلام ${displayName} عزیز 🌿 پیامت رو دیدم، می‌تونی یکم بیشتر بگی تا بتونم بهتر کمکت کنم؟`,
       sendLink: false,
       detectedTone: 'casual',
       userName: null,
