@@ -937,8 +937,21 @@ async function processConversation(page, conv, messageCache, userContextManager,
       console.log(`✋ [${username}] Already greeted today - won't say سلام again`);
     }
 
-    // Only process the LAST message (not all unread messages to avoid re-processing old ones)
-    const messagesToProcess = [lastMessage];
+    // Process ALL unread user messages (not just the last one)
+    // Filter out bot responses that might be in the unread list
+    const messagesToProcess = unreadMessages && unreadMessages.length > 0 
+      ? unreadMessages.filter(msg => {
+          // Filter out messages that look like bot responses
+          const isBotMessage = msg.includes('سیلانه') || 
+                              msg.includes('luxirana.com') ||
+                              msg.includes('همکاری') ||
+                              msg.includes('افیلیت') ||
+                              msg.includes('متأسفانه') ||
+                              msg.includes('می‌تونید') ||
+                              msg.includes('خوشحال می‌شم');
+          return !isBotMessage;
+        })
+      : [lastMessage];
     
     // Generate AI response
     const response = await askGPT(messagesToProcess, userContext, conversationHistory, hasGreetedToday);
