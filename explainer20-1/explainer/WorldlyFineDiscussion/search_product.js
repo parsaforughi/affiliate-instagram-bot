@@ -47,8 +47,17 @@ function searchProduct(productName) {
         const salePrice = fields[25] || '';
         const regularPrice = fields[26] || '';
         const categories = fields[27] || '';
+        const images = fields[30] || '';
+        const productId = fields[2] || '';
         
         const price = salePrice || regularPrice || 'تماس بگیرید';
+        
+        // Extract first image URL
+        const imageUrl = images.split(',')[0].trim();
+        
+        // Create product URL
+        const cleanName = name.replace(/"/g, '').trim();
+        const productUrl = productId ? `https://luxirana.com/product/${productId}` : 'https://luxirana.com';
         
         // Detect brand
         let brand = 'سایر';
@@ -58,12 +67,15 @@ function searchProduct(productName) {
         else if (nameLower.includes('دافی') || nameLower.includes('dafi')) brand = 'Dafi';
         else if (nameLower.includes('آیس بال') || nameLower.includes('iceball')) brand = 'IceBall';
         else if (nameLower.includes('کدکس') || nameLower.includes('codex') || nameLower.includes('ناچ')) brand = 'Codex';
+        else if (nameLower.includes('پیکسل') || nameLower.includes('pixel')) brand = 'Pixel';
         
         matches.push({
-          name: name.replace(/"/g, ''),
+          name: cleanName,
           price,
           brand,
-          categories
+          categories,
+          imageUrl,
+          productUrl
         });
         
         // Limit to first 5 matches

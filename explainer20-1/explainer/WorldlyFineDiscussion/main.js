@@ -392,6 +392,10 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
         productSearchContext += `\n\n🔍 محصولات پیدا شده برای "${term}":\n`;
         results.forEach(product => {
           productSearchContext += `• ${product.name} - ${product.price} تومان (${product.brand})\n`;
+          productSearchContext += `  لینک: ${product.productUrl}\n`;
+          if (product.imageUrl) {
+            productSearchContext += `  عکس: ${product.imageUrl}\n`;
+          }
         });
         break; // Only search for first matching term
       }
@@ -553,7 +557,9 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   "responses": [
     {
       "message": "متن پاسخ به فارسی - طبیعی و انسانی",
-      "sendLink": true/false
+      "sendLink": true/false,
+      "productLink": "لینک محصول اگر درباره محصول خاص حرف زدی، در غیر این صورت null",
+      "productImages": ["لینک عکس 1", "لینک عکس 2"] یا null
     }
   ],
   "detectedTone": "formal/casual/playful/professional",
@@ -565,11 +571,15 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   "responses": [
     {
       "message": "جواب موضوع اول",
-      "sendLink": false
+      "sendLink": false,
+      "productLink": "https://luxirana.com/product/123",
+      "productImages": ["https://luxirana.com/image1.jpg"]
     },
     {
       "message": "جواب موضوع دوم",
-      "sendLink": true
+      "sendLink": true,
+      "productLink": null,
+      "productImages": null
     }
   ],
   "detectedTone": "casual",
@@ -584,6 +594,26 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 • اگر بی‌علاقه بود → مودبانه گفتگو را ببند
 • خودت را ربات معرفی نکن
 • اگر کاربر حرف غیرمرتبط زد، محترمانه جهت گفتگو را به سمت اصلی برگردان
+
+💬 قانون طلایی: سوالات Engagement (مثل فروشنده‌های حرفه‌ای!)
+⭐ همیشه آخر پیامت یه سوال engagement داشته باش که مکالمه رو ادامه‌دار کنه:
+
+نمونه سوالات برای محصولات:
+• "میخوای لینک و عکسشو بفرستم تا بیشتر با این محصول فوق العادمون آشنا بشی؟"
+• "می‌خوای عکس و لینک محصول رو برات بفرستم؟"
+• "قیمت مناسبه، نه؟ میخوای لینکش رو برات بذارم؟"
+• "نمونه‌های دیگه‌ای هم می‌خوای ببینی؟"
+• "راجع به این محصول سوال دیگه‌ای داری؟"
+
+نمونه سوالات برای همکاری:
+• "علاقه‌مندی؟ میخوام لینک ثبت‌نام رو برات بفرستم؟"
+• "آماده‌ای شروع کنی؟"
+• "می‌خوای راجع به نحوه همکاری بیشتر توضیح بدم؟"
+
+⚠️ مهم: اگر درباره محصول خاص صحبت کردی و اطلاعات لینک/عکس داری:
+  • حتماً بپرس "میخوای لینک و عکسشو بفرستم؟"
+  • در فیلد productLink و productImages آماده کن
+  • اگر کاربر "بله، آره، میخوام، بفرست" گفت، در پیام بعدی بفرست
 
 ⚠️ نکات حیاتی:
 - هر پاسخ باید متفاوت باشد
@@ -1048,11 +1078,28 @@ async function processConversation(page, conv, messageCache, userContextManager,
         await textarea.click();
         await delay(300);
         
-        // Combine message and link if needed
+        // Combine message and links if needed
         let fullMessage = resp.message;
+        
+        // Add affiliate link if requested
         if (resp.sendLink) {
           fullMessage += `\n\n${AFFILIATE_LINK}`;
           console.log(`🔗 [${username}] Including affiliate link in message ${i + 1}...`);
+        }
+        
+        // Add product link if provided
+        if (resp.productLink) {
+          fullMessage += `\n\n🔗 لینک محصول:\n${resp.productLink}`;
+          console.log(`🛍️ [${username}] Including product link in message ${i + 1}...`);
+        }
+        
+        // Add product images if provided
+        if (resp.productImages && Array.isArray(resp.productImages) && resp.productImages.length > 0) {
+          fullMessage += `\n\n📸 عکس محصول:`;
+          resp.productImages.forEach((img, idx) => {
+            fullMessage += `\n${img}`;
+          });
+          console.log(`📸 [${username}] Including ${resp.productImages.length} product image(s) in message ${i + 1}...`);
         }
         
         await textarea.type(fullMessage, { delay: 25 });
