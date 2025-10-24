@@ -3,6 +3,7 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const fetch = require("node-fetch");
 const { execSync } = require("child_process");
 const fs = require('fs');
+const { searchProduct } = require('./search_product');
 puppeteer.use(StealthPlugin());
 
 // ========================================
@@ -352,6 +353,29 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   const persianName = translateNameToPersian(userContext.name || userContext.username);
   const displayName = persianName || userContext.name || 'هنوز مشخص نیست';
 
+  // Search for products mentioned in the message
+  let productSearchContext = '';
+  const keywords = ['خمیر', 'دندان', 'کاندوم', 'دستمال', 'کرم', 'ژل', 'دهان', 'شویه', 'نخ', 'کلاژن', 'بلیچ', 'سفید', 'میسویک', 'دافی', 'کدکس', 'آمبرلا', 'کلامین', 'آیس', 'misswake', 'dafi', 'codex', 'umbrella', 'collamin', 'iceball'];
+  
+  const userMessageLower = userMessage.toLowerCase();
+  const hasProductKeyword = keywords.some(keyword => userMessageLower.includes(keyword));
+  
+  if (hasProductKeyword) {
+    // Extract potential product names from the message
+    const searchTerms = userMessage.split(/\s+/).filter(word => word.length > 3);
+    
+    for (const term of searchTerms) {
+      const results = searchProduct(term);
+      if (results.length > 0) {
+        productSearchContext += `\n\n🔍 محصولات پیدا شده برای "${term}":\n`;
+        results.forEach(product => {
+          productSearchContext += `• ${product.name} - ${product.price} تومان (${product.brand})\n`;
+        });
+        break; // Only search for first matching term
+      }
+    }
+  }
+
   const systemPrompt = `
 🌿 تو نماینده باهوش، گرم و انسانی برند «سیلانه» هستی
 
@@ -539,6 +563,7 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 🌿 Seylane AI – Always Human, Always Helpful
 ${multiMessageContext}
 ${greetingContext}
+${productSearchContext}
 `;
 
   try {
