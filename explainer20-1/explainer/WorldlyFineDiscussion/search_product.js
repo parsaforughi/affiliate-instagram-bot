@@ -56,8 +56,11 @@ function searchProduct(productName) {
         const imageUrl = images.split(',')[0].trim();
         
         // Create product URL (search link until we get slugs)
+        // Use SHORT keyword - extract first significant word
         const cleanName = name.replace(/"/g, '').trim();
-        const encodedName = encodeURIComponent(cleanName);
+        const keywords = cleanName.split(' ').filter(w => w.length > 3);
+        const shortKeyword = keywords[0] || cleanName.split(' ')[0];
+        const encodedName = encodeURIComponent(shortKeyword);
         const productUrl = `https://luxirana.com/?s=${encodedName}`;
         
         // Detect brand
