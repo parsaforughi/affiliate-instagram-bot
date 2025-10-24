@@ -83,10 +83,30 @@ class UserContextManager {
         messageHistory: [],
         firstSeen: Date.now(),
         lastSeen: Date.now(),
+        lastGreetingDate: null,
       };
     }
     this.contexts[username].lastSeen = Date.now();
     return this.contexts[username];
+  }
+
+  hasGreetedToday(username) {
+    const context = this.getContext(username);
+    if (!context.lastGreetingDate) return false;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const lastGreeting = new Date(context.lastGreetingDate);
+    lastGreeting.setHours(0, 0, 0, 0);
+    
+    return today.getTime() === lastGreeting.getTime();
+  }
+
+  markGreetedToday(username) {
+    const context = this.getContext(username);
+    context.lastGreetingDate = Date.now();
+    this.save();
   }
 
   updateContext(username, updates) {
@@ -199,7 +219,7 @@ class PerformanceMonitor {
 // ========================================
 // OPENAI DIRECT INTEGRATION
 // ========================================
-async function askGPT(userMessages, userContext, conversationHistory = []) {
+async function askGPT(userMessages, userContext, conversationHistory = [], hasGreetedToday = false) {
   // Support both single message (string) and multiple messages (array)
   const messages = Array.isArray(userMessages) ? userMessages : [userMessages];
   const userMessage = messages.length === 1 ? messages[0] : messages.join('\n');
@@ -212,6 +232,12 @@ async function askGPT(userMessages, userContext, conversationHistory = []) {
       multiMessageContext += `پیام ${idx + 1}: "${msg}"\n`;
     });
     multiMessageContext += `\nباید به همه این پیام‌ها در یک یا چند پاسخ جامع پاسخ بدی.`;
+  }
+
+  // Greeting control
+  let greetingContext = '';
+  if (hasGreetedToday) {
+    greetingContext = `\n\n⚠️ مهم: تو امروز قبلاً به این کاربر سلام کردی، پس دیگه سلام نکن! مستقیم وارد جواب سوالش شو.`;
   }
   const systemPrompt = `
 🌿 تو نماینده باهوش، گرم و انسانی برند «سیلانه» هستی
@@ -343,6 +369,7 @@ async function askGPT(userMessages, userContext, conversationHistory = []) {
 
 🌿 Seylane AI – Always Human, Always Helpful
 ${multiMessageContext}
+${greetingContext}
 `;
 
   try {
@@ -696,11 +723,17 @@ async function processConversation(page, conv, messageCache, userContextManager,
 
     const conversationHistory = userContextManager.getRecentMessages(username, 8);
 
+    // Check if already greeted today
+    const hasGreetedToday = userContextManager.hasGreetedToday(username);
+    if (hasGreetedToday) {
+      console.log(`✋ [${username}] Already greeted today - won't say سلام again`);
+    }
+
     // Use unread messages if available (multiple messages), otherwise use last message
     const messagesToProcess = (unreadMessages && unreadMessages.length > 0) ? unreadMessages : [lastMessage];
     
     // Generate AI response
-    const response = await askGPT(messagesToProcess, userContext, conversationHistory);
+    const response = await askGPT(messagesToProcess, userContext, conversationHistory, hasGreetedToday);
     
     console.log(`🤖 [${username}] Response ready`);
 
@@ -730,6 +763,12 @@ async function processConversation(page, conv, messageCache, userContextManager,
       console.log(`✅ [${username}] Response sent!`);
 
       userContextManager.addMessage(username, 'assistant', response.message);
+
+      // Mark as greeted today if this was first message of the day
+      if (!hasGreetedToday) {
+        userContextManager.markGreetedToday(username);
+        console.log(`👋 [${username}] Marked as greeted today`);
+      }
 
       await delay(1500);
 
