@@ -362,7 +362,15 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   
   if (hasProductKeyword) {
     // Extract potential product names from the message
-    const searchTerms = userMessage.split(/\s+/).filter(word => word.length > 3);
+    let searchTerms = userMessage.split(/\s+/).filter(word => word.length > 3);
+    
+    // Prioritize specific terms (e.g., "بلیچینگ" should be searched before generic "خمیر")
+    const priorityTerms = ['بلیچینگ', 'بلیچ', 'bleaching', 'کاندوم', 'کلاژن', 'دستمال'];
+    searchTerms.sort((a, b) => {
+      const aPriority = priorityTerms.some(term => a.includes(term)) ? 1 : 0;
+      const bPriority = priorityTerms.some(term => b.includes(term)) ? 1 : 0;
+      return bPriority - aPriority;
+    });
     
     for (const term of searchTerms) {
       const results = searchProduct(term);
@@ -929,8 +937,8 @@ async function processConversation(page, conv, messageCache, userContextManager,
       console.log(`✋ [${username}] Already greeted today - won't say سلام again`);
     }
 
-    // Use unread messages if available (multiple messages), otherwise use last message
-    const messagesToProcess = (unreadMessages && unreadMessages.length > 0) ? unreadMessages : [lastMessage];
+    // Only process the LAST message (not all unread messages to avoid re-processing old ones)
+    const messagesToProcess = [lastMessage];
     
     // Generate AI response
     const response = await askGPT(messagesToProcess, userContext, conversationHistory, hasGreetedToday);
