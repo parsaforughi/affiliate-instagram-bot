@@ -55,9 +55,10 @@ function searchProduct(productName) {
         // Extract first image URL
         const imageUrl = images.split(',')[0].trim();
         
-        // Create product URL
+        // Create product URL (search link until we get slugs)
         const cleanName = name.replace(/"/g, '').trim();
-        const productUrl = productId ? `https://luxirana.com/product/${productId}` : 'https://luxirana.com';
+        const encodedName = encodeURIComponent(cleanName);
+        const productUrl = `https://luxirana.com/?s=${encodedName}`;
         
         // Detect brand
         let brand = 'سایر';
