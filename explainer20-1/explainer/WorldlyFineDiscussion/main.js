@@ -949,13 +949,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
   try {
     console.log(`\n📖 [${conv.username}] Checking${conv.hasUnread ? ' (Unread ✉️)' : ''}...`);
 
-    // Skip if no unread indicator
-    if (!conv.hasUnread) {
-      console.log(`ℹ️ [${conv.username}] No new messages`);
-      return { processed: false };
-    }
-
-    // Click conversation
+    // Click conversation (check ALL conversations, not just unread ones)
     await page.evaluate((index, myUsername) => {
       const buttons = Array.from(document.querySelectorAll('div[role="button"]'));
       const conversations = buttons.filter(btn => {
