@@ -340,7 +340,21 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
     messages.forEach((msg, idx) => {
       multiMessageContext += `پیام ${idx + 1}: "${msg}"\n`;
     });
-    multiMessageContext += `\nباید به همه این پیام‌ها در یک یا چند پاسخ جامع پاسخ بدی.`;
+    multiMessageContext += `\n
+📌 قوانین پاسخ‌دهی به چند پیام:
+- اگر همه پیام‌ها درباره یک موضوع هستن (مثلاً همه درباره بلیچینگ یا همه درباره همکاری) → یک پیام جامع بده که به همه سوالات جواب بده
+- اگر موضوع‌ها متفاوت هستن (مثلاً یکی درباره محصول، یکی درباره همکاری) → در آرایه responses چند پیام جدا برگردون
+  
+مثال موضوع‌های مربوط (یک پیام):
+  پیام 1: "قیمت بلیچینگ چند؟"
+  پیام 2: "رنگش چیه؟"
+  → یک پاسخ جامع درباره بلیچینگ (قیمت و رنگ)
+
+مثال موضوع‌های متفاوت (چند پیام جدا):
+  پیام 1: "قیمت بلیچینگ چند؟"
+  پیام 2: "برای همکاری باید چیکار کنم؟"
+  → دو پاسخ جدا (یکی درباره بلیچینگ، یکی درباره همکاری)
+`;
   }
 
   // Greeting control
@@ -527,11 +541,33 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   "sendLink": false
 
 📋 فرمت خروجی (JSON):
+
+اگر فقط یک پیام داری یا همه پیام‌ها مربوط به یک موضوعن:
 {
-  "message": "متن پاسخ به فارسی - طبیعی و انسانی",
-  "sendLink": true/false,
+  "responses": [
+    {
+      "message": "متن پاسخ به فارسی - طبیعی و انسانی",
+      "sendLink": true/false
+    }
+  ],
   "detectedTone": "formal/casual/playful/professional",
   "userName": "اسم کاربر اگر توی گفتگو ذکر شد، در غیر این صورت null"
+}
+
+اگه موضوع‌ها متفاوتن، چند پیام جدا برگردون:
+{
+  "responses": [
+    {
+      "message": "جواب موضوع اول",
+      "sendLink": false
+    },
+    {
+      "message": "جواب موضوع دوم",
+      "sendLink": true
+    }
+  ],
+  "detectedTone": "casual",
+  "userName": "نام کاربر"
 }
 
 📜 قوانین رفتاری:
@@ -622,17 +658,31 @@ ${productSearchContext}
       extractedName = translateNameToPersian(extractedName);
     }
     
+    // Handle new format with responses array
+    if (parsed.responses && Array.isArray(parsed.responses)) {
+      return {
+        responses: parsed.responses, // Array of {message, sendLink}
+        detectedTone: parsed.detectedTone || 'casual',
+        userName: extractedName,
+      };
+    }
+    
+    // Fallback to old format for compatibility
     return {
-      message: parsed.message || "سلام 🌿",
-      sendLink: parsed.sendLink || false,
+      responses: [{
+        message: parsed.message || "سلام 🌿",
+        sendLink: parsed.sendLink || false
+      }],
       detectedTone: parsed.detectedTone || 'casual',
       userName: extractedName,
     };
   } catch (err) {
     console.error("OpenAI Error:", err.message);
     return {
-      message: `سلام ${displayName} عزیز 🌿 پیامت رو دیدم، می‌تونی یکم بیشتر بگی تا بتونم بهتر کمکت کنم؟`,
-      sendLink: false,
+      responses: [{
+        message: `سلام ${displayName} عزیز 🌿 پیامت رو دیدم، می‌تونی یکم بیشتر بگی تا بتونم بهتر کمکت کنم؟`,
+        sendLink: false
+      }],
       detectedTone: 'casual',
       userName: null,
     };
@@ -971,26 +1021,40 @@ async function processConversation(page, conv, messageCache, userContextManager,
       userContextManager.addMessage(username, 'user', msg);
     });
 
-    // Send reply
+    // Send reply (support multiple responses)
     const textarea = await page.$('textarea[placeholder*="Message"], textarea[aria-label*="Message"], div[contenteditable="true"]');
     if (textarea) {
-      await textarea.click();
-      await delay(300);
+      const responses = response.responses || [{ message: response.message, sendLink: response.sendLink }];
       
-      // Combine message and link into one message if link is needed
-      let fullMessage = response.message;
-      if (response.sendLink) {
-        fullMessage += `\n\n${AFFILIATE_LINK}`;
-        console.log(`🔗 [${username}] Including affiliate link in message...`);
-      }
+      console.log(`📨 [${username}] Sending ${responses.length} message(s)...`);
       
-      await textarea.type(fullMessage, { delay: 25 });
-      await delay(300);
-      
-      await page.keyboard.press("Enter");
-      console.log(`✅ [${username}] Response sent!`);
+      // Send each response as a separate message
+      for (let i = 0; i < responses.length; i++) {
+        const resp = responses[i];
+        
+        await textarea.click();
+        await delay(300);
+        
+        // Combine message and link if needed
+        let fullMessage = resp.message;
+        if (resp.sendLink) {
+          fullMessage += `\n\n${AFFILIATE_LINK}`;
+          console.log(`🔗 [${username}] Including affiliate link in message ${i + 1}...`);
+        }
+        
+        await textarea.type(fullMessage, { delay: 25 });
+        await delay(300);
+        
+        await page.keyboard.press("Enter");
+        console.log(`✅ [${username}] Message ${i + 1}/${responses.length} sent!`);
 
-      userContextManager.addMessage(username, 'assistant', fullMessage);
+        userContextManager.addMessage(username, 'assistant', fullMessage);
+        
+        // Delay between messages if sending multiple
+        if (i < responses.length - 1) {
+          await delay(2000); // 2 second delay between messages
+        }
+      }
 
       // Mark as greeted today if this was first message of the day
       if (!hasGreetedToday) {
@@ -1078,7 +1142,7 @@ async function runSelfTest(page) {
   const t1Time = Date.now() - t1Start;
   tests.push({
     name: "Greeting",
-    passed: greetingResponse.message && greetingResponse.message.length > 10,
+    passed: greetingResponse.responses && greetingResponse.responses[0].message && greetingResponse.responses[0].message.length > 10,
     responseTime: t1Time,
   });
   console.log(`   ${tests[0].passed ? '✅' : '❌'} Greeting: ${tests[0].passed ? 'Passed' : 'Failed'} (${(t1Time/1000).toFixed(2)}s)`);
@@ -1089,7 +1153,7 @@ async function runSelfTest(page) {
   const t2Time = Date.now() - t2Start;
   tests.push({
     name: "Affiliate",
-    passed: affiliateResponse.sendLink === true,
+    passed: affiliateResponse.responses && affiliateResponse.responses[0].sendLink === true,
     responseTime: t2Time,
   });
   console.log(`   ${tests[1].passed ? '✅' : '❌'} Affiliate: ${tests[1].passed ? 'Passed' : 'Failed'} (${(t2Time/1000).toFixed(2)}s)`);
