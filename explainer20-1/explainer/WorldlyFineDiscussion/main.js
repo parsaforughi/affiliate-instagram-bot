@@ -1183,7 +1183,18 @@ async function processConversation(page, conv, messageCache, userContextManager,
                               msg.includes('افیلیت') ||
                               msg.includes('متأسفانه') ||
                               msg.includes('می‌تونید') ||
-                              msg.includes('خوشحال می‌شم');
+                              msg.includes('می‌خوای') ||
+                              msg.includes('خوشحال می‌شم') ||
+                              msg.includes('بله، ما') ||
+                              msg.includes('بله!') ||
+                              msg.includes('ما ۶ برند') ||
+                              msg.includes('سود همکاری') ||
+                              msg.includes('داریم!') ||
+                              msg.includes('داریم.') ||
+                              msg.includes('داریم که') ||
+                              msg.includes('تومان') ||
+                              msg.includes('تومن') ||
+                              msg.includes('محصولات') && msg.includes('داریم');
           return !isBotMessage;
         })
       : [lastMessage];
