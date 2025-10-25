@@ -491,7 +491,13 @@ ${priorityProductContext}
 
     console.log("🤖 Sending to OpenAI...");
     
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    // Create timeout promise (30 seconds)
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('OpenAI timeout after 30s')), 30000);
+    });
+    
+    // Race between fetch and timeout
+    const fetchPromise = fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -504,6 +510,8 @@ ${priorityProductContext}
         response_format: { type: "json_object" },
       }),
     });
+    
+    const res = await Promise.race([fetchPromise, timeoutPromise]);
 
     if (!res.ok) {
       const errorText = await res.text();
@@ -543,11 +551,15 @@ ${priorityProductContext}
       userName: extractedName,
     };
   } catch (err) {
-    console.error("OpenAI Error:", err.message);
+    console.error("⚠️ OpenAI Error:", err.message);
+    
+    // If timeout or any error, send a simple fallback message
     return {
       responses: [{
-        message: `سلام ${displayName} عزیز 🌿 پیامت رو دیدم، می‌تونی یکم بیشتر بگی تا بتونم بهتر کمکت کنم؟`,
-        sendLink: false
+        message: `متوجه منظورت نشدم، میشه دوباره بهم بگی؟ 😊`,
+        sendLink: false,
+        sendProductInfo: false,
+        productLink: null
       }],
       detectedTone: 'casual',
       userName: null,
