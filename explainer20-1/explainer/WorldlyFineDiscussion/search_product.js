@@ -55,13 +55,11 @@ function searchProduct(productName) {
         // Extract first image URL
         const imageUrl = images.split(',')[0].trim();
         
-        // Create product URL (search link until we get slugs)
-        // Use SHORT keyword - extract first significant word
+        // Create DIRECT product URL using product ID
         const cleanName = name.replace(/"/g, '').trim();
-        const keywords = cleanName.split(' ').filter(w => w.length > 3);
-        const shortKeyword = keywords[0] || cleanName.split(' ')[0];
-        const encodedName = encodeURIComponent(shortKeyword);
-        const productUrl = `https://luxirana.com/?s=${encodedName}`;
+        const productUrl = productId 
+          ? `https://luxirana.com/?post_type=product&p=${productId}`
+          : `https://luxirana.com`;
         
         // Detect brand
         let brand = 'سایر';
