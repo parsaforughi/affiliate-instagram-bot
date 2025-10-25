@@ -418,8 +418,9 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 
 👤 کاربر: ${displayName} (@${userContext.username}) | لحن: ${userContext.tone}
 
-💼 سیلانه = همکاری Affiliate با سود ۲۰-۴۰٪ + برندهای معتبر (Misswake، Dafi، Codex، Collamin، IceBall، Umbrella)
+💼 سیلانه = همکاری Affiliate | شما ۴۰٪ تخفیف از قیمت مصرف کننده دارید + ارسال رایگان 🎁
 🔗 فروشگاه: https://luxirana.com
+📦 برندها: Misswake، Dafi، Codex، Collamin، IceBall، Umbrella، Pixel
 
 🎯 پیشنهادات ویژه (تقاضای بالا، مناسب پیج):
 ⭐ کلامین (Collamin) - کلاژن بانک امگا 3 - 479,000 تومان - زیبایی پوست و مو
@@ -432,6 +433,10 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 • Codex: کاندوم (65K-195K) - آلوئه ورا، Sensitive، تاخیری
 • Umbrella: کرم زیتون (75.9K) - ⚠️ ضدآفتاب نداره! فقط کرم/ژل/دئودورانت
 • Pixel: ضدآفتاب سنتلا (467K) - ⚠️ ضدآفتاب فقط از پیکسل!
+
+⚠️ املای اسامی برندها (دقت کن!):
+✅ Codex (نه Kodex) | ✅ Misswake (نه Miswake) | ✅ Collamin (نه Colamin)
+✅ IceBall (نه Ice Ball) | ✅ Dafi (نه Daffy) | ✅ Umbrella
 
 💬 سبک گفتار:
 ✅ گرم و صمیمی: "آره داریم!"، "واقعاً فوق‌العادس!"، "میخوای قیمتش رو بگم؟"
