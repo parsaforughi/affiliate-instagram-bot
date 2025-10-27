@@ -598,7 +598,27 @@ async function extractUnreadConversations(page) {
     convButtons.forEach((btn, index) => {
       const preview = btn.innerText.substring(0, 80);
       const lines = preview.split('\n').filter(l => l.trim());
-      const username = lines[0] || `user_${index}`;
+      
+      // Skip status keywords and get actual username
+      let username = '';
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (trimmedLine && 
+            trimmedLine !== 'Active' && 
+            trimmedLine !== 'Typing...' &&
+            !trimmedLine.includes('Typing') &&
+            !trimmedLine.includes('Active now') &&
+            !trimmedLine.includes('sent an attachment') &&
+            !trimmedLine.includes('Seen') &&
+            !trimmedLine.includes('·')) {
+          username = trimmedLine;
+          break;
+        }
+      }
+      
+      if (!username) {
+        username = `user_${index}`;
+      }
       
       // Check if conversation has unread indicator
       // Method 1: Check for bold text or blue dot
