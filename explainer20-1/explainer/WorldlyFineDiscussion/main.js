@@ -794,8 +794,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
         const isOutgoing = hasFlexEnd || isRightAligned || hasSeenIndicator;
         
         if (isOutgoing) {
-          lastBotMessageIndex = i;
-          break;
+          lastBotMessageIndex = i; // Keep updating to find the LAST bot message
         }
       }
 
