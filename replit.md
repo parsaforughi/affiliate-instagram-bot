@@ -5,7 +5,44 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
 
 ## Recent Changes (October 27, 2025)
 
-### 🆕 Human-Like AI Upgrade (Latest - v3.4)
+### 🆕 Arman Fix - Human-Like AI v3.5 (Latest)
+1. **Memory & Context (5+3 Messages)**:
+   - Bot now reads last 5 user messages + 3 bot replies for better context
+   - Continues conversations naturally instead of saying "متوجه نشدم"
+   - Example: "میسویک برام بگو" → bot remembers previous brand mention and elaborates
+   - "بگو دیگه" → checks conversation history to continue topic
+   
+2. **Brand Fallback Logic**:
+   - When brand mentioned but no specific product: explains the brand
+   - Example: "میسویک یکی از برندهای محبوب ماست 😍 مخصوص مراقبت از دندان و دهان. میخوای محصولاتش رو بفرستم؟"
+   - Covers all 6 brands: Misswake, Collamin, IceBall, Dafi, Umbrella, Pixel
+
+3. **Bullet-Style Formatting**:
+   - Clean line-separated bullets for brand/product lists
+   - Example format:
+     ```
+     برندهای ما 👇
+     • Collamin – مکمل‌های زیبایی
+     • Misswake – دهان و دندان
+     • IceBall – آبرسان پوست
+     ```
+
+4. **Humor & Emotional Control**:
+   - Handles rude/joking messages playfully
+   - Example: "سلام احمق" → "ای بابا 😅 ظاهراً روز سختی داشتی! ولی من پایه‌ام 😎"
+   - Never takes offense, stays professional but friendly
+
+5. **Better "Didn't Understand" Responses**:
+   - Replaced "متوجه نشدم" with natural alternatives:
+   - "میخوای منظورتو یه کم واضح‌تر بگی؟ 😊"
+   - "حدس می‌زنم منظورت [brand] بود، درسته؟"
+   
+6. **Improved Responses**:
+   - Test 1: "سلام رفیق 👋 چه خبر؟ دنبال چی هستی؟"
+   - Test 2: "برات لینک پایین گذاشتم 👇 با ۴۰٪ تخفیف ویژه می‌تونی شروع کنی 😉"
+   - More natural, confident, and emotionally engaging
+
+### 🆕 Human-Like AI Upgrade (Previous - v3.4)
 1. **Human-Like Prompt**: Replaced formal prompt with emotionally intelligent, warm, confident tone
    - Speaks like a real brand representative, not a bot
    - Natural emoji usage (😎✨) when appropriate
@@ -46,7 +83,9 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
 - **get_product_link.js**: Slug-based direct product URLs
 - **product_slugs.csv**: 562 products with direct URLs
 - **main.js**: 
-  - **Human-like system prompt** (lines 420-496): Warm, confident, emotionally intelligent
+  - **getSmartContextMessages()** (lines 244-256): Gets last 5 user + 3 bot messages for context
+  - **Brand detection logic** (lines 387-414): Detects brand mentions and provides fallback info
+  - **Enhanced system prompt** (lines 462-564): Human-like, with memory context, humor control, bullet formatting
   - Atomic response merger (lines 1050-1068)
   - Product vs affiliate link distinction in prompt
   - Context understanding rules for short responses
