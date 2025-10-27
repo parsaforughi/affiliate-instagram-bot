@@ -420,50 +420,57 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 
 💼 سیلانه = همکاری Affiliate | شما ۴۰٪ تخفیف از قیمت مصرف کننده دارید + ارسال رایگان 🎁
 🔗 فروشگاه: https://luxirana.com
-📦 برندها: Misswake، Dafi، Kodex، Collamin، IceBall، Umbrella، Pixel
+📞 پشتیبانی: 021-88746717
+
+📦 برندهای ما (فقط این ۶ برند رو معرفی کن):
+✅ Collamin (کلامین) - کلاژن و مکمل‌های زیبایی
+✅ Misswake (میسویک) - بهداشت دهان و دندان
+✅ IceBall (آیس‌بال) - مراقبت و آبرسان پوست
+✅ Dafi (دافی) - دستمال مرطوب بهداشتی
+✅ Umbrella (آمبرلا) - کرم مرطوب‌کننده و دئودورانت
+✅ Pixel (پیکسل) - ضدآفتاب
 
 🎯 پیشنهادات ویژه (تقاضای بالا، مناسب پیج):
-⭐ کلامین (Collamin) - کلاژن بانک امگا 3 - 479,000 تومان - زیبایی پوست و مو
-⭐ میسویک (Misswake) - خمیردندان بلیچینگ دانه آبی - 287,000 تومان - سفیدی ۷۴٪
-⭐ آیس‌بال (IceBall) - ژل آبرسان هیالورونیک - 498,000 تومان - لیفتینگ طبیعی
+• کلامین - کلاژن بانک امگا 3 - 479,000 تومان (قیمت مصرف‌کننده)
+• میسویک - خمیردندان بلیچینگ دانه آبی - 287,000 تومان (قیمت مصرف‌کننده)
+• آیس‌بال - ژل آبرسان هیالورونیک - 498,000 تومان (قیمت مصرف‌کننده)
 
-🛍️ نمونه محصولات برندها:
-• Misswake: خمیردندان توتال 8 (240K)، دهان‌شویه (235K)، نخ دندان (165K)
-• Dafi: دستمال مرطوب آرایش (223K)، بهداشتی (83K)، کودک (24.9K)
-• Kodex: کاندوم (65K-195K) - آلوئه ورا، Sensitive، تاخیری
-• Umbrella: کرم زیتون (75.9K) - ⚠️ ضدآفتاب نداره! فقط کرم/ژل/دئودورانت
-• Pixel: ضدآفتاب سنتلا (467K) - ⚠️ ضدآفتاب فقط از پیکسل!
+💰 محاسبه تخفیف ۴۰٪:
+وقتی کاربر پرسید "برای من چقدر در میاد؟" یا "با تخفیف چقدره؟":
+• قیمت با ۴۰٪ تخفیف = قیمت مصرف‌کننده × 0.6
+• مثال: 287,000 تومان → برای شما: 172,200 تومان (۴۰٪ تخفیف)
+• همیشه بگو: "این قیمت مصرف‌کننده است، برای شما با ۴۰٪ تخفیف: [قیمت محاسبه شده]"
 
-⚠️ املای اسامی برندها (دقت کن!):
-✅ Kodex | ✅ Misswake | ✅ Collamin | ✅ IceBall | ✅ Dafi | ✅ Umbrella
-
-💬 سبک گفتار:
-✅ گرم و صمیمی: "آره داریم!"، "واقعاً فوق‌العادس!"، "میخوای قیمتش رو بگم؟"
+💬 سبک گفتار - کوتاه و تیتروار:
+✅ جواب‌ها باید خیلی کوتاه و bullet point باشن
+✅ مثال خوب: "برندهای ما:\n• Collamin - کلاژن\n• Misswake - خمیردندان\n• IceBall - ژل آبرسان"
+❌ مثال بد: "ما برندهای مختلفی داریم که هرکدوم محصولات فوق‌العاده‌ای دارن از جمله..."
+✅ گرم و صمیمی: "آره داریم!"، "واقعاً فوق‌العادس!"
 ✅ محاوره‌ای: می‌تونی، برات، باهات، بهت
-✅ اسم کاربر رو بکار ببر: "سلام ${displayName}!"
 ❌ رسمی نباش: محترم، با احترام، خواهشمند
+
+🔗 لینک افیلیت (متن و لینک جدا):
+وقتی باید لینک افیلیت بفرستی:
+• message: "برای ثبت‌نام در سیستم افیلیت اینجا کلیک کن:"
+• sendLink: true
+• productLink: "https://affiliate.luxirana.com/account/login"
+❌ لینک رو توی message نذار! فقط توی productLink
 
 🚨 قانون طلایی - وقتی کاربر "X دارید؟" میپرسه:
 ❌ قیمت رو همون اول نگو!
-✅ بگو "آره داریم! [توضیح کوتاه] میخوای قیمتش رو بگم؟"
-✅ فقط وقتی مستقیماً قیمت بپرسه → قیمت بگو
+✅ بگو "آره داریم! میخوای قیمتش رو بگم؟"
+✅ فقط وقتی مستقیماً قیمت بپرسه → قیمت بگو (قیمت مصرف‌کننده)
 
 📋 JSON Response Format:
 {
   "responses": [{
-    "message": "متن پیام (بدون لینک!)",
+    "message": "متن پیام کوتاه و تیتروار (بدون لینک!)",
     "sendLink": false,  // فقط برای لینک افیلیت true میشه
-    "sendProductInfo": false,  // true فقط وقتی صراحتاً لینک خواست
+    "sendProductInfo": false,  // true فقط وقتی صراحتاً لینک محصول خواست
     "productLink": "https://luxirana.com/..."  // همیشه آماده کن
   }],
   "detectedTone": "casual/formal/playful/professional"
 }
-
-⚠️ sendProductInfo فقط وقتی true میشه که کاربر صریحاً بگه "لینک بفرست"، "دوباره بفرست"
-❌ کاربر "بلیچینگ دارید؟" پرسید → sendProductInfo=false (فقط بپرس "میخوای قیمتش رو بگم؟")
-✅ کاربر "لینک بفرست" گفت → sendProductInfo=true
-
-⚠️ هیچ URL/لینکی توی "message" نذار! لینک فقط توی "productLink"
 
 ⚠️ چند سوال مختلف = چند response جدا
 مثال: "لینک بفرست؟ سود چقدره؟ بلیچینگ دارید؟" → ۳ response جدا
@@ -863,68 +870,171 @@ async function processConversation(page, conv, messageCache, userContextManager,
       console.log(`✋ [${username}] Already greeted today - won't say سلام again`);
     }
 
-    // Process ONLY the last new message (ignore unreadMessages to avoid re-processing bot's own messages)
-    const messagesToProcess = [lastMessage];
-    
-    // Generate AI response
-    const response = await askGPT(messagesToProcess, userContext, conversationHistory, hasGreetedToday);
-    
-    console.log(`🤖 [${username}] Response ready`);
-
-    // Update context
-    if (response.userName && !userContext.name) {
-      userContextManager.updateContext(username, { name: response.userName });
+    // ========================================
+    // LIKE MESSAGES (for read receipt)
+    // ========================================
+    console.log(`❤️ [${username}] Liking ${unreadMessages.length} unread message(s)...`);
+    try {
+      await page.evaluate((numMessages) => {
+        const messageContainers = Array.from(document.querySelectorAll('div[role="row"]'));
+        let likedCount = 0;
+        
+        // Like the last N incoming messages (unread ones)
+        for (let i = messageContainers.length - 1; i >= 0 && likedCount < numMessages; i--) {
+          const container = messageContainers[i];
+          
+          // Check if this is an incoming message (not outgoing)
+          const isOutgoing = container.querySelector('div[style*="justify-content: flex-end"]') !== null ||
+                            container.querySelector('div[style*="flex-end"]') !== null ||
+                            container.style.justifyContent === 'flex-end';
+          
+          if (!isOutgoing) {
+            // Hover over message to show like button
+            const messageDiv = container.querySelector('div[dir="auto"]');
+            if (messageDiv) {
+              // Find the message container parent and hover
+              const hoverTarget = container.querySelector('div');
+              if (hoverTarget) {
+                const event = new MouseEvent('mouseenter', { bubbles: true, cancelable: true });
+                hoverTarget.dispatchEvent(event);
+                
+                // Small delay for UI to show like button
+                setTimeout(() => {
+                  // Find and click like button
+                  const likeButtons = Array.from(container.querySelectorAll('svg, button'));
+                  for (const btn of likeButtons) {
+                    const ariaLabel = btn.getAttribute('aria-label');
+                    if (ariaLabel && (ariaLabel.includes('Like') || ariaLabel.includes('React'))) {
+                      btn.click();
+                      likedCount++;
+                      break;
+                    }
+                  }
+                }, 100);
+              }
+            }
+          }
+        }
+        
+        return likedCount;
+      }, unreadMessages.length);
+      
+      await delay(1000); // Wait for likes to register
+      console.log(`✅ [${username}] Messages liked`);
+    } catch (likeErr) {
+      console.log(`⚠️ [${username}] Could not like messages: ${likeErr.message}`);
     }
-    if (response.detectedTone) {
-      userContextManager.updateContext(username, { tone: response.detectedTone });
+    
+    // ========================================
+    // PROCESS EACH MESSAGE SEPARATELY
+    // ========================================
+    // Process ALL unread messages individually (or just the last one if no unread tracking)
+    const messagesToProcess = unreadMessages.length > 0 ? unreadMessages : [lastMessage];
+    
+    console.log(`📝 [${username}] Processing ${messagesToProcess.length} message(s) separately...`);
+    
+    // Generate AI responses for EACH message separately
+    const allResponses = [];
+    for (let i = 0; i < messagesToProcess.length; i++) {
+      const msg = messagesToProcess[i];
+      console.log(`🤖 [${username}] Generating response for message ${i + 1}/${messagesToProcess.length}...`);
+      
+      const response = await askGPT([msg], userContext, conversationHistory, hasGreetedToday && i > 0);
+      allResponses.push(response);
+      
+      // Update conversation history after each response
+      conversationHistory.push({ role: 'user', content: msg });
+      if (response.responses && response.responses[0]) {
+        conversationHistory.push({ role: 'assistant', content: response.responses[0].message });
+      }
+    }
+    
+    console.log(`🤖 [${username}] All ${allResponses.length} responses ready`);
+
+    // Update context from last response
+    const lastResponse = allResponses[allResponses.length - 1];
+    if (lastResponse.userName && !userContext.name) {
+      userContextManager.updateContext(username, { name: lastResponse.userName });
+    }
+    if (lastResponse.detectedTone) {
+      userContextManager.updateContext(username, { tone: lastResponse.detectedTone });
     }
 
-    // Save all unread messages to context
+    // Save all messages to context
     messagesToProcess.forEach(msg => {
       userContextManager.addMessage(username, 'user', msg);
     });
 
-    // Send reply (support multiple responses)
+    // Send replies - flatten all responses from all messages
     const textarea = await page.$('textarea[placeholder*="Message"], textarea[aria-label*="Message"], div[contenteditable="true"]');
     if (textarea) {
-      const responses = response.responses || [{ message: response.message, sendLink: response.sendLink }];
+      // Flatten responses from all message responses
+      const allFlattenedResponses = [];
+      allResponses.forEach(resp => {
+        if (resp.responses && Array.isArray(resp.responses)) {
+          allFlattenedResponses.push(...resp.responses);
+        } else if (resp.message) {
+          allFlattenedResponses.push({ message: resp.message, sendLink: resp.sendLink });
+        }
+      });
       
-      console.log(`📨 [${username}] Sending ${responses.length} message(s)...`);
+      console.log(`📨 [${username}] Sending ${allFlattenedResponses.length} message(s) total...`);
       
       // Send each response as a separate message
-      for (let i = 0; i < responses.length; i++) {
-        const resp = responses[i];
+      for (let i = 0; i < allFlattenedResponses.length; i++) {
+        const resp = allFlattenedResponses[i];
         
         await textarea.click();
         await delay(300);
         
-        // Combine message and links if needed
+        // Message text only (NO links in message text)
         let fullMessage = resp.message;
         
-        // Add affiliate link if requested (همکاری)
+        // Add link SEPARATELY if needed
         if (resp.sendLink) {
-          fullMessage += `\n\n${AFFILIATE_LINK}`;
-          console.log(`🔗 [${username}] Including affiliate link in message ${i + 1}...`);
+          // Send message first
+          await textarea.type(fullMessage, { delay: 25 });
+          await delay(300);
+          await page.keyboard.press("Enter");
+          console.log(`✅ [${username}] Message ${i + 1}/${allFlattenedResponses.length} sent!`);
+          
+          await delay(1000);
+          
+          // Send affiliate link separately
+          await textarea.click();
+          await delay(300);
+          await textarea.type(AFFILIATE_LINK, { delay: 25 });
+          await delay(300);
+          await page.keyboard.press("Enter");
+          console.log(`🔗 [${username}] Affiliate link sent separately`);
+        } else if (resp.sendProductInfo === true && resp.productLink) {
+          // Send message first
+          await textarea.type(fullMessage, { delay: 25 });
+          await delay(300);
+          await page.keyboard.press("Enter");
+          console.log(`✅ [${username}] Message ${i + 1}/${allFlattenedResponses.length} sent!`);
+          
+          await delay(1000);
+          
+          // Send product link separately
+          await textarea.click();
+          await delay(300);
+          await textarea.type(resp.productLink, { delay: 25 });
+          await delay(300);
+          await page.keyboard.press("Enter");
+          console.log(`🛍️ [${username}] Product link sent separately`);
+        } else {
+          // Just send the message
+          await textarea.type(fullMessage, { delay: 25 });
+          await delay(300);
+          await page.keyboard.press("Enter");
+          console.log(`✅ [${username}] Message ${i + 1}/${allFlattenedResponses.length} sent!`);
         }
-        
-        // Add product link ONLY if sendProductInfo is true
-        if (resp.sendProductInfo === true && resp.productLink) {
-          fullMessage += `\n\n${resp.productLink}`;
-          console.log(`🛍️ [${username}] Including product link in message ${i + 1}...`);
-        } else if (resp.productLink) {
-          console.log(`ℹ️ [${username}] Product link prepared but not sent (sendProductInfo=${resp.sendProductInfo})`);
-        }
-        
-        await textarea.type(fullMessage, { delay: 25 });
-        await delay(300);
-        
-        await page.keyboard.press("Enter");
-        console.log(`✅ [${username}] Message ${i + 1}/${responses.length} sent!`);
 
         userContextManager.addMessage(username, 'assistant', fullMessage);
         
         // Delay between messages if sending multiple
-        if (i < responses.length - 1) {
+        if (i < allFlattenedResponses.length - 1) {
           await delay(2000); // 2 second delay between messages
         }
       }

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { getProductLink } = require('./get_product_link');
 
 // Search for a product by name
 function searchProduct(productName) {
@@ -55,11 +56,14 @@ function searchProduct(productName) {
         // Extract first image URL
         const imageUrl = images.split(',')[0].trim();
         
-        // Create DIRECT product URL using product ID
+        // Create DIRECT product URL using slug (preferred) or product ID (fallback)
         const cleanName = name.replace(/"/g, '').trim();
-        const productUrl = productId 
-          ? `https://luxirana.com/?post_type=product&p=${productId}`
-          : `https://luxirana.com`;
+        let productUrl = getProductLink(cleanName); // Try slug-based URL first
+        
+        // Fallback to product ID URL if slug not found
+        if (productUrl === 'https://luxirana.com' && productId) {
+          productUrl = `https://luxirana.com/?post_type=product&p=${productId}`;
+        }
         
         // Detect brand
         let brand = 'سایر';
@@ -68,7 +72,7 @@ function searchProduct(productName) {
         else if (nameLower.includes('آمبرلا') || nameLower.includes('umbrella')) brand = 'Umbrella';
         else if (nameLower.includes('دافی') || nameLower.includes('dafi')) brand = 'Dafi';
         else if (nameLower.includes('آیس بال') || nameLower.includes('iceball')) brand = 'IceBall';
-        else if (nameLower.includes('کدکس') || nameLower.includes('codex') || nameLower.includes('ناچ')) brand = 'Codex';
+        else if (nameLower.includes('کدکس') || nameLower.includes('kodex') || nameLower.includes('ناچ')) brand = 'Kodex';
         else if (nameLower.includes('پیکسل') || nameLower.includes('pixel')) brand = 'Pixel';
         
         matches.push({
