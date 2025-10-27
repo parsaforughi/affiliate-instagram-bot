@@ -779,7 +779,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
         }
       }
 
-      // Second pass: collect all user messages after last bot message
+      // Second pass: collect ONLY user messages that came AFTER the last bot message
       for (let i = messageContainers.length - 1; i >= 0; i--) {
         const container = messageContainers[i];
         const messageDiv = container.querySelector('div[dir="auto"]');
@@ -824,7 +824,10 @@ async function processConversation(page, conv, messageCache, userContextManager,
           // Check if message is from today OR if no timestamp (assume recent)
           const isToday = !messageDate || (messageDate >= todayStart);
           
-          if (!lastIncomingMessage && isToday) {
+          // CRITICAL: Only consider messages AFTER the last bot message
+          const isAfterBotMessage = lastBotMessageIndex === -1 || i > lastBotMessageIndex;
+          
+          if (!lastIncomingMessage && isToday && isAfterBotMessage) {
             lastIncomingMessage = messageText;
             lastIncomingMessageId = `${username}_${messageText.substring(0, 50)}_${i}`;
             messageTimestamp = messageDate || new Date();
@@ -835,7 +838,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
           }
 
           // Collect unread messages (after last bot message)
-          if (i > lastBotMessageIndex && isToday) {
+          if (isAfterBotMessage && isToday) {
             unreadMessages.unshift(messageText);
           }
         }
@@ -894,13 +897,24 @@ async function processConversation(page, conv, messageCache, userContextManager,
       console.log(`🕒 Message time: ${new Date(messageTimestamp).toLocaleString('en-US')}`);
     }
 
-    // Check if this is a NEW message
+    // Check if this is a NEW message (critical for preventing self-replies)
     if (!messageCache.isNewMessage(conversationId, lastMessageId)) {
       console.log(`ℹ️ [${username}] Already responded`);
       return { processed: false };
     }
 
     console.log(`💬 [${username}] New message detected!`);
+    
+    // CRITICAL SAFETY CHECK: Never respond to our own messages
+    // Check if the last message matches any of our recent responses
+    const recentBotMessages = userContextManager.getRecentMessages(username, 5)
+      .filter(m => m.role === 'assistant')
+      .map(m => m.content);
+    
+    if (recentBotMessages.some(botMsg => botMsg.includes(lastMessage) || lastMessage.includes(botMsg))) {
+      console.log(`⚠️ [${username}] Last message matches our own response - skipping to prevent self-reply loop`);
+      return { processed: false };
+    }
 
     // Get user context
     const userContext = userContextManager.getContext(username);
@@ -972,14 +986,14 @@ async function processConversation(page, conv, messageCache, userContextManager,
     }
     
     // ========================================
-    // PROCESS EACH MESSAGE SEPARATELY
+    // PROCESS USER MESSAGES (AFTER LAST BOT MESSAGE)
     // ========================================
-    // Process ALL unread messages individually (or just the last one if no unread tracking)
+    // Process unread messages that came AFTER our last response
     const messagesToProcess = unreadMessages.length > 0 ? unreadMessages : [lastMessage];
     
-    console.log(`📝 [${username}] Processing ${messagesToProcess.length} message(s) separately...`);
+    console.log(`📝 [${username}] Processing ${messagesToProcess.length} message(s) (only messages after bot's last reply)...`);
     
-    // Generate AI responses for EACH message separately
+    // Generate AI responses for each message
     const allResponses = [];
     for (let i = 0; i < messagesToProcess.length; i++) {
       const msg = messagesToProcess[i];
@@ -1006,7 +1020,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
       userContextManager.updateContext(username, { tone: lastResponse.detectedTone });
     }
 
-    // Save all messages to context
+    // Save all processed messages to context
     messagesToProcess.forEach(msg => {
       userContextManager.addMessage(username, 'user', msg);
     });
