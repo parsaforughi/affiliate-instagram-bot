@@ -727,8 +727,25 @@ async function processConversation(page, conv, messageCache, userContextManager,
       let messageTimestamp = null;
       let lastBotMessageIndex = -1;
 
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
+      // Calculate Tehran timezone (UTC+3:30) midnight correctly
+      const now = new Date();
+      const tehranOffsetMinutes = 3.5 * 60; // Tehran is UTC+3:30
+      const localOffsetMinutes = now.getTimezoneOffset(); // Local offset from UTC (negative for ahead)
+      const offsetDiff = tehranOffsetMinutes + localOffsetMinutes; // Total difference
+      
+      // Create Tehran time
+      const tehranTime = new Date(now.getTime() + (offsetDiff * 60 * 1000));
+      
+      // Set to midnight in Tehran
+      const todayStart = new Date(Date.UTC(
+        tehranTime.getUTCFullYear(),
+        tehranTime.getUTCMonth(),
+        tehranTime.getUTCDate(),
+        0, 0, 0, 0
+      ));
+      
+      // Adjust back to get the actual UTC timestamp of Tehran midnight
+      todayStart.setTime(todayStart.getTime() - (tehranOffsetMinutes * 60 * 1000));
 
       // First pass: find the last bot message
       for (let i = messageContainers.length - 1; i >= 0; i--) {
@@ -737,9 +754,24 @@ async function processConversation(page, conv, messageCache, userContextManager,
         
         if (!messageDiv) continue;
         
-        const isOutgoing = container.querySelector('div[style*="justify-content: flex-end"]') !== null ||
+        // Multiple methods to detect outgoing messages
+        const parentDiv = container.querySelector('div[class*="x"]');
+        const hasFlexEnd = container.querySelector('div[style*="justify-content: flex-end"]') !== null ||
                           container.querySelector('div[style*="flex-end"]') !== null ||
                           container.style.justifyContent === 'flex-end';
+        
+        // Check if parent container is aligned to the right (common for sent messages)
+        const parentStyle = parentDiv ? window.getComputedStyle(parentDiv) : null;
+        const isRightAligned = parentStyle && (
+          parentStyle.justifyContent === 'flex-end' ||
+          parentStyle.alignItems === 'flex-end' ||
+          parentStyle.textAlign === 'right'
+        );
+        
+        // Check for "seen" indicator (only on sent messages)
+        const hasSeenIndicator = container.querySelector('img[alt*="Seen"]') !== null;
+        
+        const isOutgoing = hasFlexEnd || isRightAligned || hasSeenIndicator;
         
         if (isOutgoing) {
           lastBotMessageIndex = i;
@@ -758,9 +790,23 @@ async function processConversation(page, conv, messageCache, userContextManager,
         if (!messageText || messageText.length === 0 || messageText.length > 500) continue;
         
         // Better detection: outgoing messages are right-aligned
-        const isOutgoing = container.querySelector('div[style*="justify-content: flex-end"]') !== null ||
+        const parentDiv = container.querySelector('div[class*="x"]');
+        const hasFlexEnd = container.querySelector('div[style*="justify-content: flex-end"]') !== null ||
                           container.querySelector('div[style*="flex-end"]') !== null ||
                           container.style.justifyContent === 'flex-end';
+        
+        // Check if parent container is aligned to the right
+        const parentStyle = parentDiv ? window.getComputedStyle(parentDiv) : null;
+        const isRightAligned = parentStyle && (
+          parentStyle.justifyContent === 'flex-end' ||
+          parentStyle.alignItems === 'flex-end' ||
+          parentStyle.textAlign === 'right'
+        );
+        
+        // Check for "seen" indicator
+        const hasSeenIndicator = container.querySelector('img[alt*="Seen"]') !== null;
+        
+        const isOutgoing = hasFlexEnd || isRightAligned || hasSeenIndicator;
         
         // ONLY process incoming messages (not our own)
         if (!isOutgoing) {
