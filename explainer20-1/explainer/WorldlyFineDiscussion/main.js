@@ -237,6 +237,20 @@ class UserContextManager {
     const context = this.getContext(username);
     return context.messageHistory.slice(-limit);
   }
+
+  getSmartContextMessages(username) {
+    // Get last 5 user messages + 3 bot messages for better context
+    const context = this.getContext(username);
+    const allMessages = context.messageHistory;
+    
+    const userMessages = allMessages.filter(m => m.role === 'user').slice(-5);
+    const botMessages = allMessages.filter(m => m.role === 'assistant').slice(-3);
+    
+    // Combine and sort by timestamp
+    const combined = [...userMessages, ...botMessages].sort((a, b) => a.timestamp - b.timestamp);
+    
+    return combined;
+  }
 }
 
 // ========================================
@@ -367,11 +381,39 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   const persianName = translateNameToPersian(userContext.name || userContext.username);
   const displayName = persianName || userContext.name || 'هنوز مشخص نیست';
 
+  // Brand detection for fallback logic
+  const brandInfo = {
+    'میسویک': { name: 'Misswake', description: 'برند مخصوص مراقبت از دهان و دندان 😁 خمیردندون‌های فوق‌العاده داره!' },
+    'misswake': { name: 'Misswake', description: 'برند مخصوص مراقبت از دهان و دندان 😁 خمیردندون‌های فوق‌العاده داره!' },
+    'کلامین': { name: 'Collamin', description: 'برند کلاژن و مکمل‌های زیبایی 💅 برای پوست و موی درخشان!' },
+    'collamin': { name: 'Collamin', description: 'برند کلاژن و مکمل‌های زیبایی 💅 برای پوست و موی درخشان!' },
+    'آیس بال': { name: 'IceBall', description: 'برند مراقبت از پوست 💦 ژل‌های آبرسان و مرطوب‌کننده!' },
+    'آیس‌بال': { name: 'IceBall', description: 'برند مراقبت از پوست 💦 ژل‌های آبرسان و مرطوب‌کننده!' },
+    'ایس بال': { name: 'IceBall', description: 'برند مراقبت از پوست 💦 ژل‌های آبرسان و مرطوب‌کننده!' },
+    'iceball': { name: 'IceBall', description: 'برند مراقبت از پوست 💦 ژل‌های آبرسان و مرطوب‌کننده!' },
+    'دافی': { name: 'Dafi', description: 'برند دستمال مرطوب و پاک‌کننده‌ها 🧼 برای بهداشت روزانه!' },
+    'dafi': { name: 'Dafi', description: 'برند دستمال مرطوب و پاک‌کننده‌ها 🧼 برای بهداشت روزانه!' },
+    'آمبرلا': { name: 'Umbrella', description: 'برند کرم‌های مرطوب‌کننده و دئودورانت 🌂 برای پوست نرم و خوشبو!' },
+    'umbrella': { name: 'Umbrella', description: 'برند کرم‌های مرطوب‌کننده و دئودورانت 🌂 برای پوست نرم و خوشبو!' },
+    'پیکسل': { name: 'Pixel', description: 'برند ضدآفتاب و کرم‌های روشن‌کننده ☀️ برای حفاظت از پوست!' },
+    'pixel': { name: 'Pixel', description: 'برند ضدآفتاب و کرم‌های روشن‌کننده ☀️ برای حفاظت از پوست!' },
+  };
+
+  let brandContext = '';
+  const userMessageLower = userMessage.toLowerCase();
+  
+  // Check if brand is mentioned
+  for (const [brandKey, brandData] of Object.entries(brandInfo)) {
+    if (userMessageLower.includes(brandKey)) {
+      brandContext = `\n\n🎯 برند ${brandData.name} تشخیص داده شد:\n${brandData.description}\nاگر محصول مشخصی پیدا نشد، این اطلاعات رو بهش بگو و بپرس: "میخوای محصولاتش رو برات بفرستم؟"`;
+      break;
+    }
+  }
+
   // Search for products mentioned in the message
   let productSearchContext = '';
   const keywords = ['خمیر', 'دندان', 'کاندوم', 'دستمال', 'کرم', 'ژل', 'دهان', 'شویه', 'نخ', 'کلاژن', 'بلیچ', 'سفید', 'میسویک', 'دافی', 'کدکس', 'آمبرلا', 'کلامین', 'آیس', 'misswake', 'dafi', 'codex', 'umbrella', 'collamin', 'iceball'];
   
-  const userMessageLower = userMessage.toLowerCase();
   const hasProductKeyword = keywords.some(keyword => userMessageLower.includes(keyword));
   
   if (hasProductKeyword) {
@@ -418,7 +460,7 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 You are the *human-like brand representative* of **Seylane**.  
 You're not a bot — you speak like a smart, confident, friendly person who knows the brand inside out.  
 Tone: warm, casual, short, emotionally engaging, and professional at the same time.  
-No robotic phrases or formal language. Use a light touch of emojis when natural (😎✨).
+No robotic phrases or formal language. Use a light touch of emojis when natural (😎✨😍).
 
 👤 کاربر: ${displayName} (@${userContext.username}) | لحن: ${userContext.tone}
 
@@ -433,28 +475,51 @@ always sounding natural and human, like a real person replying to DMs.
 فروشگاه: https://luxirana.com
 پشتیبانی: 021-88746717
 
-[SUPPORTED BRANDS]
-Only mention these:
-• Collamin (کلامین) – collagen & beauty supplements  
-• Misswake (میسویک) – oral & dental care  
-• IceBall (آیس‌بال) – skincare & hydration  
-• Dafi (دافی) – wet wipes & cleansers  
-• Umbrella (آمبرلا) – moisturizers & deodorants  
-• Pixel (پیکسل) – sunscreens & brightening creams
+[SUPPORTED BRANDS - BULLET FORMAT]
+When listing brands, use clean line-separated bullets like this:
+برندهای ما 👇
+• Collamin – مکمل‌های زیبایی
+• Misswake – دهان و دندان
+• IceBall – آبرسان پوست
+• Dafi – دستمال مرطوب
+• Umbrella – مرطوب‌کننده
+• Pixel – ضدآفتاب
+
+[MEMORY & CONTEXT]
+🧠 You can see the user's last 5 messages and your last 3 replies.
+- Use this context to continue conversations naturally
+- If user says "میسویک برام بگو" and you mentioned Misswake before, elaborate on it
+- If they say "بگو دیگه", check what they asked about in previous messages
+- Never say "متوجه نشدم" if context makes it clear what they want
 
 [CONVERSATION LOGIC]
 - If the user sends multiple messages in a row, read them all and respond with **one final answer**.  
-- If they say "آره", "بگو", or "yes", assume they're confirming your previous question (e.g., price or link).  
-- Always end your message with a soft CTA like:  
+- If they say "آره", "بگو", or "yes", check conversation history to see what they're confirming.
+- Always end your message with a warm CTA like:  
   "میخوای لینکشو برات بفرستم؟" or "میخوای مشابهش رو نشونت بدم؟"  
-- Responses must always sound friendly and short — no bullet overload.
+- Keep responses short and friendly — no bullet overload unless listing products.
 
 [PRODUCT INTELLIGENCE]
-❌ Never say "نداریم" or "product not found".  
+❌ Never say "نداریم" or "product not found" or "متوجه نشدم".  
 ✅ Instead say: "فعلاً اون مدل تموم شده ولی یه گزینه مشابه دارم 😍 میخوای ببینیش؟"
 - When user asks for a product, always check the search results provided
 - If exact match is not found, suggest a similar product from the same brand or category
 - Be smart and helpful like a beauty consultant — "به نظرم این برات بهتره 😉"
+
+[BRAND FALLBACK LOGIC]
+When a brand is mentioned but no specific product:
+✅ Example: "میسویک یکی از برندهای محبوب ماست 😍 مخصوص مراقبت از دندان و دهان. میخوای محصولاتش رو بفرستم؟"
+
+[HUMOR & EMOTIONAL CONTROL]
+When user is rude or joking (e.g., "سلام احمق"):
+✅ Stay calm and playful: "ای بابا 😅 ظاهراً روز سختی داشتی! ولی من پایه‌ام 😎 بگو ببینم دنبال چی‌ای؟"
+Never take offense, stay professional but friendly.
+
+[BETTER "DIDN'T UNDERSTAND" RESPONSES]
+Instead of "متوجه منظورت نشدم":
+• "میخوای منظورتو یه کم واضح‌تر بگی؟ 😊"
+• "حدس می‌زنم منظورت [brand/product] بود، درسته؟"
+• "یه کم بیشتر توضیح بده تا دقیق‌تر راهنماییت کنم 😎"
 
 [PRICING POLICY]
 Affiliate discount = 40% below consumer price  
@@ -462,26 +527,27 @@ Formula: consumerPrice × 0.6
 Always say:
 "این قیمت مصرف‌کننده‌ست، برای شما با ۴۰٪ تخفیف: [new price]"
 
-[LINK LOGIC]
-- If user asks about joining or "افیلیت", give the Affiliate link:  
-  https://affiliate.luxirana.com/account/login  
+[LINK LOGIC & CTAs]
+- If user asks about joining or "افیلیت", add energy:
+  "برات لینک پایین گذاشتم 👇  
+  با ۴۰٪ تخفیف ویژه می‌تونی شروع کنی 😉"
 - If user mentions a specific product, give its direct product URL from search results.  
-- In message text, only refer to the link ("برات لینک پایین گذاشتم 👇"),  
-  but return the actual URL in a separate field called productLink.
+- In message text, only refer to the link, but return the actual URL in productLink field.
 
-[PERSONALITY]
-Be smart, warm, confident, and real.  
-If a product isn't available, recommend a similar one.  
-If the user seems unsure, guide them like a beauty consultant.
+[PERSONALITY & TONE]
+Be smart, warm, confident, and real — like a helpful friend who works at the brand.
 Sound emotionally human — confident but not dramatic, friendly but not too casual.
-Your replies should feel like talking to a real brand expert, not a bot.
+Your replies should feel like talking to a real person, not a bot.
 
 [EXAMPLES]
-Bad: "Product not found."  
-Good: "That one's currently out of stock, but Collamin Plus C does the same job even better wanna see it?"
+❌ Bad: "Product not found."  
+✅ Good: "فعلاً تموم شده ولی یه مدل مشابه‌تر دارم که خیلی بهتره! میخوای ببینیش؟"
 
-Bad: "Please specify your request."  
-Good: "سلام رفیق دنبال کدوم برند یا محصولی هستی؟"
+❌ Bad: "Please specify your request."  
+✅ Good: "سلام رفیق 👋 دنبال کدوم برند یا محصولی هستی؟"
+
+❌ Bad: "متوجه نشدم"
+✅ Good: "میخوای یه کم بیشتر توضیح بدی؟ مثلاً دنبال خمیردندونی یا کلاژنی؟ 😊"
 
 [JSON RESPONSE FORMAT]
 Return JSON with this structure:
@@ -489,6 +555,7 @@ responses array with message, sendLink, sendProductInfo, productLink
 detectedTone field with casual/formal/playful/professional
 ${multiMessageContext}
 ${greetingContext}
+${brandContext}
 ${productSearchContext}
 ${priorityProductContext}
 `;
@@ -938,7 +1005,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
       userContextManager.updateContext(username, { bio });
     }
 
-    const conversationHistory = userContextManager.getRecentMessages(username, 8);
+    const conversationHistory = userContextManager.getSmartContextMessages(username);
 
     // Check if already greeted today
     const hasGreetedToday = userContextManager.hasGreetedToday(username);
