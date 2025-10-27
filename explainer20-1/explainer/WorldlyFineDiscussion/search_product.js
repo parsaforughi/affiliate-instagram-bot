@@ -1,50 +1,76 @@
 const fs = require('fs');
 const { getProductLink } = require('./get_product_link');
 
+// Normalize numbers - convert English to Persian
+function normalizeNumbers(text) {
+  const englishToPersian = {'0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴', '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹'};
+  return text.replace(/[0-9]/g, (d) => englishToPersian[d]);
+}
+
 // Search for a product by name
 function searchProduct(productName) {
   try {
     const csvContent = fs.readFileSync('products.csv', 'utf-8');
-    const lines = csvContent.split('\n');
     
-    // Parse CSV with proper handling of quoted fields
-    function parseCSVLine(line) {
-      const result = [];
-      let current = '';
+    // Parse CSV properly - handle multi-line quoted fields
+    function parseCSV(content) {
+      const rows = [];
+      let currentRow = [];
+      let currentField = '';
       let inQuotes = false;
       
-      for (let i = 0; i < line.length; i++) {
-        const char = line[i];
+      for (let i = 0; i < content.length; i++) {
+        const char = content[i];
+        const nextChar = content[i + 1];
         
         if (char === '"') {
-          inQuotes = !inQuotes;
+          if (inQuotes && nextChar === '"') {
+            currentField += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
         } else if (char === ',' && !inQuotes) {
-          result.push(current.trim());
-          current = '';
+          currentRow.push(currentField.trim());
+          currentField = '';
+        } else if (char === '\n' && !inQuotes) {
+          currentRow.push(currentField.trim());
+          if (currentRow.length > 0 && currentRow.some(f => f.length > 0)) {
+            rows.push(currentRow);
+          }
+          currentRow = [];
+          currentField = '';
         } else {
-          current += char;
+          currentField += char;
         }
       }
       
-      result.push(current.trim());
-      return result;
+      if (currentField || currentRow.length > 0) {
+        currentRow.push(currentField.trim());
+        if (currentRow.some(f => f.length > 0)) {
+          rows.push(currentRow);
+        }
+      }
+      
+      return rows;
     }
     
-    const searchLower = productName.toLowerCase();
+    const rows = parseCSV(csvContent);
+    
+    // Normalize search query (convert English numbers to Persian)
+    const searchNormalized = normalizeNumbers(productName.toLowerCase());
     const matches = [];
     
-    // Search through all products
-    for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue;
-      
-      const fields = parseCSVLine(lines[i]);
+    // Search through all products (skip header row)
+    for (let i = 1; i < rows.length; i++) {
+      const fields = rows[i];
       if (fields.length < 28) continue;
       
       const name = fields[4] || '';
-      const nameLower = name.toLowerCase();
+      const nameLower = normalizeNumbers(name.toLowerCase());
       
       // Check if product name matches search
-      if (nameLower.includes(searchLower) || searchLower.includes(nameLower.substring(0, 20))) {
+      if (nameLower.includes(searchNormalized) || searchNormalized.includes(nameLower.substring(0, 20))) {
         const salePrice = fields[25] || '';
         const regularPrice = fields[26] || '';
         const categories = fields[27] || '';

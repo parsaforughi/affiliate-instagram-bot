@@ -449,12 +449,28 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 ✅ محاوره‌ای: می‌تونی، برات، باهات، بهت
 ❌ رسمی نباش: محترم، با احترام، خواهشمند
 
-🔗 لینک افیلیت (متن و لینک جدا):
-وقتی باید لینک افیلیت بفرستی:
+🧠 درک context - خیلی مهم!
+• اگه قبلاً پرسیدی "میخوای قیمتش رو بگم؟" و user گفت "بگو"، "اره"، "باشه" → قیمت رو بگو!
+• اگه قبلاً گفتی "میخوای لینک بفرستم؟" و user گفت "بفرست" → لینک بفرست!
+• همیشه به conversation history نگاه کن و ببین قبلاً چی پرسیدی
+❌ اگه user فقط گفت "بگو دیگه" یا "اره"، فرض نکن متوجه نشدی! context قبلی رو بخون!
+
+🔗 تشخیص نوع لینک - خیلی مهم!
+1️⃣ لینک محصول (وقتی کاربر اسم محصول مشخص می‌خواد):
+• "لینک خمیردندان توتال ۸ بفرست" → sendProductInfo: true
+• "لینک کلامین بده" → sendProductInfo: true
+• productLink باید از search result برداری (luxirana.com/product/...)
+• message: "لینکش اینه:" یا فقط یه جمله ساده
+
+2️⃣ لینک افیلیت (وقتی می‌خواد ثبت‌نام کنه):
+• "چطور همکاری کنم؟" → sendLink: true
+• "لینک افیلیت بده" → sendLink: true
+• "ثبت‌نام کجا؟" → sendLink: true
 • message: "برای ثبت‌نام در سیستم افیلیت اینجا کلیک کن:"
-• sendLink: true
 • productLink: "https://affiliate.luxirana.com/account/login"
+
 ❌ لینک رو توی message نذار! فقط توی productLink
+❌ اگه محصول مشخص خواست، لینک افیلیت نفرست!
 
 🚨 قانون طلایی - وقتی کاربر "X دارید؟" میپرسه:
 ❌ قیمت رو همون اول نگو!
@@ -472,8 +488,10 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   "detectedTone": "casual/formal/playful/professional"
 }
 
-⚠️ چند سوال مختلف = چند response جدا
-مثال: "لینک بفرست؟ سود چقدره؟ بلیچینگ دارید؟" → ۳ response جدا
+⚠️ همیشه فقط یک response بفرست!
+• حتی اگه چند سوال داره، جواب همه رو در **یک message** بده
+• مثال: "لینک بفرست؟ سود چقدره؟" → یک پیام: "سود ۴۰٪ هست! میخوای لینک بفرستم؟"
+❌ چند response جدا نفرست - همه چیز رو در یک message بگو
 
 💬 همیشه آخر پیام engagement داشته باش:
 • "میخوای قیمتش رو بگم؟"
@@ -1025,6 +1043,41 @@ async function processConversation(page, conv, messageCache, userContextManager,
           allFlattenedResponses.push({ message: resp.message, sendLink: resp.sendLink });
         }
       });
+      
+      // ENFORCE ATOMIC RESPONSE: Merge multiple responses into one
+      if (allFlattenedResponses.length > 1) {
+        console.log(`⚠️ [${username}] AI returned ${allFlattenedResponses.length} responses - merging into one atomic message`);
+        
+        // Merge all messages into one
+        const mergedMessage = allFlattenedResponses.map(r => r.message).join('\n\n');
+        
+        // Determine link priority: affiliate link > product link
+        const hasAffiliateLink = allFlattenedResponses.some(r => r.sendLink);
+        const hasProductLink = allFlattenedResponses.some(r => r.sendProductInfo);
+        
+        let finalLink = '';
+        let finalSendLink = false;
+        let finalSendProductInfo = false;
+        
+        if (hasAffiliateLink) {
+          // Affiliate link takes priority
+          finalSendLink = true;
+          finalLink = 'https://affiliate.luxirana.com/account/login';
+        } else if (hasProductLink) {
+          // Product link only if no affiliate link
+          finalSendProductInfo = true;
+          finalLink = allFlattenedResponses.find(r => r.sendProductInfo && r.productLink)?.productLink || '';
+        }
+        
+        // Replace with single merged response
+        allFlattenedResponses.length = 0;
+        allFlattenedResponses.push({
+          message: mergedMessage,
+          sendLink: finalSendLink,
+          sendProductInfo: finalSendProductInfo,
+          productLink: finalLink
+        });
+      }
       
       console.log(`📨 [${username}] Sending ${allFlattenedResponses.length} message(s) total...`);
       

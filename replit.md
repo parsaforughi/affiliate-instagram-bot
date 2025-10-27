@@ -5,6 +5,14 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
 
 ## Recent Changes (October 27, 2025)
 
+### ✅ Major Bug Fixes (Latest)
+1. **CSV Parsing Fix**: Proper multi-line field handling - توتال ۱۲ now found successfully
+2. **Number Normalization**: English numbers (12) auto-convert to Persian (۱۲) in search
+3. **Product vs Affiliate Link Detection**: AI now distinguishes "لینک محصول" vs "لینک افیلیت"
+4. **Context Understanding**: AI reads conversation history for "بگو دیگه" responses
+5. **Atomic Response Enforcement**: Code-level guard merges multiple AI responses into one message
+6. **Single Message Processing**: Responds only to last unread message (no duplicates)
+
 ### ✅ Implemented Features
 1. **Short Bullet-Point Responses**: Updated prompt to enforce concise, bullet-point style answers
 2. **6-Brand Focus**: Only mentions Collamin, Misswake, IceBall, Dafi, Umbrella, Pixel (removed Kodex from primary list)
@@ -12,23 +20,28 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
 4. **40% Discount Calculation**: Bot calculates and shows discounted price when asked "برای من چقدر در میاد؟"
 5. **Support Phone Number**: Added 021-88746717 to prompt
 6. **Message Liking**: Bot likes incoming messages for read receipts
-7. **Individual Message Responses**: Responds to each unread message separately (not batched)
-8. **Direct Product Links**: Uses slug-based URLs from product_slugs.csv (562 products)
+7. **Direct Product Links**: Uses slug-based URLs from product_slugs.csv (562 products)
 
 ### Technical Implementation
-- **get_product_link.js**: New module for slug-based direct product URLs
-- **product_slugs.csv**: 562 products with direct URLs (copied from attached_assets)
-- **search_product.js**: Updated to use slug links with product ID fallback
+- **search_product.js**: 
+  - Robust CSV parser handles multi-line quoted fields
+  - normalizeNumbers() converts English digits to Persian
+  - Supports search with both number formats (12 → ۱۲)
+- **get_product_link.js**: Slug-based direct product URLs
+- **product_slugs.csv**: 562 products with direct URLs
 - **main.js**: 
-  - Message liking via DOM hover/click automation
-  - Multi-message processing loop (lines 931-949)
-  - Separate link sending (lines 997-1028)
-  - Updated prompt with all new requirements (lines 420-491)
+  - Atomic response merger (lines 1050-1068)
+  - Product vs affiliate link distinction in prompt
+  - Context understanding rules for short responses
+  - Single-message processing (no multi-message loops)
+  - Message liking via DOM automation
+  - Separate link sending
 
 ### Performance
-- **Average response time**: 2.35s (under 3s target ✅)
+- **Average response time**: 2.04s (under 3s target ✅)
 - **Self-tests**: 3/3 passing
 - **Timeout handler**: 30-second fallback with "متوجه منظورت نشدم"
+- **Product search**: توتال 12 ✅, توتال 8 ✅, توتال ۱۲ ✅
 
 ## Project Architecture
 
