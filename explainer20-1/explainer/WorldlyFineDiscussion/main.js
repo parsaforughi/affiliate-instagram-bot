@@ -903,15 +903,6 @@ async function processConversation(page, conv, messageCache, userContextManager,
     }
     
     console.log(`📨 Last message: "${lastMessage.substring(0, 50)}${lastMessage.length > 50 ? '...' : ''}"`);
-    if (unreadMessages && unreadMessages.length > 0) {
-      console.log(`📬 Unread messages count: ${unreadMessages.length}`);
-      if (unreadMessages.length > 1) {
-        console.log(`📝 All unread messages:`);
-        unreadMessages.forEach((msg, idx) => {
-          console.log(`   ${idx + 1}. "${msg.substring(0, 60)}${msg.length > 60 ? '...' : ''}"`);
-        });
-      }
-    }
     if (messageTimestamp) {
       console.log(`🕒 Message time: ${new Date(messageTimestamp).toLocaleString('en-US')}`);
     }
@@ -950,16 +941,15 @@ async function processConversation(page, conv, messageCache, userContextManager,
     }
 
     // ========================================
-    // LIKE MESSAGES (for read receipt)
+    // LIKE LAST MESSAGE (for read receipt)
     // ========================================
-    console.log(`❤️ [${username}] Liking ${unreadMessages.length} unread message(s)...`);
+    console.log(`❤️ [${username}] Liking last message...`);
     try {
-      await page.evaluate((numMessages) => {
+      await page.evaluate(() => {
         const messageContainers = Array.from(document.querySelectorAll('div[role="row"]'));
-        let likedCount = 0;
         
-        // Like the last N incoming messages (unread ones)
-        for (let i = messageContainers.length - 1; i >= 0 && likedCount < numMessages; i--) {
+        // Like only the last incoming message
+        for (let i = messageContainers.length - 1; i >= 0; i--) {
           const container = messageContainers[i];
           
           // Check if this is an incoming message (not outgoing)
@@ -971,64 +961,45 @@ async function processConversation(page, conv, messageCache, userContextManager,
             // Hover over message to show like button
             const messageDiv = container.querySelector('div[dir="auto"]');
             if (messageDiv) {
-              // Find the message container parent and hover
               const hoverTarget = container.querySelector('div');
               if (hoverTarget) {
                 const event = new MouseEvent('mouseenter', { bubbles: true, cancelable: true });
                 hoverTarget.dispatchEvent(event);
                 
-                // Small delay for UI to show like button
                 setTimeout(() => {
-                  // Find and click like button
                   const likeButtons = Array.from(container.querySelectorAll('svg, button'));
                   for (const btn of likeButtons) {
                     const ariaLabel = btn.getAttribute('aria-label');
                     if (ariaLabel && (ariaLabel.includes('Like') || ariaLabel.includes('React'))) {
                       btn.click();
-                      likedCount++;
                       break;
                     }
                   }
                 }, 100);
               }
             }
+            break; // Only like the last incoming message
           }
         }
-        
-        return likedCount;
-      }, unreadMessages.length);
+      });
       
-      await delay(1000); // Wait for likes to register
-      console.log(`✅ [${username}] Messages liked`);
+      await delay(1000);
+      console.log(`✅ [${username}] Message liked`);
     } catch (likeErr) {
-      console.log(`⚠️ [${username}] Could not like messages: ${likeErr.message}`);
+      console.log(`⚠️ [${username}] Could not like message: ${likeErr.message}`);
     }
     
     // ========================================
-    // PROCESS USER MESSAGES (AFTER LAST BOT MESSAGE)
+    // PROCESS USER MESSAGE (ONLY THE LAST ONE)
     // ========================================
-    // Process unread messages that came AFTER our last response
-    const messagesToProcess = unreadMessages.length > 0 ? unreadMessages : [lastMessage];
+    // Process ONLY the last message to avoid duplicates
+    console.log(`📝 [${username}] Processing last message only...`);
     
-    console.log(`📝 [${username}] Processing ${messagesToProcess.length} message(s) (only messages after bot's last reply)...`);
+    // Generate AI response for the last message only
+    const response = await askGPT([lastMessage], userContext, conversationHistory, hasGreetedToday);
+    const allResponses = [response];
     
-    // Generate AI responses for each message
-    const allResponses = [];
-    for (let i = 0; i < messagesToProcess.length; i++) {
-      const msg = messagesToProcess[i];
-      console.log(`🤖 [${username}] Generating response for message ${i + 1}/${messagesToProcess.length}...`);
-      
-      const response = await askGPT([msg], userContext, conversationHistory, hasGreetedToday && i > 0);
-      allResponses.push(response);
-      
-      // Update conversation history after each response
-      conversationHistory.push({ role: 'user', content: msg });
-      if (response.responses && response.responses[0]) {
-        conversationHistory.push({ role: 'assistant', content: response.responses[0].message });
-      }
-    }
-    
-    console.log(`🤖 [${username}] All ${allResponses.length} responses ready`);
+    console.log(`🤖 [${username}] Response ready`);
 
     // Update context from last response
     const lastResponse = allResponses[allResponses.length - 1];
@@ -1039,10 +1010,8 @@ async function processConversation(page, conv, messageCache, userContextManager,
       userContextManager.updateContext(username, { tone: lastResponse.detectedTone });
     }
 
-    // Save all processed messages to context
-    messagesToProcess.forEach(msg => {
-      userContextManager.addMessage(username, 'user', msg);
-    });
+    // Save the processed message to context
+    userContextManager.addMessage(username, 'user', lastMessage);
 
     // Send replies - flatten all responses from all messages
     const textarea = await page.$('textarea[placeholder*="Message"], textarea[aria-label*="Message"], div[contenteditable="true"]');
