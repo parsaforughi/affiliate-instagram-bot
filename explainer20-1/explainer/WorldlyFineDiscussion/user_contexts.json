@@ -7,16 +7,6 @@
     "messageHistory": [
       {
         "role": "user",
-        "content": "توتال ۱۲ چطور ؟",
-        "timestamp": 1761543217220
-      },
-      {
-        "role": "assistant",
-        "content": "آره داریم! میخوای قیمتش رو بگم؟",
-        "timestamp": 1761543218808
-      },
-      {
-        "role": "user",
         "content": "لینکشو بده",
         "timestamp": 1761543242829
       },
@@ -104,10 +94,20 @@
         "role": "assistant",
         "content": "تخفیف ۴۰٪ داریم! مراحل: \n1. روی لینک ثبت‌نام کلیک کن. \n2. اطلاعاتت رو وارد کن. \n3. بعد از تایید، لینک‌های خودت رو بگیر. \n\nمیخوای لینک رو برات بفرستم؟",
         "timestamp": 1761544937008
+      },
+      {
+        "role": "user",
+        "content": "سلام",
+        "timestamp": 1761546149861
+      },
+      {
+        "role": "assistant",
+        "content": "سلام! چطور میتونم کمکت کنم؟",
+        "timestamp": 1761546151386
       }
     ],
     "firstSeen": 1761111012068,
-    "lastSeen": 1761544937008,
+    "lastSeen": 1761546151386,
     "lastGreetingDate": 1761539078950
   },
   "BAHARE| sent an attachment.": {
