@@ -41,8 +41,8 @@ const {
   GOOGLE_SHEETS_ENABLED = "false",
 } = process.env;
 
-const AFFILIATE_LINK = "https://affiliate.luxirana.com/account/login";
-const MY_USERNAME = INSTAGRAM_USERNAME || "luxirana"; // Our bot account name
+const AFFILIATE_LINK = "https://affiliate.seylane.com/account/login";
+const MY_USERNAME = INSTAGRAM_USERNAME || "seylane"; // Our bot account name
 
 // ========================================
 // NAME TRANSLATION (English to Persian)
@@ -472,7 +472,7 @@ always sounding natural and human, like a real person replying to DMs.
 برند: سیلانه (Seylane)
 نوع همکاری: Affiliate Marketing
 تخفیف همکاران: ۴۰٪ از قیمت مصرف‌کننده کمتر
-فروشگاه: https://luxirana.com
+فروشگاه: https://seylane.com
 پشتیبانی: 021-88746717
 
 [SUPPORTED BRANDS - BULLET FORMAT]
@@ -500,11 +500,12 @@ When listing brands, use clean line-separated bullets like this:
 - Keep responses short and friendly — no bullet overload unless listing products.
 
 [PRODUCT INTELLIGENCE]
-❌ Never say "نداریم" or "product not found" or "متوجه نشدم".  
-✅ Instead say: "فعلاً اون مدل تموم شده ولی یه گزینه مشابه دارم 😍 میخوای ببینیش؟"
+❌ NEVER EVER say: "نداریم", "product not found", "متوجه نشدم", "I don't know", "خطا", "error"
+✅ ALWAYS respond confidently with: "فعلاً اون مدل تموم شده ولی یه گزینه مشابه دارم 😍 میخوای ببینیش؟"
 - When user asks for a product, always check the search results provided
-- If exact match is not found, suggest a similar product from the same brand or category
+- If exact match is not found, ALWAYS suggest a similar product from the same brand or category
 - Be smart and helpful like a beauty consultant — "به نظرم این برات بهتره 😉"
+- You are NEVER uncertain - always provide a confident, helpful answer
 
 [BRAND FALLBACK LOGIC]
 When a brand is mentioned but no specific product:
@@ -526,6 +527,23 @@ Affiliate discount = 40% below consumer price
 Formula: consumerPrice × 0.6  
 Always say:
 "این قیمت مصرف‌کننده‌ست، برای شما با ۴۰٪ تخفیف: [new price]"
+
+[PRODUCT RESPONSE FORMAT]
+When a product is found, ALWAYS use this exact structure:
+```
+پیدا شد 😍
+🛍️ [product name]
+💰 قیمت مصرف‌کننده: [price] تومان
+برای شما با ۴۰٪ تخفیف: [discountPrice] تومان
+✨ برند: [brand]
+لینک خرید 👇
+```
+Then return the productUrl in the productLink field.
+
+When NO exact match found:
+```
+فعلاً اون مدل تموم شده ولی چندتا مشابهش دارم، میخوای ببینی؟ 😊
+```
 
 [LINK LOGIC & CTAs]
 - If user asks about joining or "افیلیت", add energy:
@@ -637,10 +655,10 @@ ${priorityProductContext}
   } catch (err) {
     console.error("⚠️ OpenAI Error:", err.message);
     
-    // If timeout or any error, send a simple fallback message
+    // If timeout or any error, send a confident, helpful fallback message
     return {
       responses: [{
-        message: `متوجه منظورت نشدم، میشه دوباره بهم بگی؟ 😊`,
+        message: `سلام! 😊 چطور میتونم کمکت کنم؟ دنبال محصول خاصی هستی یا میخوای درباره همکاری افیلیت بدونی؟`,
         sendLink: false,
         sendProductInfo: false,
         productLink: null
@@ -959,7 +977,9 @@ async function processConversation(page, conv, messageCache, userContextManager,
     // Validate username is not our own (robust check for variations)
     const isOwnAccount = !username || 
                         username === MY_USERNAME || 
+                        username.toLowerCase() === 'seylane' ||
                         username.toLowerCase() === 'luxirana' ||
+                        username.toLowerCase().includes('seylane') ||
                         username.toLowerCase().includes('luxirana') ||
                         MY_USERNAME.toLowerCase().includes(username.toLowerCase());
     
@@ -1117,7 +1137,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
         if (hasAffiliateLink) {
           // Affiliate link takes priority
           finalSendLink = true;
-          finalLink = 'https://affiliate.luxirana.com/account/login';
+          finalLink = 'https://affiliate.seylane.com/account/login';
         } else if (hasProductLink) {
           // Product link only if no affiliate link
           finalSendProductInfo = true;
