@@ -425,11 +425,23 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   for (const [brandKey, brandData] of Object.entries(brandInfo)) {
     if (userMessageLower.includes(brandKey)) {
       detectedBrand = brandData.name;
-      const bestSeller = bestSellers[brandKey] || '';
       brandContext = `\n\n🎯 برند ${brandData.name} (${brandData.englishName}) تشخیص داده شد: ${brandData.description}`;
-      if (bestSeller) {
-        brandContext += `\n📌 پرفروش‌ترین: ${bestSeller}`;
+      
+      // Only suggest best-seller if user explicitly asks about it
+      const askingForBestSeller = userMessageLower.includes('پرفروش') || 
+                                   userMessageLower.includes('بهترین') ||
+                                   userMessageLower.includes('شروع کن') ||
+                                   userMessageLower.includes('پیشنهاد') ||
+                                   userMessageLower.includes('توصیه');
+      
+      if (askingForBestSeller) {
+        const bestSeller = bestSellers[brandKey] || '';
+        if (bestSeller) {
+          brandContext += `\n\n📌 پرفروش‌ترین محصول این برند: ${bestSeller}`;
+          brandContext += `\nاگه user خواست، لینک و قیمت کامل رو بهش بده.`;
+        }
       }
+      
       console.log(`🧠 Detected brand: ${brandData.name} (${brandData.englishName})`);
       break;
     }
@@ -453,6 +465,8 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
    - Only talk about: کلامین، میسویک، آیس‌بال، دافی، آمبرلا، پیکسل
    - If user asks about other brands: "این برند در لیست فعلی ما نیست ✨ برندهای فعالمون: کلامین، میسویک، آیس‌بال، دافی، آمبرلا، پیکسل"
    - Each brand only its own products (e.g., کلامین → only Collamin products)
+   - When asked ONLY about brand (e.g., "کلامین چیه؟") → Give general brand info, DON'T auto-suggest products
+   - ONLY suggest specific products when user asks: "پرفروش‌ترین"، "بهترین"، "با چه محصولی شروع کنم"، "پیشنهاد"
 
 2️⃣ **Message Style (استایل پیام)**
    - Short bullet-point style (3-6 lines max)

@@ -15,9 +15,10 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
    - آمبرلا: استیک دئودورانت اسنو سفید
    - پیکسل: کرم ضد آفتاب سنتلا
 
-2. **Auto-Suggest Best Sellers**:
-   - When user asks about a brand → bot suggests best-selling product
-   - Includes price + 40% discount calculation
+2. **Smart Best-Seller Suggestions** (ONLY when asked):
+   - When user asks "کلامین چیه؟" → General brand info ONLY
+   - When user asks "پرفروش‌ترین کلامین؟" or "با چه محصولی شروع کنم؟" → Show best-seller with price
+   - No auto-suggestions unless explicitly requested
 
 ### 🎯 v3.8 - Bullet-Style Format + Brand Filtering (COMPLETE ✅)
 1. **New Message Format (Bullet-Style with Emojis)**:
