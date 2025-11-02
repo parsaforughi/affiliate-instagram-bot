@@ -987,6 +987,46 @@ async function processConversation(page, conv, messageCache, userContextManager,
     
     console.log(`🤖 [${username}] Response ready`);
 
+    // ========================================
+    // POST-PROCESSING: Search for products if user asked
+    // ========================================
+    const { searchProduct } = require('./search_product.js');
+    
+    // Detect if user is asking for products/prices
+    const askingForProducts = lastMessage.includes('قیمت') || 
+                              lastMessage.includes('محصول') ||
+                              lastMessage.includes('چند') ||
+                              lastMessage.includes('چقدر') ||
+                              lastMessage.includes('برام بگو') ||
+                              lastMessage.includes('نشون بده') ||
+                              lastMessage.includes('میخوام');
+    
+    if (askingForProducts) {
+      console.log(`🔍 [${username}] Detected product request - searching products...`);
+      const products = searchProduct(lastMessage);
+      
+      if (products && products.length > 0) {
+        console.log(`✅ Found ${products.length} products from CSV`);
+        
+        // Build proper formatted message with REAL prices
+        let productMessage = '';
+        const firstProduct = products[0];
+        
+        productMessage = `✨ محصول: ${firstProduct.name}\n`;
+        productMessage += `💰 قیمت مصرف‌کننده: ${firstProduct.price}\n`;
+        productMessage += `🔖 برای شما با ۴۰٪ تخفیف: ${firstProduct.discountPrice}\n`;
+        productMessage += `🔗 لینک خرید پایین 👇`;
+        
+        // Replace AI response with real product info
+        response.responses[0].message = productMessage;
+        response.responses[0].sendProductInfo = true;
+        response.responses[0].productLink = firstProduct.productUrl;
+        response.responses[0].sendLink = false;
+        
+        console.log(`🔗 Product link: ${firstProduct.productUrl}`);
+      }
+    }
+
     // Update context from last response
     const lastResponse = allResponses[allResponses.length - 1];
     if (lastResponse.userName && !userContext.name) {
