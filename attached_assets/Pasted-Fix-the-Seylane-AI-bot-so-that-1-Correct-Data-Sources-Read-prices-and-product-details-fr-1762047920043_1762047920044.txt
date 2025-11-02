@@ -1,0 +1,57 @@
+Fix the Seylane AI bot so that:
+
+1. **Correct Data Sources**
+   - Read prices and product details from `data/products.csv`.
+   - Read product URLs (slugs) from `data/product_slugs.csv`.
+   - Both files are UTF-8 encoded Persian CSVs.
+   - products.csv includes fields like name, brand, category, price.
+   - product_slugs.csv includes fields like name and product_url.
+
+2. **Logic Fix**
+   - When a product name (Persian or English) is mentioned:
+     - Find the exact match in products.csv by name (normalize Persian characters like ك→ک, ي→ی).
+     - Get its price and brand.
+     - Then look up the same product name in product_slugs.csv to get the correct `product_url`.
+     - If no exact match in slugs, try brand+name similarity.
+
+3. **Link Format**
+   - The final URL should come directly from product_slugs.csv — **do not build fake URLs**.
+   - All links must use domain `https://luxirana.com`.
+
+4. **Price Calculation**
+   - Show price from products.csv.
+   - Also show discounted price (40% off).
+   - Use Persian digits with `Intl.NumberFormat('fa-IR')`.
+
+5. **Reply Format (in Persian)**
+   - If product found:
+     ```
+     پیدا شد 😍  
+     🛍️ [name]  
+     💰 قیمت مصرف‌کننده: [price] تومان  
+     برای شما با ۴۰٪ تخفیف: [discountPrice] تومان  
+     ✨ برند: [brand]  
+     لینک خرید 👇  
+     [product_url]
+     ```
+   - If not found:
+     ```
+     فعلاً اون مدل رو موجود نداریم ولی چندتا مشابه دارم، میخوای ببینی؟ 😊
+     ```
+   - Never respond with “نمی‌دونم” or “خطا”.
+
+6. **Improved Matching**
+   - Match both Persian and English.
+   - Handle partial matches and similar names (fuzzy search).
+   - If no exact match, show up to 3 similar products with names and links.
+
+7. **Data Debug**
+   - Log to console the exact product name, price, and link used.
+   - If lookup fails, log clearly which file didn’t have a match.
+
+8. **Continuous Check**
+   - Keep checking for new messages every few seconds and handle replies continuously.
+
+Once fixed, show me:
+- The updated search_product.js and get_product_link.js
+- And one sample console output for a known product (with correct price and link from luxirana.com)

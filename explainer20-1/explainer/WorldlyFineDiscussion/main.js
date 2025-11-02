@@ -41,8 +41,8 @@ const {
   GOOGLE_SHEETS_ENABLED = "false",
 } = process.env;
 
-const AFFILIATE_LINK = "https://affiliate.seylane.com/account/login";
-const MY_USERNAME = INSTAGRAM_USERNAME || "seylane"; // Our bot account name
+const AFFILIATE_LINK = "https://affiliate.luxirana.com/account/login";
+const MY_USERNAME = INSTAGRAM_USERNAME || "luxirana"; // Our bot account name
 
 // ========================================
 // NAME TRANSLATION (English to Persian)
@@ -472,7 +472,7 @@ always sounding natural and human, like a real person replying to DMs.
 برند: سیلانه (Seylane)
 نوع همکاری: Affiliate Marketing
 تخفیف همکاران: ۴۰٪ از قیمت مصرف‌کننده کمتر
-فروشگاه: https://seylane.com
+فروشگاه: https://luxirana.com
 پشتیبانی: 021-88746717
 
 [SUPPORTED BRANDS - BULLET FORMAT]
@@ -974,9 +974,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
     // Validate username is not our own (robust check for variations)
     const isOwnAccount = !username || 
                         username === MY_USERNAME || 
-                        username.toLowerCase() === 'seylane' ||
                         username.toLowerCase() === 'luxirana' ||
-                        username.toLowerCase().includes('seylane') ||
                         username.toLowerCase().includes('luxirana') ||
                         MY_USERNAME.toLowerCase().includes(username.toLowerCase());
     
@@ -1134,7 +1132,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
         if (hasAffiliateLink) {
           // Affiliate link takes priority
           finalSendLink = true;
-          finalLink = 'https://affiliate.seylane.com/account/login';
+          finalLink = 'https://affiliate.luxirana.com/account/login';
         } else if (hasProductLink) {
           // Product link only if no affiliate link
           finalSendProductInfo = true;
