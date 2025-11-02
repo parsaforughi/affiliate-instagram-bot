@@ -3,11 +3,22 @@
 ## Overview
 Persian-language Instagram DM bot for affiliate marketing with session-based authentication and OpenAI integration. Provides warm, friendly responses for Luxirana's affiliate program.
 
-## Recent Changes (October 27, 2025)
+## Recent Changes (November 2, 2025)
 
-### 🆕 Arman Fix - Human-Like AI v3.5 (Latest)
-1. **Memory & Context (5+3 Messages)**:
-   - Bot now reads last 5 user messages + 3 bot replies for better context
+### 🔥 Performance Fix - Timeout Resolution v3.6 (Latest)
+1. **Optimized System Prompt (80% reduction)**:
+   - Reduced prompt from 117 lines to ~24 lines
+   - Removed redundant instructions while keeping core functionality
+   - Prevents OpenAI API timeouts (was 38s, now targeting <3s)
+
+2. **Reduced Context Window (2+1 Messages)**:
+   - Changed from 5 user + 3 bot messages to 2 user + 1 bot message
+   - Significantly reduces token count sent to OpenAI
+   - Maintains conversation continuity with less overhead
+
+### 🆕 Arman Fix - Human-Like AI v3.5
+1. **Memory & Context (Now 2+1 Messages)**:
+   - Bot now reads last 2 user messages + 1 bot reply for context
    - Continues conversations naturally instead of saying "متوجه نشدم"
    - Example: "میسویک برام بگو" → bot remembers previous brand mention and elaborates
    - "بگو دیگه" → checks conversation history to continue topic
