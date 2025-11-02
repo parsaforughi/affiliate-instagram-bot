@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { getProductLink } = require('./get_product_link');
 
 // Normalize Persian characters - critical for matching
 function normalizePersian(text) {
@@ -45,28 +44,14 @@ function normalizeNumbers(text) {
   return text.replace(/[0-9]/g, (d) => englishToPersian[d]);
 }
 
-// Helper function to detect brand from text
-function detectBrand(text) {
-  const textLower = normalizePersian(normalizeNumbers(text.toLowerCase()));
-  if (textLower.includes('میسویک') || textLower.includes('misswake')) return 'Misswake';
-  if (textLower.includes('کلامین') || textLower.includes('collamin')) return 'Collamin';
-  if (textLower.includes('آمبرلا') || textLower.includes('umbrella')) return 'Umbrella';
-  if (textLower.includes('دافی') || textLower.includes('dafi')) return 'Dafi';
-  if (textLower.includes('آیس بال') || textLower.includes('iceball') || textLower.includes('ایس بال')) return 'IceBall';
-  if (textLower.includes('کدکس') || textLower.includes('kodex') || textLower.includes('ناچ')) return 'Kodex';
-  if (textLower.includes('پیکسل') || textLower.includes('pixel')) return 'Pixel';
-  return 'سایر';
-}
-
 // Calculate similarity score between two strings (fuzzy matching)
-// Uses multiple methods to handle typos, partial matches, and token-based matching
 function similarity(s1, s2) {
   const longer = s1.length > s2.length ? s1 : s2;
   const shorter = s1.length > s2.length ? s2 : s1;
   
   if (longer.length === 0) return 1.0;
   
-  // Method 1: Simple substring match (highest priority for short queries)
+  // Method 1: Simple substring match (highest priority)
   if (longer.includes(shorter) || shorter.includes(longer)) {
     return 0.8 + (shorter.length / longer.length) * 0.2; // 0.8-1.0 range
   }
@@ -91,7 +76,7 @@ function similarity(s1, s2) {
   
   if (tokenScore > 0.5) return 0.5 + tokenScore * 0.3; // 0.5-0.8 range
   
-  // Method 3: Levenshtein distance for typo detection
+  // Method 3: Levenshtein distance
   const editDistance = (s1, s2) => {
     const costs = [];
     for (let i = 0; i <= s1.length; i++) {
@@ -116,12 +101,139 @@ function similarity(s1, s2) {
   const distance = editDistance(longer, shorter);
   const levenScore = (longer.length - distance) / longer.length;
   
-  // For short queries (< 10 chars), be more forgiving
-  if (shorter.length < 10) {
-    return Math.min(1.0, levenScore * 1.5); // Boost score for short queries, capped at 1.0
+  return Math.min(1.0, levenScore);
+}
+
+// Parse CSV properly - handles multi-line quoted fields
+function parseCSV(content) {
+  const rows = [];
+  let currentRow = [];
+  let currentField = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i];
+    const nextChar = content[i + 1];
+    
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currentField += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      currentRow.push(currentField.trim());
+      currentField = '';
+    } else if (char === '\n' && !inQuotes) {
+      currentRow.push(currentField.trim());
+      if (currentRow.length > 0 && currentRow.some(f => f.length > 0)) {
+        rows.push(currentRow);
+      }
+      currentRow = [];
+      currentField = '';
+    } else {
+      currentField += char;
+    }
   }
   
-  return Math.min(1.0, levenScore); // Always cap at 1.0
+  if (currentField || currentRow.length > 0) {
+    currentRow.push(currentField.trim());
+    if (currentRow.some(f => f.length > 0)) {
+      rows.push(currentRow);
+    }
+  }
+  
+  return rows;
+}
+
+// Get product URL from product_slugs.csv
+function getProductURL(productName) {
+  try {
+    console.log(`   📎 Looking up URL in product_slugs.csv for: "${productName}"`);
+    
+    const csvContent = fs.readFileSync('data/product_slugs.csv', 'utf-8');
+    const lines = csvContent.split('\n');
+    
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      
+      result.push(current.trim());
+      return result;
+    }
+    
+    const searchNormalized = normalizePersian(productName.toLowerCase());
+    
+    // First pass: exact match
+    for (let i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      
+      const fields = parseCSVLine(lines[i]);
+      if (fields.length < 2) continue;
+      
+      const title = fields[0] || '';
+      const url = fields[1] || '';
+      const titleNormalized = normalizePersian(title.toLowerCase());
+      
+      // Exact match
+      if (titleNormalized === searchNormalized || 
+          titleNormalized.includes(searchNormalized) || 
+          searchNormalized.includes(titleNormalized.substring(0, 20))) {
+        console.log(`   ✅ EXACT URL found: ${url}`);
+        return url;
+      }
+    }
+    
+    // Second pass: fuzzy match
+    let bestMatch = null;
+    let bestScore = 0;
+    
+    for (let i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      
+      const fields = parseCSVLine(lines[i]);
+      if (fields.length < 2) continue;
+      
+      const title = fields[0] || '';
+      const url = fields[1] || '';
+      const titleNormalized = normalizePersian(title.toLowerCase());
+      
+      const score = similarity(searchNormalized, titleNormalized);
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = { title, url };
+      }
+    }
+    
+    // If we found a good fuzzy match (>60% similar)
+    if (bestMatch && bestScore > 0.6) {
+      console.log(`   ⚠️ FUZZY URL match (${Math.round(bestScore * 100)}%): ${bestMatch.url}`);
+      return bestMatch.url;
+    }
+    
+    // Not found - return store homepage (never build fake URLs)
+    console.log(`   ❌ NO URL match - using homepage`);
+    return 'https://luxirana.com';
+    
+  } catch (error) {
+    console.error(`   ❌ ERROR getting URL: ${error.message}`);
+    return 'https://luxirana.com';
+  }
 }
 
 // Search for a product by name
@@ -131,51 +243,8 @@ function searchProduct(productName) {
     console.log(`🔎 Search Query: "${productName}"`);
     
     const csvContent = fs.readFileSync('data/products.csv', 'utf-8');
-    
-    // Parse CSV properly - handle multi-line quoted fields
-    function parseCSV(content) {
-      const rows = [];
-      let currentRow = [];
-      let currentField = '';
-      let inQuotes = false;
-      
-      for (let i = 0; i < content.length; i++) {
-        const char = content[i];
-        const nextChar = content[i + 1];
-        
-        if (char === '"') {
-          if (inQuotes && nextChar === '"') {
-            currentField += '"';
-            i++;
-          } else {
-            inQuotes = !inQuotes;
-          }
-        } else if (char === ',' && !inQuotes) {
-          currentRow.push(currentField.trim());
-          currentField = '';
-        } else if (char === '\n' && !inQuotes) {
-          currentRow.push(currentField.trim());
-          if (currentRow.length > 0 && currentRow.some(f => f.length > 0)) {
-            rows.push(currentRow);
-          }
-          currentRow = [];
-          currentField = '';
-        } else {
-          currentField += char;
-        }
-      }
-      
-      if (currentField || currentRow.length > 0) {
-        currentRow.push(currentField.trim());
-        if (currentRow.some(f => f.length > 0)) {
-          rows.push(currentRow);
-        }
-      }
-      
-      return rows;
-    }
-    
     const rows = parseCSV(csvContent);
+    
     console.log(`📊 Total products in CSV: ${rows.length - 1}`);
     
     // Normalize search query
@@ -188,35 +257,30 @@ function searchProduct(productName) {
     // Search through all products (skip header row)
     for (let i = 1; i < rows.length; i++) {
       const fields = rows[i];
-      if (fields.length < 28) continue;
+      if (fields.length < 41) continue;
       
-      const name = fields[4] || '';
-      const nameLower = normalizePersian(normalizeNumbers(name.toLowerCase()));
-      
+      const name = (fields[4] || '').replace(/"/g, '').trim();
       const salePrice = fields[25] || '';
       const regularPrice = fields[26] || '';
       const categories = fields[27] || '';
       const productId = fields[2] || '';
-      const brandField = fields[38] || '';
+      const brand = fields[40] || '';  // FIXED: Field 41 (index 40)
       
       const rawPrice = salePrice || regularPrice || '';
       
-      // Detect brand from name or brand field
-      const brand = brandField || detectBrand(nameLower);
+      // Normalize for matching
+      const nameLower = normalizePersian(normalizeNumbers(name.toLowerCase()));
+      const brandLower = normalizePersian(brand.toLowerCase());
       
-      const cleanName = name.replace(/"/g, '').trim();
-      
-      // Check for exact match in name OR brand
-      const brandNormalized = normalizePersian(brand.toLowerCase());
-      const matchesName = nameLower.includes(searchNormalized) || searchNormalized.includes(nameLower.substring(0, 20));
-      const matchesBrand = brandNormalized.includes(searchNormalized) || searchNormalized.includes(brandNormalized);
-      
-      if (matchesName || matchesBrand) {
-        // Get product link from slugs file
-        const productUrl = getProductLink(cleanName);
+      // Check for exact match by name
+      if (nameLower.includes(searchNormalized) || 
+          searchNormalized.includes(nameLower.substring(0, 20))) {
+        
+        // Get URL from product_slugs.csv
+        const productUrl = getProductURL(name);
         
         const product = {
-          name: cleanName,
+          name,
           rawPrice,
           price: formatPersianPrice(rawPrice),
           discountPrice: calculateDiscount(rawPrice),
@@ -224,31 +288,58 @@ function searchProduct(productName) {
           categories,
           productUrl,
           productId,
-          matchType: 'exact'
+          matchType: 'exact-name'
         };
         
         matches.push(product);
-        console.log(`✅ EXACT MATCH FOUND:`);
-        console.log(`   Name: ${cleanName}`);
+        console.log(`✅ EXACT NAME MATCH:`);
+        console.log(`   Name: ${name}`);
         console.log(`   Brand: ${brand}`);
-        console.log(`   Raw Price: ${rawPrice}`);
-        console.log(`   Formatted Price: ${product.price} تومان`);
-        console.log(`   Discount Price: ${product.discountPrice} تومان`);
+        console.log(`   Price: ${product.price} تومان`);
+        console.log(`   Discount: ${product.discountPrice} تومان (40% off)`);
         console.log(`   URL: ${productUrl}`);
         
         if (matches.length >= 5) break;
-      } else {
-        // Calculate similarity for fuzzy matching
-        const simScore = similarity(searchNormalized, nameLower);
-        // Also check similarity with brand name
-        const brandScore = similarity(searchNormalized, brandNormalized);
-        const maxScore = Math.max(simScore, brandScore);
+      } 
+      // Check for match by brand (only if brand is not empty)
+      else if (brand && brandLower && 
+               (brandLower.includes(searchNormalized) || 
+                searchNormalized.includes(brandLower))) {
         
-        if (maxScore > 0.3) {  // 30% similarity threshold (more lenient)
-          const productUrl = getProductLink(cleanName);
+        const productUrl = getProductURL(name);
+        
+        const product = {
+          name,
+          rawPrice,
+          price: formatPersianPrice(rawPrice),
+          discountPrice: calculateDiscount(rawPrice),
+          brand,
+          categories,
+          productUrl,
+          productId,
+          matchType: 'exact-brand'
+        };
+        
+        matches.push(product);
+        console.log(`✅ EXACT BRAND MATCH:`);
+        console.log(`   Name: ${name}`);
+        console.log(`   Brand: ${brand}`);
+        console.log(`   Price: ${product.price} تومان`);
+        console.log(`   URL: ${productUrl}`);
+        
+        if (matches.length >= 5) break;
+      } 
+      // Fuzzy matching
+      else {
+        const nameScore = similarity(searchNormalized, nameLower);
+        const brandScore = similarity(searchNormalized, brandLower);
+        const maxScore = Math.max(nameScore, brandScore);
+        
+        if (maxScore > 0.3) {  // 30% similarity threshold
+          const productUrl = getProductURL(name);
           
           fuzzyMatches.push({
-            name: cleanName,
+            name,
             rawPrice,
             price: formatPersianPrice(rawPrice),
             discountPrice: calculateDiscount(rawPrice),
@@ -263,29 +354,30 @@ function searchProduct(productName) {
       }
     }
     
-    // If exact matches found, return them
+    // Return exact matches if found
     if (matches.length > 0) {
       console.log(`\n✅ Returning ${matches.length} exact match(es)`);
       console.log(`🔍 ========== PRODUCT SEARCH END ==========\n`);
       return matches;
     }
     
-    // If no exact matches, return top 3 fuzzy matches
+    // Return top 3 fuzzy matches if no exact matches
     if (fuzzyMatches.length > 0) {
       fuzzyMatches.sort((a, b) => b.similarity - a.similarity);
       const topMatches = fuzzyMatches.slice(0, 3);
       
-      console.log(`\n⚠️ No exact match found. Returning ${topMatches.length} similar product(s):`);
+      console.log(`\n⚠️ No exact match. Returning ${topMatches.length} similar product(s):`);
       topMatches.forEach((p, i) => {
         console.log(`   ${i + 1}. ${p.name} (${Math.round(p.similarity * 100)}% similar)`);
-        console.log(`      Price: ${p.price} تومان | URL: ${p.productUrl}`);
+        console.log(`      Brand: ${p.brand} | Price: ${p.price} تومان`);
+        console.log(`      URL: ${p.productUrl}`);
       });
       console.log(`🔍 ========== PRODUCT SEARCH END ==========\n`);
       return topMatches;
     }
     
-    // No matches at all
-    console.log(`\n❌ NO MATCHES FOUND in products.csv`);
+    // No matches
+    console.log(`\n❌ NO MATCHES FOUND`);
     console.log(`🔍 ========== PRODUCT SEARCH END ==========\n`);
     return [];
     

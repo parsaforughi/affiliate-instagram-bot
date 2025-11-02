@@ -87,17 +87,24 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
 7. **Direct Product Links**: Uses slug-based URLs from product_slugs.csv (562 products)
 
 ### Technical Implementation
-- **search_product.js**: 
-  - Robust CSV parser handles multi-line quoted fields
-  - normalizeNumbers() converts English digits to Persian
-  - Supports search with both number formats (12 → ۱۲)
-  - **detectBrand()** and **detectCategory()** helpers for intelligent matching
-  - **findSimilarProducts()** with 3-tier fallback:
-    1. Same brand products
-    2. Same category products
-    3. Popular products (Collamin, Misswake, IceBall)
-- **get_product_link.js**: Slug-based direct product URLs
-- **product_slugs.csv**: 562 products with direct URLs
+- **search_product.js** (merged with URL lookup logic):
+  - **Reads price/brand from data/products.csv** (571 products, UTF-8):
+    - Field 5 (index 4): نام (Name)
+    - Field 26 (index 25): قیمت فروش (Sale Price)
+    - Field 27 (index 26): قیمت اصلی (Regular Price)
+    - Field 41 (index 40): برندها (Brands) - FIXED from incorrect field 38
+  - **Reads URLs from data/product_slugs.csv** (562 products, UTF-8):
+    - Fields: Title, URL
+  - **Persian character normalization**: ك→ک, ي→ی (critical for matching)
+  - **Number normalization**: English digits (12) → Persian (۱۲)
+  - **Robust CSV parser**: Handles multi-line quoted fields
+  - **3-tier matching logic**:
+    1. Exact name match (highest priority)
+    2. Exact brand match (only if brand field not empty)
+    3. Fuzzy matching with 30% similarity threshold
+  - **Never builds fake URLs**: Only uses real URLs from product_slugs.csv
+  - **Price formatting**: Persian separators with 40% discount calculation
+  - **Merged getProductURL()**: Looks up URL from product_slugs.csv after finding product
 - **main.js**: 
   - **getSmartContextMessages()** (lines 244-256): Gets last 5 user + 3 bot messages for context
   - **Brand detection logic** (lines 387-414): Detects brand mentions and provides fallback info
@@ -110,11 +117,15 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
   - Separate link sending
 
 ### Performance
-- **Average response time**: 2.37s (under 3s target ✅)
-- **Self-tests**: 3/3 passing
+- **Average response time**: 1.44s (well under 3s target ✅)
+- **Self-tests**: 3/3 passing consistently
 - **Timeout handler**: 30-second fallback with "متوجه منظورت نشدم"
-- **Product search**: توتال 12 ✅, توتال 8 ✅, توتال ۱۲ ✅
-- **Similar product fallback**: Works seamlessly when exact match not found
+- **Product search examples**:
+  - "توتال ۱۲" → خمیردندان توتال ۱۲ کاره ۷۵ میل میسویک ✅
+  - "میسویک" → 5 Misswake products ✅
+  - "خمیردندان بلیچینگ" → exact matches ✅
+- **URL accuracy**: All URLs from real product_slugs.csv (no fake URLs)
+- **Fuzzy matching**: Works seamlessly when exact match not found (30% threshold)
 
 ## Project Architecture
 
