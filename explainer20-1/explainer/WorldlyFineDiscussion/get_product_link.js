@@ -3,7 +3,7 @@ const fs = require('fs');
 // Get direct product link from slug file
 function getProductLink(productName) {
   try {
-    const csvContent = fs.readFileSync('product_slugs.csv', 'utf-8');
+    const csvContent = fs.readFileSync('data/product_slugs.csv', 'utf-8');
     const lines = csvContent.split('\n');
     
     function parseCSVLine(line) {
@@ -43,15 +43,17 @@ function getProductLink(productName) {
       
       // Check if product name matches
       if (titleLower.includes(searchLower) || searchLower.includes(titleLower.substring(0, 20))) {
-        return url;
+        // Convert luxirana.com URLs to seylane.com
+        const seylaneUrl = url.replace(/luxirana\.com/g, 'seylane.com');
+        return seylaneUrl;
       }
     }
     
     // Not found - return store homepage
-    return 'https://luxirana.com';
+    return 'https://seylane.com';
   } catch (error) {
     console.error('Error getting product link:', error.message);
-    return 'https://luxirana.com';
+    return 'https://seylane.com';
   }
 }
 

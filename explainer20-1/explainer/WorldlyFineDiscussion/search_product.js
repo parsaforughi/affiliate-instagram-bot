@@ -76,7 +76,7 @@ function findSimilarProducts(searchQuery, allProducts, maxResults = 3) {
 // Search for a product by name
 function searchProduct(productName) {
   try {
-    const csvContent = fs.readFileSync('products.csv', 'utf-8');
+    const csvContent = fs.readFileSync('data/products.csv', 'utf-8');
     
     // Parse CSV properly - handle multi-line quoted fields
     function parseCSV(content) {
@@ -151,9 +151,9 @@ function searchProduct(productName) {
       const cleanName = name.replace(/"/g, '').trim();
       let productUrl = getProductLink(cleanName); // Try slug-based URL first
       
-      // Fallback to product ID URL if slug not found
-      if (productUrl === 'https://luxirana.com' && productId) {
-        productUrl = `https://luxirana.com/?post_type=product&p=${productId}`;
+      // Fallback to seylane.com with product ID if slug not found
+      if (productUrl === 'https://seylane.com' && productId) {
+        productUrl = `https://seylane.com/?post_type=product&p=${productId}`;
       }
       
       // Detect brand

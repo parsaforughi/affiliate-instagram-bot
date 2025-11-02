@@ -1,0 +1,46 @@
+This Replit project is the Seylane Instagram AI agent.
+Here’s what I need you to do:
+
+1. **Core Logic Fix**
+   - Make sure all product data is read correctly from `data/products.csv` and `data/product_slugs.csv` (UTF-8, Persian text safe).
+   - Fix any broken CSV paths or encoding issues.
+   - Verify that product search works both in Persian and English.
+   - Always return correct `name`, `brand`, `price`, `category`, `image`, and `link`.
+
+2. **Response Engine**
+   - When a user message mentions a product name:
+     - Find it from the CSVs.
+     - Reply naturally in Persian with this structure:
+       ```
+       پیدا شد 😍  
+       🛍️ [name]  
+       💰 قیمت مصرف‌کننده: [price] تومان  
+       برای شما با ۴۰٪ تخفیف: [discountPrice] تومان  
+       ✨ برند: [brand]  
+       لینک خرید 👇  
+       [productUrl]
+       ```
+   - If no exact match, respond:
+       ```
+       فعلاً اون مدل تموم شده ولی چندتا مشابهش دارم، میخوای ببینی؟ 😊
+       ```
+   - Never say “نمی‌دونم” or “خطا”. Always give a friendly, confident answer.
+
+3. **Brain & Personality**
+   - Use the Seylane persona (from ROLE, SYSTEM UPDATE, and Brand Brain Manual) to guide all replies.
+   - The bot must sound like a real human assistant: confident, warm, elegant, helpful.
+   - All outputs are in Persian, but internal logic can stay in English.
+
+4. **Link System**
+   - All links should use the correct format: `https://seylane.com/product/[slug]`
+   - If a product slug isn’t found, try to match brand + name similarity and build a valid link.
+
+5. **Continuous Check**
+   - Make sure the bot keeps checking new messages or DMs continuously (loop or setInterval).
+   - It should always stay responsive and restart checking automatically if an error happens.
+
+6. **No Uncertainty**
+   - The bot must never respond with “I don’t know” or “error”.
+   - If something is missing, it should gracefully guess and respond with confidence.
+
+Once done, show me the exact updated main.js and the new console output from a few product searches (in Persian).
