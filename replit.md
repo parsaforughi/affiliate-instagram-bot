@@ -5,6 +5,20 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
 
 ## Recent Changes (November 2, 2025)
 
+### 🎯 v3.9 - Best Sellers List (Latest)
+1. **Best-Selling Products Added**:
+   - Each brand has a designated best-selling product
+   - کلامین: کلاژن بانک امگا 3 حجم 125 میل (۴۷۹٬۰۰۰ تومان)
+   - میسویک: خمیردندان بلیچینگ + ضد زردی (۶۱۴٬۰۰۰ تومان)
+   - آیس‌بال: ژل آبرسان کلاژن لیفتینگ (۴۹۸٬۰۰۰ تومان)
+   - دافی: میسلار واتر (پاک‌کننده پوست)
+   - آمبرلا: استیک دئودورانت اسنو سفید
+   - پیکسل: کرم ضد آفتاب سنتلا
+
+2. **Auto-Suggest Best Sellers**:
+   - When user asks about a brand → bot suggests best-selling product
+   - Includes price + 40% discount calculation
+
 ### 🎯 v3.8 - Bullet-Style Format + Brand Filtering (COMPLETE ✅)
 1. **New Message Format (Bullet-Style with Emojis)**:
    - Changed from paragraphs to short 3-6 line bullet points

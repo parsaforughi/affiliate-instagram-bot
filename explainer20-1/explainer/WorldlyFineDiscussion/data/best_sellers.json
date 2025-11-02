@@ -1,0 +1,46 @@
+{
+  "bestSellers": [
+    {
+      "brand": "آمبرلا",
+      "englishName": "Umbrella",
+      "productName": "استیک زنانه اسنو سفید ۹۰ میل آمبرلا",
+      "searchTerms": ["استیک زنانه", "اسنو", "آمبرلا"],
+      "category": "دئودورانت"
+    },
+    {
+      "brand": "آیس‌بال",
+      "englishName": "IceBall",
+      "productName": "ژل آبرسان کلاژن لیفتینگ صورت آیس بال",
+      "searchTerms": ["ژل آبرسان", "کلاژن", "لیفتینگ", "آیس بال"],
+      "category": "مراقبت پوست"
+    },
+    {
+      "brand": "دافی",
+      "englishName": "Dafi",
+      "productName": "میسلار واتر دافی مناسب پوست های چرب و آکنه دار حجم 200 میل",
+      "searchTerms": ["میسلار واتر", "دافی", "پوست چرب", "آکنه"],
+      "category": "پاک کننده"
+    },
+    {
+      "brand": "میسویک",
+      "englishName": "Misswake",
+      "productName": "خمیردندان بلیچینگ + خمیردندان ضد زردی میسویک",
+      "searchTerms": ["بلیچینگ", "ضد زردی", "میسویک", "سفید کننده"],
+      "category": "مراقبت دهان و دندان"
+    },
+    {
+      "brand": "پیکسل",
+      "englishName": "Pixel",
+      "productName": "کرم ضد آفتاب سنتلا پیکسل",
+      "searchTerms": ["ضد آفتاب", "سنتلا", "پیکسل"],
+      "category": "ضدآفتاب"
+    },
+    {
+      "brand": "کلامین",
+      "englishName": "Collamin",
+      "productName": "کلاژن بانک امگا 3 حجم 125 میل کلامین",
+      "searchTerms": ["کلاژن بانک", "امگا 3", "کلامین"],
+      "category": "مکمل زیبایی"
+    }
+  ]
+}
