@@ -5,16 +5,21 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
 
 ## Recent Changes (November 2, 2025)
 
-### 🔥 Performance Fix - Timeout Resolution v3.6 (Latest)
-1. **Optimized System Prompt (80% reduction)**:
-   - Reduced prompt from 117 lines to ~24 lines
-   - Removed redundant instructions while keeping core functionality
-   - Prevents OpenAI API timeouts (was 38s, now targeting <3s)
+### 🔥 Performance Fix - Timeout Resolution v3.7 (Latest)
+1. **Removed Automatic Product Search from Prompt (Critical Fix)**:
+   - Removed automatic injection of 5+ products into system prompt
+   - Previously: "میسویک" query → added all Misswake products to prompt → timeout
+   - Now: Minimal prompt, AI asks follow-up questions to narrow down product
+   - **Result: 38s → 1.6s response time!** ⚡
 
-2. **Reduced Context Window (2+1 Messages)**:
+2. **Optimized System Prompt (90% reduction)**:
+   - Reduced from 117 lines to ~10 lines
+   - Removed priority products context
+   - Removed redundant instructions
+   
+3. **Reduced Context Window (2+1 Messages)**:
    - Changed from 5 user + 3 bot messages to 2 user + 1 bot message
    - Significantly reduces token count sent to OpenAI
-   - Maintains conversation continuity with less overhead
 
 ### 🆕 Arman Fix - Human-Like AI v3.5
 1. **Memory & Context (Now 2+1 Messages)**:

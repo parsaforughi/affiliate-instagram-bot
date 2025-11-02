@@ -410,76 +410,24 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
     }
   }
 
-  // Search for products mentioned in the message
+  // Note: Product search removed from system prompt to prevent timeout
+  // Products will be searched AFTER AI response based on user's specific request
   let productSearchContext = '';
-  const keywords = ['خمیر', 'دندان', 'کاندوم', 'دستمال', 'کرم', 'ژل', 'دهان', 'شویه', 'نخ', 'کلاژن', 'بلیچ', 'سفید', 'میسویک', 'دافی', 'کدکس', 'آمبرلا', 'کلامین', 'آیس', 'misswake', 'dafi', 'codex', 'umbrella', 'collamin', 'iceball'];
-  
-  const hasProductKeyword = keywords.some(keyword => userMessageLower.includes(keyword));
-  
-  if (hasProductKeyword) {
-    // Extract potential product names from the message
-    let searchTerms = userMessage.split(/\s+/).filter(word => word.length > 3);
-    
-    // Prioritize specific terms (e.g., "بلیچینگ" should be searched before generic "خمیر")
-    const priorityTerms = ['بلیچینگ', 'بلیچ', 'bleaching', 'کاندوم', 'کلاژن', 'دستمال'];
-    searchTerms.sort((a, b) => {
-      const aPriority = priorityTerms.some(term => a.includes(term)) ? 1 : 0;
-      const bPriority = priorityTerms.some(term => b.includes(term)) ? 1 : 0;
-      return bPriority - aPriority;
-    });
-    
-    for (const term of searchTerms) {
-      const results = searchProduct(term);
-      if (results.length > 0) {
-        productSearchContext += `\n\n🔍 محصولات پیدا شده برای "${term}":\n`;
-        results.forEach(product => {
-          productSearchContext += `• ${product.name} - ${product.price} تومان (${product.brand})\n`;
-          productSearchContext += `  لینک: ${product.productUrl}\n`;
-        });
-        break; // Only search for first matching term
-      }
-    }
-  }
-
-  // Priority products for special offers
-  const priorityProducts = ['کلامین', 'collamin', 'میسویک', 'misswake', 'آیس بال', 'ایس بال', 'iceball'];
-  const hasPriorityProduct = priorityProducts.some(keyword => userMessageLower.includes(keyword));
-  
   let priorityProductContext = '';
-  if (hasPriorityProduct) {
-    priorityProductContext = `\n\n🎯 پیشنهاد ویژه - حتماً این محصولات رو معرفی کن:
-• کلامین (Collamin) - کلاژن بانک امگا 3 برای زیبایی پوست و مو - 479,000 تومان
-• میسویک (Misswake) - خمیردندان بلیچینگ دانه آبی - 287,000 تومان  
-• آیس‌بال (IceBall) - ژل آبرسان هیالورونیک و کلاژن لیفتینگ - 498,000 تومان
 
-⭐ بگو: "این محصولات خیلی مناسب پیج شماست و الان تقاضاشون خیلی بالاست!"
-`;
-  }
-
-  const systemPrompt = `You are Seylane's brand representative. Speak naturally in Persian like a friendly expert.
+  const systemPrompt = `You are Seylane's brand rep. Speak Persian naturally & friendly.
 
 کاربر: ${displayName} | برندها: Collamin, Misswake, IceBall, Dafi, Umbrella, Pixel
-فروشگاه: luxirana.com | تخفیف افیلیت: ۴۰٪
+فروشگاه: luxirana.com | تخفیف: ۴۰٪
 
-قوانین:
-1. پاسخ‌های کوتاه و دوستانه با emoji مناسب (😊✨👇)
-2. هیچوقت نگو: "نداریم", "متوجه نشدم", "خطا"
-3. محصول نبود؟ بگو: "فعلاً تموم شده ولی یه مشابه دارم 😍 میخوای ببینی؟"
-4. قیمت با تخفیف ۴۰٪: [price] × 0.6
-5. فرمت محصول:
-پیدا شد 😍
-🛍️ [نام]
-💰 مصرف‌کننده: [قیمت] تومان
-با ۴۰٪ تخفیف: [تخفیف] تومان
-✨ برند: [برند]
-لینک خرید 👇
-
-6. JSON: {"responses":[{"message":"...","sendLink":bool,"productLink":"url"}],"detectedTone":"casual"}
+Rules:
+1. کوتاه و گرم با emoji (😊✨👇)
+2. سوال کلی → سوال مشخص‌تر بپرس (مثلاً: "کدوم محصول میسویک؟ خمیردندون؟ دهان‌شویه؟")
+3. سوال راجب افیلیت → لینک بده: https://luxirana.com/affiliate
+4. JSON: {"responses":[{"message":"...","sendLink":bool,"productLink":"url"}],"detectedTone":"casual"}
 ${multiMessageContext}
 ${greetingContext}
 ${brandContext}
-${productSearchContext}
-${priorityProductContext}
 `;
 
   try {
