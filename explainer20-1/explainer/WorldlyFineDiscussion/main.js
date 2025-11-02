@@ -994,10 +994,14 @@ async function processConversation(page, conv, messageCache, userContextManager,
     const fs = require('fs');
     
     // Check if user is asking for BEST SELLERS (all brands)
-    const askingForBestSellers = (lastMessage.includes('بهترین') && lastMessage.includes('برند')) ||
-                                 (lastMessage.includes('پرفروش') && lastMessage.includes('برند')) ||
-                                 lastMessage.includes('معرفی کن') ||
-                                 (lastMessage.includes('هر برند') && (lastMessage.includes('بهترین') || lastMessage.includes('پرفروش')));
+    const normalizedMsg = lastMessage.replace(/\s+/g, ' ').toLowerCase();
+    const askingForBestSellers = (
+      (normalizedMsg.includes('بهترین') && normalizedMsg.includes('برند')) ||
+      (normalizedMsg.includes('پرفروش') && normalizedMsg.includes('برند')) ||
+      (normalizedMsg.includes('پر فروش') && normalizedMsg.includes('برند')) ||
+      (normalizedMsg.includes('هر برند') && (normalizedMsg.includes('بهترین') || normalizedMsg.includes('پرفروش') || normalizedMsg.includes('پر فروش'))) ||
+      (normalizedMsg.includes('معرفی') && normalizedMsg.includes('برند'))
+    );
     
     if (askingForBestSellers) {
       console.log(`⭐ [${username}] User wants best-sellers from ALL brands`);
