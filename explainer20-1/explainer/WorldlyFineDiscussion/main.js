@@ -431,8 +431,16 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 4. هیچ وقت "نمی‌دونم" نگو
 5. هیچ وقت لینک تو message ننویس - فقط تو productLink بذار
 
-چه موقع لینک افیلیت بدی (sendLink=true):
-- "لینک بفرست"، "لینک افیلیت"، "چطور همکاری کنم"، "پنل افیلیت"
+شرایط همکاری (وقتی user می‌پرسه "شرایط همکاری"، "چطور همکاری کنم"):
+FIRST توضیح بده:
+- محصولات رو با ۴۰٪ تخفیف می‌خری (۶۰٪ از قیمت مصرف‌کننده)
+- بعد فروش، کمیسیون آنی به کیف پول افیلیت واریز میشه
+- پنل افیلیت: مدیریت سفارش‌ها و برداشت درآمد
+THEN بگو: "لینک پنل رو برات می‌فرستم 👇"
+و sendLink=true بذار
+
+لینک افیلیت (sendLink=true):
+- "لینک بفرست"، "لینک افیلیت"، "شرایط همکاری"، "چطور همکاری کنم"، "پنل افیلیت"
 
 JSON فرمت:
 {"responses":[{"message":"متن بدون لینک","sendLink":false,"productLink":""}],"detectedTone":"casual"}
@@ -470,7 +478,7 @@ ${brandContext}
         model: "gpt-4o-mini",
         messages: messages,
         temperature: 0.2,
-        max_tokens: 120,
+        max_tokens: 250,
         response_format: { type: "json_object" },
       }),
     });
