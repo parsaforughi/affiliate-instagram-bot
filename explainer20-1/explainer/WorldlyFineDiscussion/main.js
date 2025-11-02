@@ -971,11 +971,19 @@ async function processConversation(page, conv, messageCache, userContextManager,
     // Check if user is asking for BEST SELLERS (all brands)
     const normalizedMsg = lastMessage.replace(/\s+/g, ' ').toLowerCase();
     const askingForBestSellers = (
+      // With "برند"
       (normalizedMsg.includes('بهترین') && normalizedMsg.includes('برند')) ||
       (normalizedMsg.includes('پرفروش') && normalizedMsg.includes('برند')) ||
       (normalizedMsg.includes('پر فروش') && normalizedMsg.includes('برند')) ||
       (normalizedMsg.includes('هر برند') && (normalizedMsg.includes('بهترین') || normalizedMsg.includes('پرفروش') || normalizedMsg.includes('پر فروش'))) ||
-      (normalizedMsg.includes('معرفی') && normalizedMsg.includes('برند'))
+      (normalizedMsg.includes('معرفی') && normalizedMsg.includes('برند')) ||
+      // With "محصول" / "محصولات"
+      (normalizedMsg.includes('بهترین محصول')) ||
+      (normalizedMsg.includes('پرفروش‌ترین محصول')) ||
+      (normalizedMsg.includes('پر فروش ترین محصول')) ||
+      (normalizedMsg.includes('محصولات پرفروش')) ||
+      (normalizedMsg.includes('محصولات برتر')) ||
+      (normalizedMsg.includes('بهترین محصولات'))
     );
     
     if (askingForBestSellers) {
@@ -987,6 +995,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
       
       // Build message with all 6 best-sellers
       let bestSellerMessage = '✨ پرفروش‌ترین محصولات برندهامون:\n\n';
+      let allProductLinks = '';
       
       allBestSellers.forEach((item, index) => {
         // Search for this specific product to get price and URL
@@ -996,6 +1005,11 @@ async function processConversation(page, conv, messageCache, userContextManager,
           const product = products[0];
           bestSellerMessage += `${index + 1}. ${item.brand}: ${product.name}\n`;
           bestSellerMessage += `   💰 ${product.price} → 🔖 ${product.discountPrice}\n\n`;
+          
+          // Collect product link
+          if (product.productUrl) {
+            allProductLinks += `${index + 1}. ${product.productUrl}\n`;
+          }
         } else {
           bestSellerMessage += `${index + 1}. ${item.brand}: ${item.productName}\n\n`;
         }
@@ -1005,10 +1019,11 @@ async function processConversation(page, conv, messageCache, userContextManager,
       
       // Replace AI response
       response.responses[0].message = bestSellerMessage;
-      response.responses[0].sendLink = true; // Send affiliate link
-      response.responses[0].sendProductInfo = false;
+      response.responses[0].sendLink = false;
+      response.responses[0].sendProductInfo = true;
+      response.responses[0].productLink = allProductLinks.trim(); // Send all product links
       
-      console.log(`✅ Sent all 6 best-sellers`);
+      console.log(`✅ Sent all 6 best-sellers with ${allBestSellers.length} product links`);
     } else {
       // Regular product search
       const askingForProducts = lastMessage.includes('قیمت') || 
