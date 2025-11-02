@@ -226,13 +226,13 @@ function getProductURL(productName) {
       return bestMatch.url;
     }
     
-    // Not found - return store homepage (never build fake URLs)
-    console.log(`   ❌ NO URL match - using homepage`);
-    return 'https://luxirana.com';
+    // Not found - return null (only send real URLs from product_slugs.csv)
+    console.log(`   ❌ NO URL match - returning null`);
+    return null;
     
   } catch (error) {
     console.error(`   ❌ ERROR getting URL: ${error.message}`);
-    return 'https://luxirana.com';
+    return null;
   }
 }
 
@@ -276,58 +276,65 @@ function searchProduct(productName) {
       if (nameLower.includes(searchNormalized) || 
           searchNormalized.includes(nameLower.substring(0, 20))) {
         
-        // Get URL from product_slugs.csv
+        // Get URL from product_slugs.csv (only real URLs)
         const productUrl = getProductURL(name);
         
-        const product = {
-          name,
-          rawPrice,
-          price: formatPersianPrice(rawPrice),
-          discountPrice: calculateDiscount(rawPrice),
-          brand,
-          categories,
-          productUrl,
-          productId,
-          matchType: 'exact-name'
-        };
-        
-        matches.push(product);
-        console.log(`✅ EXACT NAME MATCH:`);
-        console.log(`   Name: ${name}`);
-        console.log(`   Brand: ${brand}`);
-        console.log(`   Price: ${product.price} تومان`);
-        console.log(`   Discount: ${product.discountPrice} تومان (40% off)`);
-        console.log(`   URL: ${productUrl}`);
-        
-        if (matches.length >= 5) break;
+        // Only include product if we found a real URL
+        if (productUrl) {
+          const product = {
+            name,
+            rawPrice,
+            price: formatPersianPrice(rawPrice),
+            discountPrice: calculateDiscount(rawPrice),
+            brand,
+            categories,
+            productUrl,
+            productId,
+            matchType: 'exact-name'
+          };
+          
+          matches.push(product);
+          console.log(`✅ EXACT NAME MATCH:`);
+          console.log(`   Name: ${name}`);
+          console.log(`   Brand: ${brand}`);
+          console.log(`   Price: ${product.price} تومان`);
+          console.log(`   Discount: ${product.discountPrice} تومان (40% off)`);
+          console.log(`   URL: ${productUrl}`);
+          
+          if (matches.length >= 5) break;
+        }
       } 
       // Check for match by brand (only if brand is not empty)
       else if (brand && brandLower && 
                (brandLower.includes(searchNormalized) || 
                 searchNormalized.includes(brandLower))) {
         
+        // Get URL from product_slugs.csv (only real URLs)
         const productUrl = getProductURL(name);
         
-        const product = {
-          name,
-          rawPrice,
-          price: formatPersianPrice(rawPrice),
-          discountPrice: calculateDiscount(rawPrice),
-          brand,
-          categories,
-          productUrl,
-          productId,
-          matchType: 'exact-brand'
-        };
-        
-        matches.push(product);
-        console.log(`✅ EXACT BRAND MATCH:`);
-        console.log(`   Name: ${name}`);
-        console.log(`   Brand: ${brand}`);
-        console.log(`   Price: ${product.price} تومان`);
-        console.log(`   URL: ${productUrl}`);
-        
-        if (matches.length >= 5) break;
+        // Only include product if we found a real URL
+        if (productUrl) {
+          const product = {
+            name,
+            rawPrice,
+            price: formatPersianPrice(rawPrice),
+            discountPrice: calculateDiscount(rawPrice),
+            brand,
+            categories,
+            productUrl,
+            productId,
+            matchType: 'exact-brand'
+          };
+          
+          matches.push(product);
+          console.log(`✅ EXACT BRAND MATCH:`);
+          console.log(`   Name: ${name}`);
+          console.log(`   Brand: ${brand}`);
+          console.log(`   Price: ${product.price} تومان`);
+          console.log(`   URL: ${productUrl}`);
+          
+          if (matches.length >= 5) break;
+        }
       } 
       // Fuzzy matching
       else {
@@ -338,18 +345,21 @@ function searchProduct(productName) {
         if (maxScore > 0.3) {  // 30% similarity threshold
           const productUrl = getProductURL(name);
           
-          fuzzyMatches.push({
-            name,
-            rawPrice,
-            price: formatPersianPrice(rawPrice),
-            discountPrice: calculateDiscount(rawPrice),
-            brand,
-            categories,
-            productUrl,
-            productId,
-            matchType: 'fuzzy',
-            similarity: maxScore
-          });
+          // Only include if we found a real URL from product_slugs.csv
+          if (productUrl) {
+            fuzzyMatches.push({
+              name,
+              rawPrice,
+              price: formatPersianPrice(rawPrice),
+              discountPrice: calculateDiscount(rawPrice),
+              brand,
+              categories,
+              productUrl,
+              productId,
+              matchType: 'fuzzy',
+              similarity: maxScore
+            });
+          }
         }
       }
     }

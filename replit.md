@@ -103,6 +103,7 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
     2. Exact brand match (only if brand field not empty)
     3. Fuzzy matching with 30% similarity threshold
   - **Never builds fake URLs**: Only uses real URLs from product_slugs.csv
+  - **Returns null if URL not found**: Products without valid URLs are excluded from results
   - **Price formatting**: Persian separators with 40% discount calculation
   - **Merged getProductURL()**: Looks up URL from product_slugs.csv after finding product
 - **main.js**: 
