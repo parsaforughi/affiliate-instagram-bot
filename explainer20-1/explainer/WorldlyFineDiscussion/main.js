@@ -452,23 +452,23 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   let productSearchContext = '';
   let priorityProductContext = '';
 
-  const systemPrompt = `نماینده برند Seylane برای برنامه افیلیت Luxirana. فارسی، صمیمی، کوتاه.
+  const systemPrompt = `نماینده Seylane برای افیلیت Luxirana. فارسی، کوتاه.
 
 کاربر: ${displayName}
 برندها: کلامین، میسویک، آیس‌بال، دافی، آمبرلا، پیکسل
-تخفیف: ۴۰٪
 
 قوانین:
-1. فقط 6 برند بالا - هیچ برند دیگه نداریم
-2. "کلامین چیه؟" → توضیح کلی برند (بدون قیمت/محصول)
-3. "پرفروش‌ترین کلامین؟" → با قیمت و لینک
-4. پیام کوتاه (2-4 خط)
-5. NEVER بگو "برو سایت" یا "luxirana.com ببین" - همیشه خودت جواب بده
-6. همیشه پاسخ مفید بده - هیچ وقت "نمی‌دونم" نگو
+1. فقط 6 برند بالا
+2. پیام کوتاه (2-3 خط)
+3. NEVER بگو "برو سایت"
+4. هیچ وقت "نمی‌دونم" نگو
+5. هیچ وقت لینک تو message ننویس - فقط تو productLink بذار
 
-لینک افیلیت: https://luxirana.com/affiliate
+چه موقع لینک افیلیت بدی (sendLink=true):
+- "لینک بفرست"، "لینک افیلیت"، "چطور همکاری کنم"، "پنل افیلیت"
 
-JSON: {"responses":[{"message":"...","sendLink":bool,"productLink":"url"}],"detectedTone":"casual"}
+JSON فرمت:
+{"responses":[{"message":"متن بدون لینک","sendLink":false,"productLink":""}],"detectedTone":"casual"}
 ${brandContext}
 `;
 
@@ -502,8 +502,8 @@ ${brandContext}
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: messages,
-        temperature: 0.3,
-        max_tokens: 150,
+        temperature: 0.2,
+        max_tokens: 120,
         response_format: { type: "json_object" },
       }),
     });
@@ -988,42 +988,82 @@ async function processConversation(page, conv, messageCache, userContextManager,
     console.log(`🤖 [${username}] Response ready`);
 
     // ========================================
-    // POST-PROCESSING: Search for products if user asked
+    // POST-PROCESSING: Best-Sellers or Product Search
     // ========================================
     const { searchProduct } = require('./search_product.js');
+    const fs = require('fs');
     
-    // Detect if user is asking for products/prices
-    const askingForProducts = lastMessage.includes('قیمت') || 
-                              lastMessage.includes('محصول') ||
-                              lastMessage.includes('چند') ||
-                              lastMessage.includes('چقدر') ||
-                              lastMessage.includes('برام بگو') ||
-                              lastMessage.includes('نشون بده') ||
-                              lastMessage.includes('میخوام');
+    // Check if user is asking for BEST SELLERS (all brands)
+    const askingForBestSellers = (lastMessage.includes('بهترین') && lastMessage.includes('برند')) ||
+                                 (lastMessage.includes('پرفروش') && lastMessage.includes('برند')) ||
+                                 lastMessage.includes('معرفی کن') ||
+                                 (lastMessage.includes('هر برند') && (lastMessage.includes('بهترین') || lastMessage.includes('پرفروش')));
     
-    if (askingForProducts) {
-      console.log(`🔍 [${username}] Detected product request - searching products...`);
-      const products = searchProduct(lastMessage);
+    if (askingForBestSellers) {
+      console.log(`⭐ [${username}] User wants best-sellers from ALL brands`);
       
-      if (products && products.length > 0) {
-        console.log(`✅ Found ${products.length} products from CSV`);
+      // Load best-sellers
+      const bestSellersData = JSON.parse(fs.readFileSync('./data/best_sellers.json', 'utf8'));
+      const allBestSellers = bestSellersData.bestSellers;
+      
+      // Build message with all 6 best-sellers
+      let bestSellerMessage = '✨ پرفروش‌ترین محصولات برندهامون:\n\n';
+      
+      allBestSellers.forEach((item, index) => {
+        // Search for this specific product to get price and URL
+        const products = searchProduct(item.productName);
         
-        // Build proper formatted message with REAL prices
-        let productMessage = '';
-        const firstProduct = products[0];
+        if (products && products.length > 0) {
+          const product = products[0];
+          bestSellerMessage += `${index + 1}. ${item.brand}: ${product.name}\n`;
+          bestSellerMessage += `   💰 ${product.price} → 🔖 ${product.discountPrice}\n\n`;
+        } else {
+          bestSellerMessage += `${index + 1}. ${item.brand}: ${item.productName}\n\n`;
+        }
+      });
+      
+      bestSellerMessage += `🔗 لینک‌های خرید رو پایین می‌فرستم 👇`;
+      
+      // Replace AI response
+      response.responses[0].message = bestSellerMessage;
+      response.responses[0].sendLink = true; // Send affiliate link
+      response.responses[0].sendProductInfo = false;
+      
+      console.log(`✅ Sent all 6 best-sellers`);
+    } else {
+      // Regular product search
+      const askingForProducts = lastMessage.includes('قیمت') || 
+                                lastMessage.includes('محصول') ||
+                                lastMessage.includes('چند') ||
+                                lastMessage.includes('چقدر') ||
+                                lastMessage.includes('برام بگو') ||
+                                lastMessage.includes('نشون بده') ||
+                                lastMessage.includes('میخوام');
+      
+      if (askingForProducts) {
+        console.log(`🔍 [${username}] Detected product request - searching products...`);
+        const products = searchProduct(lastMessage);
         
-        productMessage = `✨ محصول: ${firstProduct.name}\n`;
-        productMessage += `💰 قیمت مصرف‌کننده: ${firstProduct.price}\n`;
-        productMessage += `🔖 برای شما با ۴۰٪ تخفیف: ${firstProduct.discountPrice}\n`;
-        productMessage += `🔗 لینک خرید پایین 👇`;
-        
-        // Replace AI response with real product info
-        response.responses[0].message = productMessage;
-        response.responses[0].sendProductInfo = true;
-        response.responses[0].productLink = firstProduct.productUrl;
-        response.responses[0].sendLink = false;
-        
-        console.log(`🔗 Product link: ${firstProduct.productUrl}`);
+        if (products && products.length > 0) {
+          console.log(`✅ Found ${products.length} products from CSV`);
+          
+          // Build proper formatted message with REAL prices
+          let productMessage = '';
+          const firstProduct = products[0];
+          
+          productMessage = `✨ محصول: ${firstProduct.name}\n`;
+          productMessage += `💰 قیمت مصرف‌کننده: ${firstProduct.price}\n`;
+          productMessage += `🔖 برای شما با ۴۰٪ تخفیف: ${firstProduct.discountPrice}\n`;
+          productMessage += `🔗 لینک خرید پایین 👇`;
+          
+          // Replace AI response with real product info
+          response.responses[0].message = productMessage;
+          response.responses[0].sendProductInfo = true;
+          response.responses[0].productLink = firstProduct.productUrl;
+          response.responses[0].sendLink = false;
+          
+          console.log(`🔗 Product link: ${firstProduct.productUrl}`);
+        }
       }
     }
 
