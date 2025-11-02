@@ -5,6 +5,42 @@ Persian-language Instagram DM bot for affiliate marketing with session-based aut
 
 ## Recent Changes (November 2, 2025)
 
+### 🎯 v3.8 - Bullet-Style Format + Brand Filtering (COMPLETE ✅)
+1. **New Message Format (Bullet-Style with Emojis)**:
+   - Changed from paragraphs to short 3-6 line bullet points
+   - Format example:
+     ```
+     ✨ محصول: خمیردندان توتال ۱۲ کاره میسویک
+     💰 قیمت مصرف‌کننده: ۲۱۷٬۰۰۰ تومان
+     🔖 برای شما با ۴۰٪ تخفیف: ۱۳۰٬۲۰۰ تومان
+     🔗 لینک خرید پایین 👇
+     ```
+
+2. **Strict Brand Filtering (6 Brands Only)**:
+   - ONLY allowed: کلامین، میسویک، آیس‌بال، دافی، آمبرلا، پیکسل
+   - Other brands → "این برند در لیست فعلی ما نیست ✨"
+   - Each brand shows only its own products
+
+3. **Pricing Format Update**:
+   - Always shows "قیمت مصرف‌کننده" first
+   - Then "برای شما با ۴۰٪ تخفیف" (60% of price)
+   - Persian numbers with separators
+
+4. **Payment Info Response**:
+   - When asked about payment:
+     ```
+     💳 پرداخت: درگاه مستقیم بانکی
+     💸 پورسانت: لحظه‌ای قابل برداشت از حساب افیلیت
+     🔗 پنل افیلیت: https://affiliate.luxirana.com/account/login
+     ```
+
+5. **Debug Logging Enhanced**:
+   - Logs detected brand: 🧠 Detected brand: کلامین (Collamin)
+   - Logs product link sent: 🔗 Product link: https://luxirana.com/...
+   - Better debugging for troubleshooting links
+
+## Recent Changes (November 2, 2025)
+
 ### 🔥 Performance Fix - Timeout Resolution v3.7 (Latest)
 1. **Removed Automatic Product Search from Prompt (Critical Fix)**:
    - Removed automatic injection of 5+ products into system prompt

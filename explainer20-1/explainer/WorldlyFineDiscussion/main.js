@@ -381,31 +381,34 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   const persianName = translateNameToPersian(userContext.name || userContext.username);
   const displayName = persianName || userContext.name || 'هنوز مشخص نیست';
 
-  // Brand detection for fallback logic
+  // Brand detection for fallback logic (ONLY 6 ALLOWED BRANDS)
   const brandInfo = {
-    'میسویک': { name: 'Misswake', description: 'برند مخصوص مراقبت از دهان و دندان 😁 خمیردندون‌های فوق‌العاده داره!' },
-    'misswake': { name: 'Misswake', description: 'برند مخصوص مراقبت از دهان و دندان 😁 خمیردندون‌های فوق‌العاده داره!' },
-    'کلامین': { name: 'Collamin', description: 'برند کلاژن و مکمل‌های زیبایی 💅 برای پوست و موی درخشان!' },
-    'collamin': { name: 'Collamin', description: 'برند کلاژن و مکمل‌های زیبایی 💅 برای پوست و موی درخشان!' },
-    'آیس بال': { name: 'IceBall', description: 'برند مراقبت از پوست 💦 ژل‌های آبرسان و مرطوب‌کننده!' },
-    'آیس‌بال': { name: 'IceBall', description: 'برند مراقبت از پوست 💦 ژل‌های آبرسان و مرطوب‌کننده!' },
-    'ایس بال': { name: 'IceBall', description: 'برند مراقبت از پوست 💦 ژل‌های آبرسان و مرطوب‌کننده!' },
-    'iceball': { name: 'IceBall', description: 'برند مراقبت از پوست 💦 ژل‌های آبرسان و مرطوب‌کننده!' },
-    'دافی': { name: 'Dafi', description: 'برند دستمال مرطوب و پاک‌کننده‌ها 🧼 برای بهداشت روزانه!' },
-    'dafi': { name: 'Dafi', description: 'برند دستمال مرطوب و پاک‌کننده‌ها 🧼 برای بهداشت روزانه!' },
-    'آمبرلا': { name: 'Umbrella', description: 'برند کرم‌های مرطوب‌کننده و دئودورانت 🌂 برای پوست نرم و خوشبو!' },
-    'umbrella': { name: 'Umbrella', description: 'برند کرم‌های مرطوب‌کننده و دئودورانت 🌂 برای پوست نرم و خوشبو!' },
-    'پیکسل': { name: 'Pixel', description: 'برند ضدآفتاب و کرم‌های روشن‌کننده ☀️ برای حفاظت از پوست!' },
-    'pixel': { name: 'Pixel', description: 'برند ضدآفتاب و کرم‌های روشن‌کننده ☀️ برای حفاظت از پوست!' },
+    'میسویک': { name: 'میسویک', englishName: 'Misswake', description: 'مراقبت دهان و دندان 😁' },
+    'misswake': { name: 'میسویک', englishName: 'Misswake', description: 'مراقبت دهان و دندان 😁' },
+    'کلامین': { name: 'کلامین', englishName: 'Collamin', description: 'کلاژن و مکمل‌های زیبایی 💅' },
+    'collamin': { name: 'کلامین', englishName: 'Collamin', description: 'کلاژن و مکمل‌های زیبایی 💅' },
+    'آیس بال': { name: 'آیس‌بال', englishName: 'IceBall', description: 'مراقبت پوست و آبرسان 💦' },
+    'آیس‌بال': { name: 'آیس‌بال', englishName: 'IceBall', description: 'مراقبت پوست و آبرسان 💦' },
+    'ایس بال': { name: 'آیس‌بال', englishName: 'IceBall', description: 'مراقبت پوست و آبرسان 💦' },
+    'iceball': { name: 'آیس‌بال', englishName: 'IceBall', description: 'مراقبت پوست و آبرسان 💦' },
+    'دافی': { name: 'دافی', englishName: 'Dafi', description: 'دستمال مرطوب 🧼' },
+    'dafi': { name: 'دافی', englishName: 'Dafi', description: 'دستمال مرطوب 🧼' },
+    'آمبرلا': { name: 'آمبرلا', englishName: 'Umbrella', description: 'کرم و دئودورانت 🌂' },
+    'umbrella': { name: 'آمبرلا', englishName: 'Umbrella', description: 'کرم و دئودورانت 🌂' },
+    'پیکسل': { name: 'پیکسل', englishName: 'Pixel', description: 'ضدآفتاب ☀️' },
+    'pixel': { name: 'پیکسل', englishName: 'Pixel', description: 'ضدآفتاب ☀️' },
   };
 
   let brandContext = '';
   const userMessageLower = userMessage.toLowerCase();
+  let detectedBrand = null;
   
-  // Check if brand is mentioned
+  // Check if brand is mentioned (for logging)
   for (const [brandKey, brandData] of Object.entries(brandInfo)) {
     if (userMessageLower.includes(brandKey)) {
-      brandContext = `\n\n🎯 برند ${brandData.name} تشخیص داده شد:\n${brandData.description}\nاگر محصول مشخصی پیدا نشد، این اطلاعات رو بهش بگو و بپرس: "میخوای محصولاتش رو برات بفرستم؟"`;
+      detectedBrand = brandData.name;
+      brandContext = `\n\n🎯 برند ${brandData.name} (${brandData.englishName}) تشخیص داده شد: ${brandData.description}`;
+      console.log(`🧠 Detected brand: ${brandData.name} (${brandData.englishName})`);
       break;
     }
   }
@@ -415,16 +418,55 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   let productSearchContext = '';
   let priorityProductContext = '';
 
-  const systemPrompt = `You are Seylane's brand rep. Speak Persian naturally & friendly.
+  const systemPrompt = `You are Seylane's brand rep for Luxirana affiliate program. Persian, warm, confident, bullet-style.
 
-کاربر: ${displayName} | برندها: Collamin, Misswake, IceBall, Dafi, Umbrella, Pixel
-فروشگاه: luxirana.com | تخفیف: ۴۰٪
+📋 کاربر: ${displayName}
+🏷️ برندهای مجاز (فقط این 6 برند): کلامین، میسویک، آیس‌بال، دافی، آمبرلا، پیکسل
+🌐 فروشگاه: luxirana.com
+💸 تخفیف افیلیت: ۴۰٪
 
-Rules:
-1. کوتاه و گرم با emoji (😊✨👇)
-2. سوال کلی → سوال مشخص‌تر بپرس (مثلاً: "کدوم محصول میسویک؟ خمیردندون؟ دهان‌شویه؟")
-3. سوال راجب افیلیت → لینک بده: https://luxirana.com/affiliate
-4. JSON: {"responses":[{"message":"...","sendLink":bool,"productLink":"url"}],"detectedTone":"casual"}
+📌 CRITICAL RULES:
+
+1️⃣ **Brand Filtering (فیلتر برند)**
+   - Only talk about: کلامین، میسویک، آیس‌بال، دافی، آمبرلا، پیکسل
+   - If user asks about other brands: "این برند در لیست فعلی ما نیست ✨ برندهای فعالمون: کلامین، میسویک، آیس‌بال، دافی، آمبرلا، پیکسل"
+   - Each brand only its own products (e.g., کلامین → only Collamin products)
+
+2️⃣ **Message Style (استایل پیام)**
+   - Short bullet-point style (3-6 lines max)
+   - One idea per line with emoji
+   - Visual separation between items
+   - Example format:
+     ✨ محصول: خمیردندان توتال ۱۲ کاره میسویک
+     💰 قیمت مصرف‌کننده: ۲۱۷٬۰۰۰ تومان
+     🔖 برای شما با ۴۰٪ تخفیف: ۱۳۰٬۲۰۰ تومان
+     🔗 لینک خرید پایین 👇
+
+3️⃣ **Pricing Format (فرمت قیمت)**
+   - Always say "قیمت مصرف‌کننده" first
+   - Then show "برای شما با ۴۰٪ تخفیف" (60% of original price)
+   - Use Persian numbers with separators (e.g., ۲۱۷٬۰۰۰)
+
+4️⃣ **Payment Info (اطلاعات پرداخت)**
+   - When asked about payment method:
+     💳 پرداخت: درگاه مستقیم بانکی
+     💸 پورسانت: لحظه‌ای قابل برداشت از حساب افیلیت
+     🔗 پنل افیلیت: https://affiliate.luxirana.com/account/login
+
+5️⃣ **Affiliate Link Detection**
+   - User asks "لینک افیلیت" or "چطوری همکاری کنم":
+     Set sendLink=true, productLink=""
+     Give link: https://luxirana.com/affiliate
+
+6️⃣ **Behavior**
+   - NEVER say "نمی‌دونم" or "در دست بررسیه"
+   - Always respond confidently
+   - If unsure → ask clarifying question
+   - If brand not in list → suggest our 6 brands
+
+7️⃣ **Output JSON Format**
+   {"responses":[{"message":"...","sendLink":bool,"productLink":"url"}],"detectedTone":"casual"}
+
 ${multiMessageContext}
 ${greetingContext}
 ${brandContext}
@@ -1039,6 +1081,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
           await delay(300);
           await page.keyboard.press("Enter");
           console.log(`✅ [${username}] Message ${i + 1}/${allFlattenedResponses.length} sent!`);
+          console.log(`🔗 [${username}] Product link: ${resp.productLink}`);
           
           await delay(1000);
           
@@ -1048,7 +1091,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
           await textarea.type(resp.productLink, { delay: 25 });
           await delay(300);
           await page.keyboard.press("Enter");
-          console.log(`🛍️ [${username}] Product link sent separately`);
+          console.log(`🛍️ [${username}] Product link sent separately: ${resp.productLink}`);
         } else {
           // Just send the message
           await textarea.type(fullMessage, { delay: 25 });

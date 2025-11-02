@@ -254,6 +254,20 @@ function searchProduct(productName) {
     const matches = [];
     const fuzzyMatches = [];
     
+    // First pass: Check if search query is a brand name (priority)
+    const allowedBrands = ['کلامین', 'میسویک', 'آیس‌بال', 'دافی', 'آمبرلا', 'پیکسل', 'collamin', 'misswake', 'iceball', 'dafi', 'umbrella', 'pixel'];
+    let searchingForBrand = false;
+    let targetBrand = '';
+    
+    for (const allowedBrand of allowedBrands) {
+      if (searchNormalized.includes(normalizePersian(allowedBrand.toLowerCase()))) {
+        searchingForBrand = true;
+        targetBrand = allowedBrand;
+        console.log(`🏷️ Brand search detected: ${targetBrand}`);
+        break;
+      }
+    }
+    
     // Search through all products (skip header row)
     for (let i = 1; i < rows.length; i++) {
       const fields = rows[i];
@@ -264,7 +278,7 @@ function searchProduct(productName) {
       const regularPrice = fields[26] || '';
       const categories = fields[27] || '';
       const productId = fields[2] || '';
-      const brand = fields[40] || '';  // FIXED: Field 41 (index 40)
+      const brand = fields[40] || '';  // Field 41 (index 40)
       
       const rawPrice = salePrice || regularPrice || '';
       
@@ -272,82 +286,13 @@ function searchProduct(productName) {
       const nameLower = normalizePersian(normalizeNumbers(name.toLowerCase()));
       const brandLower = normalizePersian(brand.toLowerCase());
       
-      // Check for exact match by name
-      if (nameLower.includes(searchNormalized) || 
-          searchNormalized.includes(nameLower.substring(0, 20))) {
-        
-        // Get URL from product_slugs.csv (only real URLs)
-        const productUrl = getProductURL(name);
-        
-        // Only include product if we found a real URL
-        if (productUrl) {
-          const product = {
-            name,
-            rawPrice,
-            price: formatPersianPrice(rawPrice),
-            discountPrice: calculateDiscount(rawPrice),
-            brand,
-            categories,
-            productUrl,
-            productId,
-            matchType: 'exact-name'
-          };
-          
-          matches.push(product);
-          console.log(`✅ EXACT NAME MATCH:`);
-          console.log(`   Name: ${name}`);
-          console.log(`   Brand: ${brand}`);
-          console.log(`   Price: ${product.price} تومان`);
-          console.log(`   Discount: ${product.discountPrice} تومان (40% off)`);
-          console.log(`   URL: ${productUrl}`);
-          
-          if (matches.length >= 5) break;
-        }
-      } 
-      // Check for match by brand (only if brand is not empty)
-      else if (brand && brandLower && 
-               (brandLower.includes(searchNormalized) || 
-                searchNormalized.includes(brandLower))) {
-        
-        // Get URL from product_slugs.csv (only real URLs)
-        const productUrl = getProductURL(name);
-        
-        // Only include product if we found a real URL
-        if (productUrl) {
-          const product = {
-            name,
-            rawPrice,
-            price: formatPersianPrice(rawPrice),
-            discountPrice: calculateDiscount(rawPrice),
-            brand,
-            categories,
-            productUrl,
-            productId,
-            matchType: 'exact-brand'
-          };
-          
-          matches.push(product);
-          console.log(`✅ EXACT BRAND MATCH:`);
-          console.log(`   Name: ${name}`);
-          console.log(`   Brand: ${brand}`);
-          console.log(`   Price: ${product.price} تومان`);
-          console.log(`   URL: ${productUrl}`);
-          
-          if (matches.length >= 5) break;
-        }
-      } 
-      // Fuzzy matching
-      else {
-        const nameScore = similarity(searchNormalized, nameLower);
-        const brandScore = similarity(searchNormalized, brandLower);
-        const maxScore = Math.max(nameScore, brandScore);
-        
-        if (maxScore > 0.3) {  // 30% similarity threshold
+      // If user is searching for a specific brand, ONLY match that brand
+      if (searchingForBrand) {
+        if (brand && brandLower.includes(normalizePersian(targetBrand.toLowerCase()))) {
           const productUrl = getProductURL(name);
           
-          // Only include if we found a real URL from product_slugs.csv
           if (productUrl) {
-            fuzzyMatches.push({
+            const product = {
               name,
               rawPrice,
               price: formatPersianPrice(rawPrice),
@@ -356,9 +301,74 @@ function searchProduct(productName) {
               categories,
               productUrl,
               productId,
-              matchType: 'fuzzy',
-              similarity: maxScore
-            });
+              matchType: 'exact-brand'
+            };
+            
+            matches.push(product);
+            console.log(`✅ BRAND MATCH (${brand}):`);
+            console.log(`   Name: ${name}`);
+            console.log(`   Price: ${product.price} تومان`);
+            console.log(`   Discount: ${product.discountPrice} تومان (40% off)`);
+            console.log(`   URL: ${productUrl}`);
+            
+            if (matches.length >= 5) break;
+          }
+        }
+      } else {
+        // Normal product search (not brand-specific)
+        // Check for exact match by name
+        if (nameLower.includes(searchNormalized) || 
+            searchNormalized.includes(nameLower.substring(0, 20))) {
+          
+          const productUrl = getProductURL(name);
+          
+          if (productUrl) {
+            const product = {
+              name,
+              rawPrice,
+              price: formatPersianPrice(rawPrice),
+              discountPrice: calculateDiscount(rawPrice),
+              brand,
+              categories,
+              productUrl,
+              productId,
+              matchType: 'exact-name'
+            };
+            
+            matches.push(product);
+            console.log(`✅ EXACT NAME MATCH:`);
+            console.log(`   Name: ${name}`);
+            console.log(`   Brand: ${brand}`);
+            console.log(`   Price: ${product.price} تومان`);
+            console.log(`   Discount: ${product.discountPrice} تومان (40% off)`);
+            console.log(`   URL: ${productUrl}`);
+            
+            if (matches.length >= 5) break;
+          }
+        } 
+        // Fuzzy matching
+        else {
+          const nameScore = similarity(searchNormalized, nameLower);
+          const brandScore = similarity(searchNormalized, brandLower);
+          const maxScore = Math.max(nameScore, brandScore);
+          
+          if (maxScore > 0.3) {  // 30% similarity threshold
+            const productUrl = getProductURL(name);
+            
+            if (productUrl) {
+              fuzzyMatches.push({
+                name,
+                rawPrice,
+                price: formatPersianPrice(rawPrice),
+                discountPrice: calculateDiscount(rawPrice),
+                brand,
+                categories,
+                productUrl,
+                productId,
+                matchType: 'fuzzy',
+                similarity: maxScore
+              });
+            }
           }
         }
       }

@@ -1,0 +1,64 @@
+Upgrade the Instagram bot logic and reply style.
+
+1. **Brand Filtering**
+   - Only talk about these six brands: کلامین، میسویک، آیس‌بال، دافی، آمبرلا، پیکسل.
+   - Each brand only replies about its own products. Example:
+     - User says "کلامین": only talk about "بانک کلاژن کلامین".
+     - User says "میسویک": talk about its whitening or toothpaste line.
+   - If the user mentions a brand outside these six, reply:
+     "این برند در لیست فعلی ما نیست ✨ ولی برندهای فعالمون اینان: کلامین، میسویک، آیس‌بال، دافی، آمبرلا، پیکسل."
+
+2. **Message Style**
+   - Replies must be **short, Persian, human, and option-like (تیتر‌وار)**.
+   - No long paragraphs. Each line = one short idea.
+   - Example format:
+     ```
+     ✨ محصول: سرم کلاژن کلامین
+     💰 قیمت مصرف‌کننده: ۲۲۰٬۰۰۰ تومان
+     🔖 برای شما با ۴۰٪ تخفیف: ۱۳۲٬۰۰۰ تومان
+     🧾 روش پرداخت: درگاه مستقیم بانکی
+     💸 برداشت پورسانت: لحظه‌ای از حساب افیلیت
+     🔗 لینک خرید:
+     https://luxirana.com/product/klamin-collagen
+     ```
+
+3. **Pricing**
+   - Pull price from `products.csv` (column "price").
+   - Always say: “قیمت مصرف‌کننده” first.
+   - Then show “برای شما با ۴۰٪ تخفیف” (calculate 60% of that price).
+   - Use Persian digits (Intl.NumberFormat('fa-IR')).
+
+4. **Links**
+   - Pull all product URLs from `product_slugs.csv` (column "product_url").
+   - Never generate fake links.
+   - Always use domain `https://luxirana.com`.
+
+5. **Payment Info**
+   - When user asks about payment, reply:
+     ```
+     💳 پرداخت‌ها از طریق درگاه مستقیم انجام میشه.
+     💸 پورسانت افیلیت به‌صورت لحظه‌ای قابل برداشت از حسابه.
+     ✨ همه‌چیز از پنل افیلیت انجام میشه:
+     https://affiliate.luxirana.com/account/login
+     ```
+
+6. **Behavior**
+   - The bot must always like user messages (simulate it via console.log("❤️ liked message")).
+   - Never say “نمی‌دونم” or “در دست بررسیه”.
+   - Always respond confidently and warmly.
+   - Keep replies 3–6 lines max, option-like, visually separated with emojis.
+
+7. **Debug**
+   - Log which brand was detected and which CSV entry was matched.
+   - Example console output:
+     ```
+     🧠 Detected brand: کلامین
+     ✅ Product matched: سرم کلاژن کلامین (220000 تومان)
+     ```
+
+Update main.js (reply logic section) accordingly.
+After applying, show me one sample reply for each brand using sample messages like:
+- “میسویک سفیدکننده”
+- “کلامین”
+- “پیکسل ضد آفتاب”
+- “روش پرداخت چطوریه؟”
