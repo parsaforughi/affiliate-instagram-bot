@@ -1259,7 +1259,7 @@ async function checkMessageRequests(page) {
 // ========================================
 async function runSelfTest(page) {
   console.log("\n🧪 ========================================");
-  console.log("🧪 Self-Test - Seylane AI v3.3");
+  console.log("🧪 Self-Test - Seylane AI v3.10");
   console.log("🧪 ========================================\n");
 
   const tests = [];
@@ -1320,7 +1320,7 @@ async function runSelfTest(page) {
 // ========================================
 (async () => {
   console.log("🚀 ========================================");
-  console.log("🚀 Seylane Explainer AI v3.3");
+  console.log("🚀 Seylane Explainer AI v3.10");
   console.log("🚀 Speed + Smart Personalization");
   console.log("🚀 ========================================\n");
 

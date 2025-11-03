@@ -1,11 +1,34 @@
-# Seylane Explainer AI v3.3
+# Seylane Explainer AI v3.10
 
 ## Overview
 Persian-language Instagram DM bot for affiliate marketing with session-based authentication and OpenAI integration. Provides warm, friendly responses for Luxirana's affiliate program.
 
+## Recent Changes (November 3, 2025)
+
+### 🗑️ v3.10 - Database Cleanup (Latest)
+1. **Discontinued Products Removed (23 products)**:
+   - **آمبرلا کرم محصولات (17 products)**: User confirmed Umbrella ONLY has استیک (deodorant sticks) and دستمال مرطوب (wet wipes), NO creams
+     - Removed: کرم پمپی زیتون، کرم کاسه‌ای (all variants), کرم تیوپی (all variants)
+   - **میسویک پمپی 260ml (5 products)**: User confirmed these products don't exist
+     - Removed: خمیردندان سفید کننده روزانه 260میل، خمیردندان توتال پمپی 260، خمیردندان حساس پمپی 260، خمیردندان کودک پمپی (سونیک & تک شاخ)
+   - **Umbrella best-seller updated**: Changed from discontinued "کرم پمپی زیتون" to "استیک زنانه دریم بنفش ۹۰ میل"
+   - **Database**: Cleaned from 578 → 555 products (data/products.csv)
+
+2. **"How to Start" Response Added**:
+   - New trigger: "چطور می‌تونم شروع کنم؟", "از کجا شروع کنم؟"
+   - Response format:
+     ```
+     راهنمای ساده:
+     1️⃣ ثبت‌نام تو پنل افیلیت
+     2️⃣ انتخاب محصولات (میتونی از پرفروش‌ترین‌ها شروع کنی)
+     3️⃣ فروش و کسب درآمد با کمیسیون آنی
+     لینک پنل رو برات می‌فرستم 👇
+     ```
+   - Then sends affiliate panel link: https://affiliate.luxirana.com/account/login
+
 ## Recent Changes (November 2, 2025)
 
-### 🎯 v3.9 - Best Sellers List (Latest)
+### 🎯 v3.9 - Best Sellers List
 1. **Best-Selling Products Added**:
    - Each brand has a designated best-selling product
    - کلامین: کلاژن بانک امگا 3 حجم 125 میل (۴۷۹٬۰۰۰ تومان)
