@@ -34,6 +34,7 @@ The bot adopts a warm, friendly, and conversational Persian tone (محاوره�
 - **Affiliate Onboarding**: Guides users through the affiliate program registration.
 - **Product Information**: Provides details on specific products, including brand, price, and discounted affiliate price.
 - **Brand Information**: Offers general information about the 6 priority brands.
+- **Instagram Handles**: When users request "more details" or "explain more" about a brand, bot sends the brand's Instagram handle (@).
 - **Best Seller Identification**: Highlights best-selling products for each brand upon request.
 - **Payment Information**: Explains payment methods and commission withdrawal from the affiliate account.
 
@@ -43,37 +44,43 @@ The bot adopts a warm, friendly, and conversational Persian tone (محاوره�
 
 ## Brand Information (CORRECT & UPDATED)
 
-### 6 Priority Brands - Exact Descriptions with Emojis:
+### 6 Priority Brands - Exact Descriptions with Emojis & Instagram Handles:
 
 1. **Collamin** (کلامین) ✨
    - **English**: Collamin (⚠️ NOT Kalamine)
    - **Description**: محصولات مراقبت پوستی که از ترکیب کلامین با ویتامین‌های دیگه تولید میشه
+   - **Instagram**: @collamin.iran
    - Category: Skincare products made from collagen + vitamins
 
 2. **Misswake** (میسویک) 😁
    - **English**: Misswake
    - **Description**: محصولات مراقبت دهان و دندان
+   - **Instagram**: @misswakeiran
    - Category: Oral hygiene (toothpaste, mouthwash, dental care)
 
 3. **IceBall** (آیس‌بال) ❄️
    - **English**: IceBall
    - **Description**: محصولات مراقبت پوستی، ترند و یخی، بستن منافذ و لیفت پوست
+   - **Instagram**: @iceball_ir
    - Key Features: Ice-based trendy products, pore tightening, skin lifting
 
 4. **Dafi** (دافی) 🧼
    - **English**: Dafi
    - **Description**: دستمال مرطوب و پاک‌کننده‌های آرایشی
+   - **Instagram**: @dafiiran
    - Category: Wet wipes & makeup removers
    - ⚠️ NOT home appliances or kitchen products
 
 5. **Umbrella** (آمبرلا) 🌂
    - **English**: Umbrella
    - **Description**: فقط دئودورانت
+   - **Instagram**: @Umbrella_iran
    - ⚠️ ONLY deodorant sticks (NO creams - all discontinued)
 
 6. **Pixxel** (پیکسل) ☀️
    - **English**: Pixxel (⚠️ double x, NOT Pixel)
    - **Description**: ضدآفتاب سبک، هر دو کتگوری فیزیکال و شیمیایی
+   - **Instagram**: @pixxle.iran
    - Key Features: Lightweight sunscreen, both physical and chemical options available
 
 **Note**: Kodex (condoms) exists but is NOT in the primary 6-brand list.
