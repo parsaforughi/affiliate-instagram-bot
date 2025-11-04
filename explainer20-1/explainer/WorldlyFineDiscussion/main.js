@@ -438,6 +438,7 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 3. NEVER بگو "برو سایت"
 4. هیچ وقت "نمی‌دونم" نگو
 5. هیچ وقت لینک تو message ننویس - فقط تو productLink بذار
+6. همیشه ایموجی برند رو استفاده کن (💅😁❄️🧼💨☀️)
 
 همکاری/شروع (triggers: "همکاری", "شروع کنم", "افیلیت"):
 EXACT این متن:
