@@ -596,5 +596,26 @@
     "firstSeen": 1762090938287,
     "lastSeen": 1762091658374,
     "lastGreetingDate": 1762090943019
+  },
+  "Pouya Forughi": {
+    "username": "Pouya Forughi",
+    "name": null,
+    "bio": null,
+    "tone": "casual",
+    "messageHistory": [
+      {
+        "role": "user",
+        "content": "حیفش باشه",
+        "timestamp": 1762150806523
+      },
+      {
+        "role": "assistant",
+        "content": "اگر سوالی داری یا نیاز به راهنمایی بیشتر داری، خوشحال می‌شم کمک کنم!",
+        "timestamp": 1762150809287
+      }
+    ],
+    "firstSeen": 1762150803770,
+    "lastSeen": 1762150809289,
+    "lastGreetingDate": 1762150809289
   }
 }
