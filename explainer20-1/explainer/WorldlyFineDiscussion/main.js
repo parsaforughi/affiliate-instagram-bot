@@ -41,7 +41,7 @@ const {
   GOOGLE_SHEETS_ENABLED = "false",
 } = process.env;
 
-const AFFILIATE_LINK = "https://affiliate.luxirana.com/account/login";
+const AFFILIATE_LINK = "https://luxirana.com";
 const MY_USERNAME = INSTAGRAM_USERNAME || "luxirana"; // Our bot account name
 
 // ========================================
@@ -450,7 +450,7 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 
 برای لینک همکاری:
 🔗 لینک ثبت‌نام:
-https://affiliate.luxirana.com/account/login
+https://luxirana.com
 
 برای لینک محصول:
 🔗 لینک خرید:
@@ -496,7 +496,7 @@ https://luxirana.com
 کد همکاری: Onlineshops
 
 🔗 لینک ثبت‌نام:
-https://affiliate.luxirana.com/account/login
+https://luxirana.com
 ${greetingContext}
 `;
 
@@ -551,8 +551,8 @@ ${greetingContext}
     console.log("📦 OpenAI response:", rawContent);
     
     // Check if response contains the affiliate link
-    const sendLink = rawContent.includes('affiliate.luxirana.com') || 
-                     rawContent.includes('https://affiliate.luxirana.com');
+    const sendLink = rawContent.includes('luxirana.com') || 
+                     rawContent.includes('https://luxirana.com');
     
     return {
       responses: [{
@@ -1144,7 +1144,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
         if (hasAffiliateLink) {
           // Affiliate link takes priority
           finalSendLink = true;
-          finalLink = 'https://affiliate.luxirana.com/account/login';
+          finalLink = 'https://luxirana.com';
         } else if (hasProductLink) {
           // Product link only if no affiliate link
           finalSendProductInfo = true;
