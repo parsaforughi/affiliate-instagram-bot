@@ -29,3 +29,7 @@ outputType = "console"
 
 [agent]
 expertMode = true
+
+[deployment]
+deploymentTarget = "vm"
+run = ["bash", "-c", "cd explainer20-1/explainer/WorldlyFineDiscussion && node main.js"]
