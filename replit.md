@@ -31,6 +31,10 @@ The bot adopts a warm, friendly, and conversational Persian tone (محاوره�
 - **Affiliate Program Integration**: Provides a structured, 4-step explanation for joining the affiliate program and directs users to the affiliate login panel.
 
 ### Feature Specifications
+- **Affiliate Offer Flow**: 
+  - When users ask "افر همکاری شما چیه؟" or similar, bot explains 40% discount offer with code "onlineshops" and free shipping
+  - Offers custom discount code with user's brand name
+  - If user responds positively ("بله", "آره", "می‌خوام"), sends 4-step affiliate registration guide + link
 - **Affiliate Onboarding**: Guides users through the affiliate program registration.
 - **Product Information**: Provides details on specific products, including brand, price, and discounted affiliate price.
 - **Brand Information**: Offers general information about the 6 priority brands.
