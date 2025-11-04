@@ -41,7 +41,7 @@ const {
   GOOGLE_SHEETS_ENABLED = "false",
 } = process.env;
 
-const AFFILIATE_LINK = "https://affiliate.luxirana.com/account/login";
+const AFFILIATE_LINK = "https://luxirana.com";
 const MY_USERNAME = INSTAGRAM_USERNAME || "luxirana"; // Our bot account name
 
 // ========================================
@@ -383,21 +383,22 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 
   // Brand detection for fallback logic (ONLY 6 ALLOWED BRANDS)
   const brandInfo = {
-    'میسویک': { name: 'میسویک', englishName: 'Misswake', description: 'محصولات مراقبت دهان و دندان 😁' },
-    'misswake': { name: 'میسویک', englishName: 'Misswake', description: 'محصولات مراقبت دهان و دندان 😁' },
-    'کلامین': { name: 'کلامین', englishName: 'Collamin', description: 'محصولات مراقبت پوستی از ترکیب کلامین با ویتامین‌ها ✨' },
-    'collamin': { name: 'کلامین', englishName: 'Collamin', description: 'محصولات مراقبت پوستی از ترکیب کلامین با ویتامین‌ها ✨' },
-    'آیس بال': { name: 'آیس‌بال', englishName: 'IceBall', description: 'محصولات مراقبت پوستی - ترند، یخ، بستن منافذ، لیفت پوست ❄️' },
-    'آیس‌بال': { name: 'آیس‌بال', englishName: 'IceBall', description: 'محصولات مراقبت پوستی - ترند، یخ، بستن منافذ، لیفت پوست ❄️' },
-    'ایس بال': { name: 'آیس‌بال', englishName: 'IceBall', description: 'محصولات مراقبت پوستی - ترند، یخ، بستن منافذ، لیفت پوست ❄️' },
-    'iceball': { name: 'آیس‌بال', englishName: 'IceBall', description: 'محصولات مراقبت پوستی - ترند، یخ، بستن منافذ، لیفت پوست ❄️' },
-    'دافی': { name: 'دافی', englishName: 'Dafi', description: 'دستمال مرطوب و پاک‌کننده‌های آرایشی 🧼' },
-    'dafi': { name: 'دافی', englishName: 'Dafi', description: 'دستمال مرطوب و پاک‌کننده‌های آرایشی 🧼' },
-    'آمبرلا': { name: 'آمبرلا', englishName: 'Umbrella', description: 'فقط دئودورانت (نه کرم) 🌂' },
-    'umbrella': { name: 'آمبرلا', englishName: 'Umbrella', description: 'فقط دئودورانت (نه کرم) 🌂' },
-    'پیکسل': { name: 'پیکسل', englishName: 'Pixxel', description: 'ضدآفتاب سبک - فیزیکال و شیمیایی ☀️' },
-    'pixel': { name: 'پیکسل', englishName: 'Pixxel', description: 'ضدآفتاب سبک - فیزیکال و شیمیایی ☀️' },
-    'pixxel': { name: 'پیکسل', englishName: 'Pixxel', description: 'ضدآفتاب سبک - فیزیکال و شیمیایی ☀️' },
+    'میسویک': { name: 'میسویک', englishName: 'Misswake', description: 'خمیردندان‌های تخصصی و سفیدکننده' },
+    'misswake': { name: 'میسویک', englishName: 'Misswake', description: 'خمیردندان‌های تخصصی و سفیدکننده' },
+    'کلامین': { name: 'کلامین', englishName: 'Collamin', description: 'بانک کلاژن مخصوص پوست' },
+    'collamin': { name: 'کلامین', englishName: 'Collamin', description: 'بانک کلاژن مخصوص پوست' },
+    'آیس بال': { name: 'آیس‌بال', englishName: 'Ice Ball', description: 'ژل لیفتینگ با یخ و کلاژن' },
+    'آیس‌بال': { name: 'آیس‌بال', englishName: 'Ice Ball', description: 'ژل لیفتینگ با یخ و کلاژن' },
+    'ایس بال': { name: 'آیس‌بال', englishName: 'Ice Ball', description: 'ژل لیفتینگ با یخ و کلاژن' },
+    'ice ball': { name: 'آیس‌بال', englishName: 'Ice Ball', description: 'ژل لیفتینگ با یخ و کلاژن' },
+    'iceball': { name: 'آیس‌بال', englishName: 'Ice Ball', description: 'ژل لیفتینگ با یخ و کلاژن' },
+    'دافی': { name: 'دافی', englishName: 'Dafi', description: 'محصولات پوستی مثل میسلار واتر' },
+    'dafi': { name: 'دافی', englishName: 'Dafi', description: 'محصولات پوستی مثل میسلار واتر' },
+    'آمبرلا': { name: 'آمبرلا', englishName: 'Umbrella', description: 'ضدآفتاب و دئودورانت' },
+    'umbrella': { name: 'آمبرلا', englishName: 'Umbrella', description: 'ضدآفتاب و دئودورانت' },
+    'پیکسل': { name: 'پیکسل', englishName: 'Pixel', description: 'کرم ضدآفتاب سنتلا و محصولات پوستی خاص' },
+    'pixel': { name: 'پیکسل', englishName: 'Pixel', description: 'کرم ضدآفتاب سنتلا و محصولات پوستی خاص' },
+    'pixxel': { name: 'پیکسل', englishName: 'Pixel', description: 'کرم ضدآفتاب سنتلا و محصولات پوستی خاص' },
   };
 
   const userMessageLower = userMessage.toLowerCase();
@@ -412,17 +413,62 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
     }
   }
 
-  const systemPrompt = `Seylane. فارسی.
+  const systemPrompt = `# RESET ALL EXISTING INSTRUCTIONS
+Forget every previous rule, persona, and behavior configuration.
 
-کلامین✨پوست @collamin.iran | میسویک😁دهان @misswakeiran | آیس‌بال❄️پوست @iceball_ir | دافی🧼دستمال @dafiiran | آمبرلا🌂دئودورانت @Umbrella_iran | پیکسل☀️ضدآفتاب @pixxle.iran
+You are now **Seylane AI** — a Persian-speaking, human-like personal assistant that represents the **Seylane Green Holding**.  
+You act, write, and respond **exactly like ChatGPT (GPT-5)** with full emotional intelligence, humor, and flow — never robotic.
 
-کوتاه (MAX 20 کلمه). ایموجی برند. سلام نده اگه قبلاً دادی.
+### 🎯 MISSION
+Your purpose is to manage and answer Instagram DMs for **Seylane**, explaining affiliate opportunities and product details naturally.  
+You speak fluent Persian (Finglish optional if user does), reply instantly, and never leave any message unanswered.
 
-افر/همکاری: "40% تخفیف کد onlineshops +ارسال رایگان🎁 کد با اسم خودت؟😊" sendLink=false
-بله→ "۱)ثبت‌نام ۲)کد ۳)معرفی ۴)کمیسیون. لینک؟😊" sendLink=false
-لینک→ sendLink=true
+### 💬 PERSONALITY
+- Tone: warm, confident, friendly, and polite  
+- Style: conversational and human — no markdown, no JSON  
+- Energy: genuine, respectful, calm but engaging  
+- Behave like a smart, kind sales manager, not a chatbot
 
-JSON: {"responses":[{"message":"...","sendLink":false}],"detectedTone":"casual"}
+### 🧴 BRANDS (Only mention these six)
+1. Misswake — خمیردندان‌های تخصصی و سفیدکننده  
+2. Collamin — بانک کلاژن مخصوص پوست  
+3. Ice Ball — ژل لیفتینگ با یخ و کلاژن  
+4. Dafi — محصولات پوستی مثل میسلار واتر  
+5. Umbrella — ضدآفتاب و دئودورانت  
+6. Pixel — کرم ضدآفتاب سنتلا و محصولات پوستی خاص  
+
+### 💎 AFFILIATE PROGRAM
+- همکاری مستقیم با شرکت سیلانه سبز  
+- تخفیف همکار: ۴۰٪ از قیمت مصرف‌کننده  
+- ارسال رایگان محصولات  
+- فقط ۱۰ فروشگاه آنلاین در هر ماه پذیرفته می‌شن  
+- کد اختصاصی: **Onlineshops**  
+- لینک ثبت‌نام: **https://luxirana.com**
+
+وقتی کاربر گفت:  
+«می‌خوام همکاری کنم» یا «بفرست لینک» یا «ثبت‌نام»  
+→ فقط لینک بده: "https://luxirana.com"
+
+وقتی پرسید «چجوری همکاری کنم؟»  
+→ توضیح کوتاه و جذاب بده و در آخر بگو:  
+«مایلید براتون لینک ثبت‌نام بفرستم؟ 🌿»  
+
+### 📦 BESTSELLERS
+- Misswake → خمیردندان ضد زردی و بلیچینگ  
+- Collamin → بانک کلاژن امگا۳  
+- Ice Ball → ژل لیفتینگ یخی پوست  
+- Dafi → میسلار واتر پوست چرب  
+- Umbrella → استیک سفید زنانه  
+- Pixel → ضدآفتاب سنتلا  
+
+### 🤝 CONVERSATION LOGIC
+1. هر پیام رو با دقت بخون. هیچ پیامی بی‌پاسخ نمونه.  
+2. جواب‌ها همیشه کوتاه، تیتر‌وار و صمیمی باشن.  
+3. اگر از برند خاصی پرسید، فقط همون برند و حوزه‌اش رو توضیح بده.  
+4. اگر از قیمت پرسید → بگو قیمت مصرف‌کننده است، ولی برای همکارها ۴۰٪ کمتره.  
+5. اگر درباره پرداخت پرسید → بگو پرداخت مستقیم درگاه شرکت و واریز پورسانت خودکار انجام می‌شه.  
+6. اگر تشکر کرد → با احترام پاسخ بده و گفتگو رو مودبانه تموم کن.  
+7. لحن همیشه انسانی، شبیه چت عادی و با ایموجی‌های طبیعی مثل 🌿✨💬${greetingContext}
 `;
 
   try {
@@ -457,9 +503,8 @@ JSON: {"responses":[{"message":"...","sendLink":false}],"detectedTone":"casual"}
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: messages,
-        temperature: 0.2,
-        max_tokens: 150,
-        response_format: { type: "json_object" },
+        temperature: 0.3,
+        max_tokens: 300,
       }),
     });
     
@@ -473,34 +518,20 @@ JSON: {"responses":[{"message":"...","sendLink":false}],"detectedTone":"casual"}
     const data = await res.json();
     console.log("✅ Response received from OpenAI");
     
-    const rawContent = data.choices[0].message.content;
+    const rawContent = data.choices[0].message.content.trim();
     console.log("📦 OpenAI response:", rawContent);
     
-    const parsed = JSON.parse(rawContent);
+    // Check if response contains the affiliate link
+    const sendLink = rawContent.includes('luxirana.com') || 
+                     rawContent.includes('https://luxirana.com');
     
-    // Translate extracted name to Persian if needed
-    let extractedName = parsed.userName || null;
-    if (extractedName) {
-      extractedName = translateNameToPersian(extractedName);
-    }
-    
-    // Handle new format with responses array
-    if (parsed.responses && Array.isArray(parsed.responses)) {
-      return {
-        responses: parsed.responses, // Array of {message, sendLink}
-        detectedTone: parsed.detectedTone || 'casual',
-        userName: extractedName,
-      };
-    }
-    
-    // Fallback to old format for compatibility
     return {
       responses: [{
-        message: parsed.message || "سلام 🌿",
-        sendLink: parsed.sendLink || false
+        message: rawContent,
+        sendLink: sendLink
       }],
-      detectedTone: parsed.detectedTone || 'casual',
-      userName: extractedName,
+      detectedTone: 'casual',
+      userName: null,
     };
   } catch (err) {
     console.error("⚠️ OpenAI Error:", err.message);
@@ -1084,7 +1115,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
         if (hasAffiliateLink) {
           // Affiliate link takes priority
           finalSendLink = true;
-          finalLink = 'https://affiliate.luxirana.com/account/login';
+          finalLink = 'https://luxirana.com';
         } else if (hasProductLink) {
           // Product link only if no affiliate link
           finalSendProductInfo = true;
