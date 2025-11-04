@@ -400,25 +400,17 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
     'pixxel': { name: 'پیکسل', englishName: 'Pixxel', description: 'ضدآفتاب سبک - فیزیکال و شیمیایی ☀️' },
   };
 
-  let brandContext = '';
   const userMessageLower = userMessage.toLowerCase();
   let detectedBrand = null;
   
-  // Check if brand is mentioned (for logging)
+  // Check if brand is mentioned (for logging only)
   for (const [brandKey, brandData] of Object.entries(brandInfo)) {
     if (userMessageLower.includes(brandKey)) {
       detectedBrand = brandData.name;
-      brandContext = `\n\n🎯 برند ${brandData.name} (${brandData.englishName}) تشخیص داده شد: ${brandData.description}`;
-      
       console.log(`🧠 Detected brand: ${brandData.name} (${brandData.englishName})`);
       break;
     }
   }
-
-  // Note: Product search removed from system prompt to prevent timeout
-  // Products will be searched AFTER AI response based on user's specific request
-  let productSearchContext = '';
-  let priorityProductContext = '';
 
   const systemPrompt = `Seylane. فارسی.
 
@@ -438,8 +430,10 @@ JSON: {"responses":[{"message":"...","sendLink":false}],"detectedTone":"casual"}
       { role: "system", content: systemPrompt }
     ];
 
+    // Only keep last 2 conversation messages to prevent token overflow
     if (conversationHistory.length > 0) {
-      conversationHistory.forEach(msg => {
+      const recentHistory = conversationHistory.slice(-2);
+      recentHistory.forEach(msg => {
         messages.push({ role: msg.role, content: msg.content });
       });
     }
