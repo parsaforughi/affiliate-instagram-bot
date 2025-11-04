@@ -43,35 +43,35 @@ The bot adopts a warm, friendly, and conversational Persian tone (محاوره�
 
 ## Brand Information (CORRECT & UPDATED)
 
-### 6 Priority Brands - Exact Descriptions:
+### 6 Priority Brands - Exact Descriptions with Emojis:
 
-1. **Collamin** (کلامین)
+1. **Collamin** (کلامین) 💅
    - **English**: Collamin (⚠️ NOT Kalamine)
    - **Description**: محصولات مراقبت پوستی که از ترکیب کلامین با ویتامین‌های دیگه تولید میشه
    - Category: Skincare products made from collagen + vitamins
 
-2. **Misswake** (میسویک)
+2. **Misswake** (میسویک) 😁
    - **English**: Misswake
    - **Description**: محصولات مراقبت دهان و دندان
    - Category: Oral hygiene (toothpaste, mouthwash, dental care)
 
-3. **IceBall** (آیس‌بال)
+3. **IceBall** (آیس‌بال) ❄️
    - **English**: IceBall
    - **Description**: محصولات مراقبت پوستی، ترند و یخی، بستن منافذ و لیفت پوست
    - Key Features: Ice-based trendy products, pore tightening, skin lifting
 
-4. **Dafi** (دافی)
+4. **Dafi** (دافی) 🧼
    - **English**: Dafi
    - **Description**: دستمال مرطوب و پاک‌کننده‌های آرایشی
    - Category: Wet wipes & makeup removers
    - ⚠️ NOT home appliances or kitchen products
 
-5. **Umbrella** (آمبرلا)
+5. **Umbrella** (آمبرلا) 💨
    - **English**: Umbrella
    - **Description**: فقط دئودورانت
    - ⚠️ ONLY deodorant sticks (NO creams - all discontinued)
 
-6. **Pixxel** (پیکسل)
+6. **Pixxel** (پیکسل) ☀️
    - **English**: Pixxel (⚠️ double x, NOT Pixel)
    - **Description**: ضدآفتاب سبک، هر دو کتگوری فیزیکال و شیمیایی
    - Key Features: Lightweight sunscreen, both physical and chemical options available
