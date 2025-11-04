@@ -467,7 +467,6 @@ sendLink=true
 
 JSON فرمت:
 {"responses":[{"message":"متن بدون لینک","sendLink":false,"productLink":""}],"detectedTone":"casual"}
-${brandContext}
 `;
 
   try {
