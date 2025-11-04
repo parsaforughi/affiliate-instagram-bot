@@ -41,7 +41,7 @@ const {
   GOOGLE_SHEETS_ENABLED = "false",
 } = process.env;
 
-const AFFILIATE_LINK = "https://affiliate.luxirana.com/account/login";
+const AFFILIATE_LINK = "https://luxirana.com";
 const MY_USERNAME = INSTAGRAM_USERNAME || "luxirana"; // Our bot account name
 
 // ========================================
@@ -356,8 +356,8 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
     });
     multiMessageContext += `\n
 📌 قوانین پاسخ‌دهی به چند پیام:
-- اگر همه پیام‌ها درباره یک موضوع هستن (مثلاً همه درباره بلیچینگ یا همه درباره همکاری) → یک پیام جامع بده که به همه سوالات جواب بده
-- اگر موضوع‌ها متفاوت هستن (مثلاً یکی درباره محصول، یکی درباره همکاری) → در آرایه responses چند پیام جدا برگردون
+- اگر همه پیام‌ها درباره یک موضوع هستن (مثلاً همه درباره بلیچینگ یا همه درباره خرید) → یک پیام جامع بده که به همه سوالات جواب بده
+- اگر موضوع‌ها متفاوت هستن (مثلاً یکی درباره محصول، یکی درباره کد تخفیف) → در آرایه responses چند پیام جدا برگردون
   
 مثال موضوع‌های مربوط (یک پیام):
   پیام 1: "قیمت بلیچینگ چند؟"
@@ -366,8 +366,8 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 
 مثال موضوع‌های متفاوت (چند پیام جدا):
   پیام 1: "قیمت بلیچینگ چند؟"
-  پیام 2: "برای همکاری باید چیکار کنم؟"
-  → دو پاسخ جدا (یکی درباره بلیچینگ، یکی درباره همکاری)
+  پیام 2: "کد تخفیف دارید؟"
+  → دو پاسخ جدا (یکی درباره بلیچینگ، یکی درباره کد تخفیف)
 `;
   }
 
@@ -437,22 +437,17 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 👇 فقط در اون صورت، پاسخ بده:
 
 💰 این قیمت مصرف‌کننده‌ست: [قیمت اصلی]
-🤝 قیمت همکاری برای شما با ۴۰٪ تخفیف محاسبه میشه.
+🎁 با کد تخفیف Onlineshops می‌تونید ۴۰٪ تخفیف بگیرید.
 
 سپس اضافه کن: «اگه خواستید، می‌تونم لینک محصول رو هم براتون بفرستم 🌿»
 
 - اگر کاربر هیچ اشاره‌ای به قیمت نکرده بود → اصلاً عدد، لینک، یا قیمت رو نگو.
-فقط درباره‌ی کیفیت، نوع محصول یا پیشنهاد همکاری صحبت کن.
+فقط درباره‌ی کیفیت، نوع محصول صحبت کن.
 
 🔹 ۲. لینک‌ها فقط یک‌بار و جدا ارسال شوند (PATCH v1.2.1):
 ⚠️ هیچ وقت لینک را داخل متن قرار نده (نه با "کلیک کنید"، نه در پرانتز).
 ⚠️ فقط در خط بعدی، به‌صورت جدا بنویس:
 
-برای لینک همکاری:
-🔗 لینک ثبت‌نام:
-https://affiliate.luxirana.com/account/login
-
-برای لینک محصول:
 🔗 لینک خرید:
 https://luxirana.com
 
@@ -485,18 +480,16 @@ https://luxirana.com
 
 اگر درباره هر برند خواستید بیشتر بدونید، در خدمتم 🌿
 
-🔹 ۵. همکاری (افیلیت):
-اگر کاربر گفت: «می‌خوام همکاری کنم» یا «چجوری میشه همکاری کرد؟» یا «شرایط همکاری چیه؟»
+🔹 ۵. کد تخفیف:
+اگر کاربر گفت: «کد تخفیف دارید؟» یا «چجوری میشه خرید کرد؟» یا «لینک بفرستید»
 👇 جواب بده:
 
-خیلی هم عالی 🌿
-با برنامه همکاری سیلانه می‌تونید محصولات رو مستقیم از شرکت بگیرید،
-۴۰٪ سود از هر فروش + ارسال محصولات رایگان برای تست ✨
+البته! می‌تونید با کد تخفیف اختصاصی خریدتون رو انجام بدید 🌿
 
-کد همکاری: Onlineshops
+کد تخفیف: Onlineshops
 
-🔗 لینک ثبت‌نام:
-https://affiliate.luxirana.com/account/login
+🔗 لینک خرید:
+https://luxirana.com
 ${greetingContext}
 `;
 
@@ -550,9 +543,9 @@ ${greetingContext}
     const rawContent = data.choices[0].message.content.trim();
     console.log("📦 OpenAI response:", rawContent);
     
-    // Check if response contains the affiliate link
-    const sendLink = rawContent.includes('affiliate.luxirana.com') || 
-                     rawContent.includes('https://affiliate.luxirana.com');
+    // Check if response contains the link
+    const sendLink = rawContent.includes('luxirana.com') || 
+                     rawContent.includes('https://luxirana.com');
     
     return {
       responses: [{
@@ -1142,9 +1135,9 @@ async function processConversation(page, conv, messageCache, userContextManager,
         let finalSendProductInfo = false;
         
         if (hasAffiliateLink) {
-          // Affiliate link takes priority
+          // Link takes priority
           finalSendLink = true;
-          finalLink = 'https://affiliate.luxirana.com/account/login';
+          finalLink = 'https://luxirana.com';
         } else if (hasProductLink) {
           // Product link only if no affiliate link
           finalSendProductInfo = true;
@@ -1314,16 +1307,16 @@ async function runSelfTest(page) {
   });
   console.log(`   ${tests[0].passed ? '✅' : '❌'} Greeting: ${tests[0].passed ? 'Passed' : 'Failed'} (${(t1Time/1000).toFixed(2)}s)`);
 
-  console.log("🧪 Test 2: Affiliate Detection...");
+  console.log("🧪 Test 2: Link Detection...");
   const t2Start = Date.now();
-  const affiliateResponse = await askGPT("می‌خوام همکاری کنم", mockUser, []);
+  const linkResponse = await askGPT("لینک بفرستید", mockUser, []);
   const t2Time = Date.now() - t2Start;
   tests.push({
-    name: "Affiliate",
-    passed: affiliateResponse.responses && affiliateResponse.responses[0].sendLink === true,
+    name: "Link",
+    passed: linkResponse.responses && linkResponse.responses[0].sendLink === true,
     responseTime: t2Time,
   });
-  console.log(`   ${tests[1].passed ? '✅' : '❌'} Affiliate: ${tests[1].passed ? 'Passed' : 'Failed'} (${(t2Time/1000).toFixed(2)}s)`);
+  console.log(`   ${tests[1].passed ? '✅' : '❌'} Link: ${tests[1].passed ? 'Passed' : 'Failed'} (${(t2Time/1000).toFixed(2)}s)`);
 
   console.log("🧪 Test 3: Tone Detection...");
   const t3Start = Date.now();
