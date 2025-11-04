@@ -396,9 +396,9 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
     'dafi': { name: 'دافی', englishName: 'Dafi', description: 'محصولات پوستی مثل میسلار واتر' },
     'آمبرلا': { name: 'آمبرلا', englishName: 'Umbrella', description: 'فقط دئودورانت (نه ضدآفتاب)' },
     'umbrella': { name: 'آمبرلا', englishName: 'Umbrella', description: 'فقط دئودورانت (نه ضدآفتاب)' },
-    'پیکسل': { name: 'پیکسل', englishName: 'Pixel', description: 'فقط سنتلا (نه ضدآفتاب)' },
-    'pixel': { name: 'پیکسل', englishName: 'Pixel', description: 'فقط سنتلا (نه ضدآفتاب)' },
-    'pixxel': { name: 'پیکسل', englishName: 'Pixel', description: 'فقط سنتلا (نه ضدآفتاب)' },
+    'پیکسل': { name: 'پیکسل', englishName: 'Pixel', description: 'انواع ضدآفتاب (سنتلا و محصولات دیگه)' },
+    'pixel': { name: 'پیکسل', englishName: 'Pixel', description: 'انواع ضدآفتاب (سنتلا و محصولات دیگه)' },
+    'pixxel': { name: 'پیکسل', englishName: 'Pixel', description: 'انواع ضدآفتاب (سنتلا و محصولات دیگه)' },
   };
 
   const userMessageLower = userMessage.toLowerCase();
@@ -435,7 +435,7 @@ You speak fluent Persian (Finglish optional if user does), reply instantly, and 
 3. Ice Ball — ژل لیفتینگ با یخ و کلاژن  
 4. Dafi — محصولات پوستی مثل میسلار واتر  
 5. Umbrella — فقط دئودورانت (نه ضدآفتاب)
-6. Pixel — فقط سنتلا (نه ضدآفتاب)  
+6. Pixel — انواع ضدآفتاب (سنتلا و محصولات دیگه)  
 
 ### 💎 AFFILIATE PROGRAM
 - همکاری مستقیم با شرکت سیلانه سبز  
