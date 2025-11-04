@@ -420,53 +420,17 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   let productSearchContext = '';
   let priorityProductContext = '';
 
-  const systemPrompt = `نماینده Seylane برای افیلیت Luxirana. فارسی، کوتاه.
+  const systemPrompt = `Seylane. فارسی.
 
-کاربر: ${displayName}
+کلامین✨پوست @collamin.iran | میسویک😁دهان @misswakeiran | آیس‌بال❄️پوست @iceball_ir | دافی🧼دستمال @dafiiran | آمبرلا🌂دئودورانت @Umbrella_iran | پیکسل☀️ضدآفتاب @pixxle.iran
 
-برندها (فقط این 6):
-1. کلامین ✨: مراقبت پوست (کلاژن+ویتامین) - IG: @collamin.iran
-2. میسویک 😁: دهان و دندان - IG: @misswakeiran
-3. آیس‌بال ❄️: مراقبت پوست (یخی، بستن منافذ) - IG: @iceball_ir
-4. دافی 🧼: دستمال مرطوب - IG: @dafiiran
-5. آمبرلا 🌂: دئودورانت - IG: @Umbrella_iran
-6. پیکسل ☀️: ضدآفتاب - IG: @pixxle.iran
+کوتاه (MAX 20 کلمه). ایموجی برند. سلام نده اگه قبلاً دادی.
 
-قوانین:
-1. فقط 6 برند بالا
-2. پیام خیلی کوتاه: MAX 3 خط، MAX 20 کلمه (به جز فلو همکاری)
-3. NEVER بگو "برو سایت"
-4. هیچ وقت "نمی‌دونم" نگو
-5. هیچ وقت لینک تو message ننویس - فقط تو productLink بذار
-6. همیشه ایموجی برند رو استفاده کن (✨😁❄️🧼🌂☀️)
-7. وقتی درخواست "بیشتر توضیح بده" یا "اطلاعات بیشتر" در مورد برند میده، اینستاگرام هندل (@) رو بفرست
-8. وقتی کاربر قبلاً سلام کرده، دیگه سلام نگو - مستقیم جواب بده
+افر/همکاری: "40% تخفیف کد onlineshops +ارسال رایگان🎁 کد با اسم خودت؟😊" sendLink=false
+بله→ "۱)ثبت‌نام ۲)کد ۳)معرفی ۴)کمیسیون. لینک؟😊" sendLink=false
+لینک→ sendLink=true
 
-🔴🔴🔴 فلو همکاری و افیلیت (سه مرحله):
-📌 مرحله 1: سوالات اولیه همکاری
-وقتی کاربر میپرسه: "افر چیه"، "همکاری"، "کار می‌خوام"، "کمیسیون"، "تخفیف"، "راهنمایی کن"، "چطوری"
-فقط این پیام رو بفرست:
-"با 40% تخفیف از تمام محصولات با کد onlineshops خرید کن + ارسال رایگان 🎁
-می‌خوای کد تخفیف با اسم خودت باشه؟ 😊"
-sendLink=false
-
-📌 مرحله 2: بعد پاسخ مثبت
-وقتی کاربر گفت: "بله"، "آره"، "می‌خوام"، "علاقه‌مندم"، "چطوری"
-این رو بفرست:
-"مراحل همکاری:
-۱) ثبت‌نام پنل افیلیت
-۲) کد تخفیف اختصاصی
-۳) معرفی محصولات
-۴) کمیسیون از فروش
-می‌خوای لینک ثبت‌نام؟ 😊"
-sendLink=false
-
-📌 مرحله 3: ارسال لینک
-وقتی کاربر گفت: "بله"، "آره"، "لینک بفرست"
-sendLink=true
-
-JSON فرمت:
-{"responses":[{"message":"متن بدون لینک","sendLink":false,"productLink":""}],"detectedTone":"casual"}
+JSON: {"responses":[{"message":"...","sendLink":false}],"detectedTone":"casual"}
 `;
 
   try {
@@ -500,7 +464,7 @@ JSON فرمت:
         model: "gpt-4o-mini",
         messages: messages,
         temperature: 0.2,
-        max_tokens: 200,
+        max_tokens: 150,
         response_format: { type: "json_object" },
       }),
     });
@@ -547,10 +511,10 @@ JSON فرمت:
   } catch (err) {
     console.error("⚠️ OpenAI Error:", err.message);
     
-    // If timeout or any error, send a confident, helpful fallback message
+    // If error, return a simple fallback
     return {
       responses: [{
-        message: `سلام! 😊 چطور میتونم کمکت کنم؟ دنبال محصول خاصی هستی یا میخوای درباره همکاری افیلیت بدونی؟`,
+        message: `چطور میتونم کمکت کنم؟ 😊`,
         sendLink: false,
         sendProductInfo: false,
         productLink: null
