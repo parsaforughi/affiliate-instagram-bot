@@ -45,7 +45,7 @@ The bot adopts a warm, friendly, and conversational Persian tone (محاوره�
 
 ### 6 Priority Brands - Exact Descriptions with Emojis:
 
-1. **Collamin** (کلامین) 💅
+1. **Collamin** (کلامین) ✨
    - **English**: Collamin (⚠️ NOT Kalamine)
    - **Description**: محصولات مراقبت پوستی که از ترکیب کلامین با ویتامین‌های دیگه تولید میشه
    - Category: Skincare products made from collagen + vitamins
@@ -66,7 +66,7 @@ The bot adopts a warm, friendly, and conversational Persian tone (محاوره�
    - Category: Wet wipes & makeup removers
    - ⚠️ NOT home appliances or kitchen products
 
-5. **Umbrella** (آمبرلا) 💨
+5. **Umbrella** (آمبرلا) 🌂
    - **English**: Umbrella
    - **Description**: فقط دئودورانت
    - ⚠️ ONLY deodorant sticks (NO creams - all discontinued)
