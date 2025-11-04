@@ -449,7 +449,7 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
 ⚠️ فقط در خط بعدی، به‌صورت جدا بنویس:
 
 برای لینک همکاری:
-🔗 لینک ثبت‌نام:
+همین الان شروع کن👇
 https://luxirana.com
 
 برای لینک محصول:
@@ -495,7 +495,7 @@ https://luxirana.com
 
 کد همکاری: Onlineshops
 
-🔗 لینک ثبت‌نام:
+همین الان شروع کن👇
 https://luxirana.com
 ${greetingContext}
 `;
