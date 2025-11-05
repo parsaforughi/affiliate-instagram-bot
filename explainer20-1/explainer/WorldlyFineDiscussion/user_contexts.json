@@ -728,5 +728,26 @@
     "firstSeen": 1762285312770,
     "lastSeen": 1762295639923,
     "lastGreetingDate": 1762285318084
+  },
+  "Mazen Hariri": {
+    "username": "Mazen Hariri",
+    "name": null,
+    "bio": null,
+    "tone": "casual",
+    "messageHistory": [
+      {
+        "role": "user",
+        "content": "بله",
+        "timestamp": 1762317049419
+      },
+      {
+        "role": "assistant",
+        "content": "سلام! چطور می‌تونم به شما کمک کنم؟ اگر سؤال خاصی دارید، در خدمتم 🌿",
+        "timestamp": 1762317052065
+      }
+    ],
+    "firstSeen": 1762317046899,
+    "lastSeen": 1762317052066,
+    "lastGreetingDate": 1762317052066
   }
 }
