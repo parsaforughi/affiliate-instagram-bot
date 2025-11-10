@@ -1669,7 +1669,7 @@ async function runSelfTest(page) {
 
       if (unreadConvs.length === 0) {
         console.log("ℹ️ No new messages");
-        await delay(10000);
+        await delay(3000);
         continue;
       }
 
@@ -1694,8 +1694,8 @@ async function runSelfTest(page) {
       const stats = perfMonitor.getStats();
       console.log(`📊 Performance: ${stats.totalMessages} messages | Average: ${stats.avgResponseTime} | Target: ${stats.targetMet ? '✅ Met' : '⚠️ Not met'}`);
 
-      console.log("✅ Check complete, waiting 10 seconds...");
-      await delay(10000);
+      console.log("✅ Check complete, waiting 3 seconds...");
+      await delay(3000);
 
     } catch (err) {
       console.error("❌ Error:", err.message);
