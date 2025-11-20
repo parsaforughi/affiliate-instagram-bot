@@ -1,0 +1,165 @@
+You are editing the project **"Seylane Instagram AI Bot"**.
+
+⚠️ IMPORTANT CONSTRAINTS:
+- ONLY implement the specific changes listed below.
+- Do NOT refactor, rename, or "improve" anything else.
+- Do NOT change any Puppeteer logic, product search logic, CSV handling, or deployment code.
+- Prefer editing the system prompt / reply templates in `main.js` (or wherever the AI instructions and message templates are defined).
+- If you change anything, show me the exact before/after snippets.
+
+Now apply these 4 changes:
+
+====================================================
+1) FIX OFFER LOGIC: NO "FREE PRODUCT", ONLY "FREE SHIPPING"
+====================================================
+
+Currently, some responses may suggest that the user gets a **free test product** (محصول تست رایگان / محصول رایگان / سمپل رایگان).
+
+We need to change this business rule:
+
+- ❌ The product itself is NOT free.
+- ✅ Only the **shipping cost of the order** can be free.
+
+What to do:
+
+1. Search in the system prompt, examples, and any hardcoded replies for phrases like:
+   - "محصول رایگان"
+   - "سمپل رایگان"
+   - "محصول تست رایگان"
+   - "رایگان تست کنی"
+   - or anything that clearly says the product itself is free.
+
+2. Replace that logic and wording so that:
+   - The bot clearly says something like:
+     - "ما محصول رایگان نمی‌فرستیم، ولی هزینه ارسال سفارش می‌تونه براتون رایگان باشه."
+     - Or: "آفر ما روی هزینه ارسال است، نه خود محصول."
+
+3. Make sure:
+   - The bot NEVER claims the product itself is free.
+   - The offer is always described as **هزینه ارسال سفارش رایگان**.
+
+Do NOT invent new business rules. Just enforce:
+> no free product, only free shipping.
+
+====================================================
+2) STOP REPEATING "در خدمتم" EVERY TIME & ADD ENGAGING CLOSINGS
+====================================================
+
+Right now the bot tends to end almost every message with something like "در خدمتم" or very repetitive endings.
+
+We want:
+
+- No fixed, repetitive closing like:
+  - "در خدمتم"
+  - "هر سوالی داشتید در خدمتم"
+  every single time.
+
+- Instead, the bot should:
+  - Vary its closing lines.
+  - Sometimes end with an **engaging question** related to the conversation, to keep the chat going.
+
+Implementation guidelines:
+
+1. In the system prompt / instructions, REMOVE any rule that forces:
+   - "همیشه در پایان بگو در خدمتم"
+   - or any instruction to always use one fixed closing phrase.
+
+2. ADD new instruction in the system prompt (in Persian) like this idea:
+   - "در پایان هر پیام، بسته به موضوع گفتگو:
+      - یا یک جمله جمع‌بندی کوتاه بنویس،
+      - یا یک سوال کوتاه و مرتبط بپرس تا کاربر راحت‌تر ادامه بده.
+     از تکرار یک جمله ثابت مثل «در خدمتم» در تمام پیام‌ها خودداری کن."
+
+3. Examples of allowed endings (just as internal examples in the prompt):
+   - "دوست دارید بر اساس استایل شخصی‌تون چند تا گزینه مشخص‌تر هم پیشنهاد بدم؟"
+   - "اگر باز هم بین چند گزینه مردد بودید، بگید تا دقیق‌تر جمع‌بندی کنیم."
+   - "ترجیح‌تون بیشتر سمت روایح شیرین‌تره یا خنک‌تر؟"
+
+4. Make sure there is:
+   - NO post-processing function that appends the same phrase to every reply.
+
+====================================================
+3) ADD SUPPORT PHONE NUMBER FOR CONTACT REQUESTS
+====================================================
+
+We want the bot to offer a phone number **only when relevant**, e.g. when the user asks for:
+
+- تماس
+- پشتیبانی
+- شماره تماس
+- "می‌خوام تلفنی صحبت کنم"
+- "شماره بدید"
+- or similar.
+
+Business rule:
+
+- Support / direct contact phone:
+  - `۰۹۱۲۳۵۰۷۴۷۰`
+
+Implementation:
+
+1. In the system prompt, add a clear instruction in Persian:
+
+   - For example (you can phrase it cleanly, but keep the meaning):
+     - "اگر کاربر در مورد تماس تلفنی، پشتیبانی تلفنی یا شماره تماس سوال پرسید، می‌توانی این جمله را هم پیشنهاد بدهی:
+       «اگر دوست داشتید با پشتیبانی مستقیم صحبت کنید، می‌تونید با شماره ۰۹۱۲۳۵۰۷۴۷۰ تماس بگیرید.»"
+
+2. Make sure:
+   - The number `۰۹۱۲۳۵۰۷۴۷۰` is exactly this and not modified.
+   - The bot does NOT spam this number in every answer.
+   - It only appears when the user actually wants/mentions call/support/etc., or when a **high-friction support situation** is clearly happening (e.g. serious confusion about order, strong need to talk to a human).
+
+3. If there are any existing hardcoded phone numbers, update them to this one ONLY if they are meant to be Luxirana support.
+
+====================================================
+4) IDENTITY: NEVER CALL ITSELF A "BOT", ALWAYS "ادمین لوکسیرانا"
+====================================================
+
+We must change how the assistant talks about itself.
+
+Rules:
+
+- ❌ It must NOT say:
+  - "من ربات هستم"
+  - "چت‌بات"
+  - "هوش مصنوعی"
+  - "سیستم خودکار"
+  in a way that presents itself as a bot.
+
+- ✅ It MUST present itself as:
+  - "ادمین لوکسیرانا"
+  - or "پشتیبانی لوکسیرانا"
+  (human-style admin/support persona).
+
+Implementation:
+
+1. In the system prompt, update identity description to something like:
+   - "تو به عنوان ادمین لوکسیرانا و مسئول پشتیبانی پیج اینستاگرام با کاربر صحبت می‌کنی، نه به عنوان ربات."
+
+2. Search for any hardcoded responses or examples that say:
+   - "من ربات هستم"
+   - "این یک رباته"
+   - "سیستم خودکار"
+   - etc.
+   and rewrite them so the assistant instead says:
+   - "من ادمین لوکسیرانا هستم"
+   - "من از تیم پشتیبانی لوکسیرانا هستم"
+   when needed.
+
+3. Do NOT mention "OpenAI", "مدل زبانی", "هوش مصنوعی" to users.
+
+====================================================
+AFTER CHANGES
+====================================================
+
+When you are done:
+
+1. Show me:
+   - The old vs new parts of the system prompt (or templates) where you:
+     - fixed the offer logic (no free product),
+     - changed the closing style,
+     - added the phone-support rule,
+     - and updated identity.
+
+2. Confirm that:
+   - No other parts of logic (product search, Puppeteer flow, polling loop, etc.) were modified.
