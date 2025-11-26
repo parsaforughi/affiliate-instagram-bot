@@ -109,30 +109,37 @@ async function extractAllMessagesFromConversation(page, fallbackUsername, myUser
       const messageText = messageDiv.innerText?.trim();
       if (!messageText || messageText.length === 0 || messageText.length > 1000) return;
 
-      // Improved sender detection: check multiple CSS properties for right-alignment
-      const parentDiv = container.querySelector('div[class*="x"]');
-      const hasFlexEnd = container.querySelector('div[style*="justify-content: flex-end"]') !== null ||
-                        container.querySelector('div[style*="flex-end"]') !== null;
+      // RELIABLE SENDER DETECTION: Use aria-label or title attribute
+      let isOutgoing = false;
       
-      const parentStyle = parentDiv ? window.getComputedStyle(parentDiv) : null;
-      const isRightAligned = parentStyle && (
-        parentStyle.justifyContent === 'flex-end' ||
-        parentStyle.alignItems === 'flex-end' ||
-        parentStyle.textAlign === 'right'
-      );
+      // Try to get aria-label from message container or its children
+      let ariaLabel = container.getAttribute('aria-label') || 
+                     messageDiv.getAttribute('aria-label') ||
+                     container.title ||
+                     messageDiv.title ||
+                     '';
       
-      const hasSeenIndicator = container.querySelector('img[alt*="Seen"]') !== null;
+      // Also check parent for aria-label
+      if (!ariaLabel) {
+        const parent = container.parentElement;
+        if (parent) {
+          ariaLabel = parent.getAttribute('aria-label') || parent.title || '';
+        }
+      }
       
-      // Check if message is in a right-side bubble (indicates message from logged-in user / Luxirana)
-      const msgBubble = container.querySelector('div[style*="border-radius"]');
-      const bubbleStyle = msgBubble ? window.getComputedStyle(msgBubble) : null;
-      const isBubbleRight = bubbleStyle && (
-        bubbleStyle.marginLeft === 'auto' ||
-        bubbleStyle.marginInlineStart === 'auto' ||
-        container.style.justifyContent === 'flex-end'
-      );
-      
-      const isOutgoing = hasFlexEnd || isRightAligned || hasSeenIndicator || isBubbleRight;
+      // Sender detection based on aria-label content
+      if (ariaLabel) {
+        // English: "You sent a message", "Username sent a message"
+        // Persian: "شما یک پیام فرستادید", "Username یک پیام فرستاد"
+        const isYouOrMe = ariaLabel.includes('You') || 
+                         ariaLabel.includes('شما') || 
+                         ariaLabel.includes(myUsername) ||
+                         ariaLabel.includes('luxirana');
+        isOutgoing = isYouOrMe;
+      } else {
+        // Fallback: if no aria-label, mark as user message
+        isOutgoing = false;
+      }
 
       let timestamp = Date.now();
       const timeElement = container.querySelector('time');
