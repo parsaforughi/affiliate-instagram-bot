@@ -16,6 +16,10 @@ author = "agent"
 task = "workflow.run"
 args = "Instagram Bot"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Explainer API Server"
+
 [[workflows.workflow]]
 name = "Instagram Bot"
 author = "agent"
@@ -27,9 +31,25 @@ args = "cd explainer20-1/explainer/WorldlyFineDiscussion && node main.js"
 [workflows.workflow.metadata]
 outputType = "console"
 
+[[workflows.workflow]]
+name = "Explainer API Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd explainer-api && npm install --silent && npm start"
+waitForPort = 3000
+
+[workflows.workflow.metadata]
+outputType = "console"
+
 [agent]
 expertMode = true
 
 [deployment]
 deploymentTarget = "vm"
 run = ["node", "explainer20-1/explainer/WorldlyFineDiscussion/main.js"]
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
