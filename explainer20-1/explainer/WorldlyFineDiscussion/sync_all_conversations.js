@@ -109,35 +109,27 @@ async function extractAllMessagesFromConversation(page, fallbackUsername, myUser
       const messageText = messageDiv.innerText?.trim();
       if (!messageText || messageText.length === 0 || messageText.length > 1000) return;
 
-      // RELIABLE SENDER DETECTION: Use aria-label or title attribute
+      // OFFICIAL INSTAGRAM SENDER DETECTION: Use data-testid attribute
       let isOutgoing = false;
       
-      // Try to get aria-label from message container or its children
-      let ariaLabel = container.getAttribute('aria-label') || 
-                     messageDiv.getAttribute('aria-label') ||
-                     container.title ||
-                     messageDiv.title ||
-                     '';
+      // Find the message bubble element by data-testid
+      let messageBubble = container.querySelector('[data-testid="message-bubble-self"]') ||
+                         container.querySelector('[data-testid="message-bubble"]');
       
-      // Also check parent for aria-label
-      if (!ariaLabel) {
-        const parent = container.parentElement;
-        if (parent) {
-          ariaLabel = parent.getAttribute('aria-label') || parent.title || '';
-        }
+      // If not found in container, check siblings and parent
+      if (!messageBubble && container.parentElement) {
+        messageBubble = container.parentElement.querySelector('[data-testid="message-bubble-self"]') ||
+                       container.parentElement.querySelector('[data-testid="message-bubble"]');
       }
       
-      // Sender detection based on aria-label content
-      if (ariaLabel) {
-        // English: "You sent a message", "Username sent a message"
-        // Persian: "شما یک پیام فرستادید", "Username یک پیام فرستاد"
-        const isYouOrMe = ariaLabel.includes('You') || 
-                         ariaLabel.includes('شما') || 
-                         ariaLabel.includes(myUsername) ||
-                         ariaLabel.includes('luxirana');
-        isOutgoing = isYouOrMe;
+      let roleAttr = messageBubble?.getAttribute('data-testid');
+      
+      if (roleAttr === 'message-bubble-self') {
+        isOutgoing = true;  // Message from bot (Luxirana)
+      } else if (roleAttr === 'message-bubble') {
+        isOutgoing = false; // Message from user
       } else {
-        // Fallback: if no aria-label, mark as user message
+        // Fallback: if no data-testid found, mark as user message
         isOutgoing = false;
       }
 
