@@ -31,23 +31,60 @@ const sseClients = new Set();
 // Load data from bot's user_contexts.json - ALL conversations are Luxirana (bot is logged into Luxirana only)
 function loadBotData() {
   try {
-    if (fs.existsSync(USER_CONTEXTS_PATH)) {
-      const rawData = fs.readFileSync(USER_CONTEXTS_PATH, 'utf-8');
-      const userContexts = JSON.parse(rawData);
+    // Initialize empty store if nothing is loaded
+    messagesStore = {};
+    
+    if (!fs.existsSync(USER_CONTEXTS_PATH)) {
+      console.log('⚠️  user_contexts.json not found - starting with empty store');
+      return;
+    }
 
-      let loadedCount = 0;
+    const rawData = fs.readFileSync(USER_CONTEXTS_PATH, 'utf-8');
+    
+    // Handle empty or whitespace-only files
+    if (!rawData || !rawData.trim()) {
+      console.log('⚠️  user_contexts.json is empty - initializing with empty store');
+      return;
+    }
 
-      // Convert user contexts to messages format - LOAD ALL (all are Luxirana conversations)
-      for (const [userId, userContext] of Object.entries(userContexts)) {
-        const conversationId = userId; // Use username as conversation ID
+    let userContexts;
+    try {
+      userContexts = JSON.parse(rawData);
+    } catch (parseErr) {
+      console.error('❌ Failed to parse user_contexts.json:', parseErr.message);
+      return;
+    }
+
+    // Ensure userContexts is an object
+    if (!userContexts || typeof userContexts !== 'object' || Array.isArray(userContexts)) {
+      console.warn('⚠️  user_contexts.json is not a valid object');
+      return;
+    }
+
+    let loadedCount = 0;
+
+    // Convert user contexts to messages format - LOAD ALL (all are Luxirana conversations)
+    for (const [userId, userContext] of Object.entries(userContexts)) {
+      try {
+        // Skip null/undefined entries
+        if (!userContext || typeof userContext !== 'object') {
+          continue;
+        }
+
+        const conversationId = userId;
         messagesStore[conversationId] = [];
 
-        if (userContext.messageHistory && Array.isArray(userContext.messageHistory)) {
-          // Calculate inbound and outbound counts
+        // Only process if messageHistory exists and is an array
+        if (userContext.messageHistory && Array.isArray(userContext.messageHistory) && userContext.messageHistory.length > 0) {
           let inboundCount = 0;
           let outboundCount = 0;
 
           userContext.messageHistory.forEach((msg, index) => {
+            // Skip invalid messages
+            if (!msg || !msg.role || !msg.content || !msg.timestamp) {
+              return;
+            }
+
             const isInbound = msg.role === 'user';
             if (isInbound) inboundCount++;
             else outboundCount++;
@@ -63,26 +100,32 @@ function loadBotData() {
             });
           });
 
-          // Store conversation metadata
-          if (!messagesStore[`${conversationId}_metadata`]) {
+          // Store conversation metadata only if we have messages
+          if (messagesStore[conversationId].length > 0 && userContext.messageHistory.length > 0) {
             const lastMsg = userContext.messageHistory[userContext.messageHistory.length - 1];
-            messagesStore[`${conversationId}_metadata`] = {
-              lastMessageAt: new Date(lastMsg.timestamp).toISOString(),
-              inboundCount,
-              outboundCount,
-              messageCount: userContext.messageHistory.length
-            };
+            if (lastMsg && lastMsg.timestamp) {
+              messagesStore[`${conversationId}_metadata`] = {
+                lastMessageAt: new Date(lastMsg.timestamp).toISOString(),
+                inboundCount,
+                outboundCount,
+                messageCount: userContext.messageHistory.length
+              };
+            }
           }
-        }
-        loadedCount++;
-      }
 
-      console.log(`✅ Loaded ${loadedCount} Luxirana conversations from bot data`);
-    } else {
-      console.log('⚠️  user_contexts.json not found at', USER_CONTEXTS_PATH);
+          loadedCount++;
+        }
+      } catch (entryErr) {
+        console.warn(`⚠️  Error processing conversation ${userId}:`, entryErr.message);
+        // Continue processing other entries
+      }
     }
+
+    console.log(`✅ Loaded ${loadedCount} Luxirana conversations from bot data`);
   } catch (error) {
-    console.error('❌ Error loading bot data:', error.message);
+    console.error('❌ Unexpected error loading bot data:', error.message);
+    // Always ensure messagesStore is at least an empty object
+    messagesStore = {};
   }
 }
 
