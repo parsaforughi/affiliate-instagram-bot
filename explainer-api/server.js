@@ -147,6 +147,9 @@ app.get('/stats', (req, res) => {
   for (const conversationId in messagesStore) {
     const messages = messagesStore[conversationId];
     
+    // Skip metadata entries - only process arrays
+    if (!Array.isArray(messages)) continue;
+    
     messages.forEach(msg => {
       const msgDate = new Date(msg.createdAt);
       
@@ -177,6 +180,9 @@ app.get('/conversations', (req, res) => {
   for (const conversationId in messagesStore) {
     const messages = messagesStore[conversationId];
     
+    // Skip metadata entries - only process arrays
+    if (!Array.isArray(messages)) continue;
+
     let inboundCount = 0;
     let outboundCount = 0;
     let lastMessageAt = null;
