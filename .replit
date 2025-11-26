@@ -53,3 +53,7 @@ run = ["bash", "-c", "cd explainer-api && npm install --silent && node server.js
 [[ports]]
 localPort = 3000
 externalPort = 3000
+
+[[ports]]
+localPort = 45607
+externalPort = 80

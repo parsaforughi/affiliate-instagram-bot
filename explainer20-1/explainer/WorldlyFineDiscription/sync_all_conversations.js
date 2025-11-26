@@ -154,7 +154,7 @@ async function scrollToLoadAllMessages(page) {
                      document.querySelector('main');
     if (container) {
       for (let i = 0; i < 10; i++) {
-        container.scrollTop = 0;
+        container.scrollTop = 0; // Scroll to top to load older messages
       }
     }
   });
@@ -242,6 +242,7 @@ async function syncAllConversations() {
     console.log(`\n📨 [${convNum}/${conversations.length}] Processing: "${conv.username}"`);
 
     try {
+      // Click the conversation
       const clickSuccess = await page.evaluate((index, myUsername) => {
         const buttons = Array.from(document.querySelectorAll('div[role="button"]'));
         const convButtons = buttons.filter(btn => {
@@ -270,6 +271,7 @@ async function syncAllConversations() {
       const msgData = await extractAllMessagesFromConversation(page, conv.username);
       const username = msgData.username || conv.username;
 
+      // FORCE SAVE ALL CONVERSATIONS - NO FILTERING
       const now = Date.now();
       const messages = msgData.messages && msgData.messages.length > 0 ? msgData.messages : [];
       
@@ -304,6 +306,7 @@ async function syncAllConversations() {
     }
   }
 
+  // PRINT SUMMARY
   console.log(`\n${"=".repeat(60)}`);
   console.log(`✅ SYNC COMPLETE`);
   console.log(`${"=".repeat(60)}`);
