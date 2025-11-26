@@ -28,104 +28,37 @@ const messageEmitter = new EventEmitter();
 // Track SSE clients for /live-messages
 const sseClients = new Set();
 
-// Load data from bot's user_contexts.json - ALL conversations are Luxirana (bot is logged into Luxirana only)
+// Load data from bot's user_contexts.json
 function loadBotData() {
   try {
-    // Initialize empty store if nothing is loaded
-    messagesStore = {};
-    
-    if (!fs.existsSync(USER_CONTEXTS_PATH)) {
-      console.log('⚠️  user_contexts.json not found - starting with empty store');
-      return;
-    }
+    if (fs.existsSync(USER_CONTEXTS_PATH)) {
+      const rawData = fs.readFileSync(USER_CONTEXTS_PATH, 'utf-8');
+      const userContexts = JSON.parse(rawData);
 
-    const rawData = fs.readFileSync(USER_CONTEXTS_PATH, 'utf-8');
-    
-    // Handle empty or whitespace-only files
-    if (!rawData || !rawData.trim()) {
-      console.log('⚠️  user_contexts.json is empty - initializing with empty store');
-      return;
-    }
-
-    let userContexts;
-    try {
-      userContexts = JSON.parse(rawData);
-    } catch (parseErr) {
-      console.error('❌ Failed to parse user_contexts.json:', parseErr.message);
-      return;
-    }
-
-    // Ensure userContexts is an object
-    if (!userContexts || typeof userContexts !== 'object' || Array.isArray(userContexts)) {
-      console.warn('⚠️  user_contexts.json is not a valid object');
-      return;
-    }
-
-    let loadedCount = 0;
-
-    // Convert user contexts to messages format - LOAD ALL (all are Luxirana conversations)
-    for (const [userId, userContext] of Object.entries(userContexts)) {
-      try {
-        // Skip null/undefined entries
-        if (!userContext || typeof userContext !== 'object') {
-          continue;
-        }
-
-        const conversationId = userId;
+      // Convert user contexts to messages format
+      for (const [userId, userContext] of Object.entries(userContexts)) {
+        const conversationId = userId; // Use username as conversation ID
         messagesStore[conversationId] = [];
 
-        // Process ALL conversations, even those with empty messageHistory
-        let inboundCount = 0;
-        let outboundCount = 0;
-
-        if (userContext.messageHistory && Array.isArray(userContext.messageHistory) && userContext.messageHistory.length > 0) {
+        if (userContext.messageHistory && Array.isArray(userContext.messageHistory)) {
           userContext.messageHistory.forEach((msg, index) => {
-            // Skip invalid messages
-            if (!msg || !msg.role || !msg.content || !msg.timestamp) {
-              return;
-            }
-
-            const isInbound = msg.role === 'user';
-            if (isInbound) inboundCount++;
-            else outboundCount++;
-
             messagesStore[conversationId].push({
               id: `${conversationId}_${index}`,
               conversationId: conversationId,
-              from: isInbound ? 'user' : 'bot',
+              from: msg.role === 'user' ? 'user' : 'bot',
               text: msg.content,
-              createdAt: new Date(msg.timestamp).toISOString(),
-              inboundCount,
-              outboundCount
+              createdAt: new Date(msg.timestamp).toISOString()
             });
           });
-
-          // Store conversation metadata only if we have messages
-          if (messagesStore[conversationId].length > 0 && userContext.messageHistory.length > 0) {
-            const lastMsg = userContext.messageHistory[userContext.messageHistory.length - 1];
-            if (lastMsg && lastMsg.timestamp) {
-              messagesStore[`${conversationId}_metadata`] = {
-                lastMessageAt: new Date(lastMsg.timestamp).toISOString(),
-                inboundCount,
-                outboundCount,
-                messageCount: userContext.messageHistory.length
-              };
-            }
-          }
         }
-
-        loadedCount++;
-      } catch (entryErr) {
-        console.warn(`⚠️  Error processing conversation ${userId}:`, entryErr.message);
-        // Continue processing other entries
       }
-    }
 
-    console.log(`✅ Loaded ${loadedCount} Luxirana conversations from bot data`);
+      console.log(`✅ Loaded ${Object.keys(messagesStore).length} conversations`);
+    } else {
+      console.log('⚠️  user_contexts.json not found at', USER_CONTEXTS_PATH);
+    }
   } catch (error) {
-    console.error('❌ Unexpected error loading bot data:', error.message);
-    // Always ensure messagesStore is at least an empty object
-    messagesStore = {};
+    console.error('❌ Error loading bot data:', error.message);
   }
 }
 
@@ -146,9 +79,6 @@ app.get('/stats', (req, res) => {
 
   for (const conversationId in messagesStore) {
     const messages = messagesStore[conversationId];
-    
-    // Skip metadata entries - only process arrays
-    if (!Array.isArray(messages)) continue;
     
     messages.forEach(msg => {
       const msgDate = new Date(msg.createdAt);
@@ -176,17 +106,10 @@ app.get('/stats', (req, res) => {
 // ============================================
 app.get('/conversations', (req, res) => {
   const conversations = [];
-  const EXCLUDED_USERNAMES = ['luxirana', 'Send message'];
 
   for (const conversationId in messagesStore) {
     const messages = messagesStore[conversationId];
     
-    // Skip metadata entries - only process arrays
-    if (!Array.isArray(messages)) continue;
-
-    // EXCLUDE system threads and self conversations
-    if (EXCLUDED_USERNAMES.includes(conversationId)) continue;
-
     let inboundCount = 0;
     let outboundCount = 0;
     let lastMessageAt = null;
@@ -203,24 +126,20 @@ app.get('/conversations', (req, res) => {
       }
     });
 
-    // Return conversation with proper metadata
-    conversations.push({
-      id: conversationId,
-      userId: conversationId,
-      username: conversationId,
-      lastMessageAt: lastMessageAt || null,
-      inboundCount,
-      outboundCount
-    });
+    if (messages.length > 0) {
+      conversations.push({
+        id: conversationId,
+        userId: conversationId,
+        username: conversationId,
+        lastMessageAt: lastMessageAt || new Date().toISOString(),
+        inboundCount,
+        outboundCount
+      });
+    }
   }
 
-  // Sort by lastMessageAt descending (newest first, null values go last)
-  conversations.sort((a, b) => {
-    if (!a.lastMessageAt && !b.lastMessageAt) return 0;
-    if (!a.lastMessageAt) return 1;
-    if (!b.lastMessageAt) return -1;
-    return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
-  });
+  // Sort by lastMessageAt descending
+  conversations.sort((a, b) => new Date(b.lastMessageAt) - new Date(a.lastMessageAt));
 
   res.json(conversations);
 });
