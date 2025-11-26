@@ -367,4 +367,16 @@ app.listen(PORT, '0.0.0.0', () => {
   
   // Print all routes
   printRegisteredRoutes();
+
+  // DEBUG: Print ALL registered routes at runtime (user-requested)
+  console.log(`\n🔍 DEBUG: ALL ROUTES AT RUNTIME:\n`);
+  console.log(
+    app._router.stack
+      .filter(r => r.route)
+      .map(r => ({
+        method: Object.keys(r.route.methods)[0].toUpperCase(),
+        path: r.route.path
+      }))
+  );
+  console.log(`\n`);
 });
