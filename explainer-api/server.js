@@ -270,10 +270,15 @@ app.post('/events/message', (req, res) => {
 // ENDPOINT 6: GET /live-messages (SSE)
 // ============================================
 app.get('/live-messages', (req, res) => {
+  // Set all required headers for SSE
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  
+  // Flush headers immediately to establish connection
+  res.flushHeaders();
 
   // Send initial connection confirmation
   res.write(`event: connected\n`);
@@ -281,23 +286,35 @@ app.get('/live-messages', (req, res) => {
 
   // Register this client
   sseClients.add(res);
-  console.log(`🔗 SSE client connected. Total clients: ${sseClients.size}`);
+  console.log(`✅ SSE client connected. Total clients: ${sseClients.size}`);
 
-  // Handle client disconnection
-  req.on('close', () => {
-    sseClients.delete(res);
-    console.log(`🔌 SSE client disconnected. Total clients: ${sseClients.size}`);
-    res.end();
-  });
-
-  // Keep connection alive with heartbeat
+  // Keep connection alive with heartbeat (every 25 seconds)
   const heartbeat = setInterval(() => {
-    res.write(`event: heartbeat\n`);
-    res.write(`data: ${JSON.stringify({ type: 'heartbeat', timestamp: new Date().toISOString() })}\n\n`);
-  }, 30000);
+    if (!res.destroyed && !res.writableEnded) {
+      res.write(`:heartbeat\n\n`);
+    }
+  }, 25000);
 
+  // Handle client disconnection (single handler)
   req.on('close', () => {
     clearInterval(heartbeat);
+    sseClients.delete(res);
+    console.log(`❌ SSE client disconnected. Total clients: ${sseClients.size}`);
+    if (!res.writableEnded) {
+      res.end();
+    }
+  });
+
+  // Prevent response from auto-terminating
+  req.on('error', () => {
+    clearInterval(heartbeat);
+    sseClients.delete(res);
+  });
+
+  // Keep response object alive - don't let Node close it
+  res.on('error', () => {
+    clearInterval(heartbeat);
+    sseClients.delete(res);
   });
 });
 
