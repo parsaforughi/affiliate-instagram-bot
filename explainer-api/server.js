@@ -74,11 +74,11 @@ function loadBotData() {
         const conversationId = userId;
         messagesStore[conversationId] = [];
 
-        // Only process if messageHistory exists and is an array
-        if (userContext.messageHistory && Array.isArray(userContext.messageHistory) && userContext.messageHistory.length > 0) {
-          let inboundCount = 0;
-          let outboundCount = 0;
+        // Process ALL conversations, even those with empty messageHistory
+        let inboundCount = 0;
+        let outboundCount = 0;
 
+        if (userContext.messageHistory && Array.isArray(userContext.messageHistory) && userContext.messageHistory.length > 0) {
           userContext.messageHistory.forEach((msg, index) => {
             // Skip invalid messages
             if (!msg || !msg.role || !msg.content || !msg.timestamp) {
@@ -112,9 +112,9 @@ function loadBotData() {
               };
             }
           }
-
-          loadedCount++;
         }
+
+        loadedCount++;
       } catch (entryErr) {
         console.warn(`⚠️  Error processing conversation ${userId}:`, entryErr.message);
         // Continue processing other entries
@@ -199,20 +199,24 @@ app.get('/conversations', (req, res) => {
       }
     });
 
-    if (messages.length > 0) {
-      conversations.push({
-        id: conversationId,
-        userId: conversationId,
-        username: conversationId,
-        lastMessageAt: lastMessageAt || new Date().toISOString(),
-        inboundCount,
-        outboundCount
-      });
-    }
+    // Return ALL conversations, even if messages.length === 0
+    conversations.push({
+      id: conversationId,
+      userId: conversationId,
+      username: conversationId,
+      lastMessageAt: lastMessageAt || null,
+      inboundCount,
+      outboundCount
+    });
   }
 
-  // Sort by lastMessageAt descending
-  conversations.sort((a, b) => new Date(b.lastMessageAt) - new Date(a.lastMessageAt));
+  // Sort by lastMessageAt descending (null values go last)
+  conversations.sort((a, b) => {
+    if (!a.lastMessageAt && !b.lastMessageAt) return 0;
+    if (!a.lastMessageAt) return 1;
+    if (!b.lastMessageAt) return -1;
+    return new Date(b.lastMessageAt) - new Date(a.lastMessageAt);
+  });
 
   res.json(conversations);
 });
