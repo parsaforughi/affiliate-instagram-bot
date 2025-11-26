@@ -28,10 +28,7 @@ const messageEmitter = new EventEmitter();
 // Track SSE clients for /live-messages
 const sseClients = new Set();
 
-// Luxirana account identifier(s) - filter to serve ONLY these
-const ALLOWED_ACCOUNTS = ['luxirana'];
-
-// Load data from bot's user_contexts.json - FILTERED TO LUXIRANA ONLY
+// Load data from bot's user_contexts.json - ALL conversations are Luxirana (bot is logged into Luxirana only)
 function loadBotData() {
   try {
     if (fs.existsSync(USER_CONTEXTS_PATH)) {
@@ -39,34 +36,48 @@ function loadBotData() {
       const userContexts = JSON.parse(rawData);
 
       let loadedCount = 0;
-      let filteredCount = 0;
 
-      // Convert user contexts to messages format - LUXIRANA ONLY
+      // Convert user contexts to messages format - LOAD ALL (all are Luxirana conversations)
       for (const [userId, userContext] of Object.entries(userContexts)) {
-        // Only load conversations for Luxirana account
-        if (!ALLOWED_ACCOUNTS.includes(userId.toLowerCase())) {
-          filteredCount++;
-          continue; // Skip non-Luxirana accounts
-        }
-
         const conversationId = userId; // Use username as conversation ID
         messagesStore[conversationId] = [];
 
         if (userContext.messageHistory && Array.isArray(userContext.messageHistory)) {
+          // Calculate inbound and outbound counts
+          let inboundCount = 0;
+          let outboundCount = 0;
+
           userContext.messageHistory.forEach((msg, index) => {
+            const isInbound = msg.role === 'user';
+            if (isInbound) inboundCount++;
+            else outboundCount++;
+
             messagesStore[conversationId].push({
               id: `${conversationId}_${index}`,
               conversationId: conversationId,
-              from: msg.role === 'user' ? 'user' : 'bot',
+              from: isInbound ? 'user' : 'bot',
               text: msg.content,
-              createdAt: new Date(msg.timestamp).toISOString()
+              createdAt: new Date(msg.timestamp).toISOString(),
+              inboundCount,
+              outboundCount
             });
           });
+
+          // Store conversation metadata
+          if (!messagesStore[`${conversationId}_metadata`]) {
+            const lastMsg = userContext.messageHistory[userContext.messageHistory.length - 1];
+            messagesStore[`${conversationId}_metadata`] = {
+              lastMessageAt: new Date(lastMsg.timestamp).toISOString(),
+              inboundCount,
+              outboundCount,
+              messageCount: userContext.messageHistory.length
+            };
+          }
         }
         loadedCount++;
       }
 
-      console.log(`✅ Loaded ${loadedCount} Luxirana conversations (filtered ${filteredCount} non-Luxirana accounts)`);
+      console.log(`✅ Loaded ${loadedCount} Luxirana conversations from bot data`);
     } else {
       console.log('⚠️  user_contexts.json not found at', USER_CONTEXTS_PATH);
     }
