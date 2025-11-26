@@ -48,7 +48,7 @@ expertMode = true
 
 [deployment]
 deploymentTarget = "vm"
-run = ["bash", "-c", "cd explainer-api && npm install --silent && cd .. && node start-production.js"]
+run = ["bash", "-c", "cd explainer-api && npm install --silent && node server.js"]
 
 [[ports]]
 localPort = 3000
