@@ -314,6 +314,44 @@ app.get('/health', (req, res) => {
 });
 
 // ============================================
+// DEBUG: Print all registered routes
+// ============================================
+function printRegisteredRoutes() {
+  console.log(`\n📋 FULL REGISTERED ROUTES:\n`);
+  
+  const routes = [];
+  app._router.stack.forEach(middleware => {
+    if (middleware.route) {
+      // Standard Express route
+      const path = middleware.route.path;
+      const methods = Object.keys(middleware.route.methods).map(m => m.toUpperCase());
+      routes.push({ path, methods });
+    } else if (middleware.name === 'router' && middleware.handle.stack) {
+      // Router middleware (not typically used here, but included for completeness)
+      middleware.handle.stack.forEach(handler => {
+        if (handler.route) {
+          const path = handler.route.path;
+          const methods = Object.keys(handler.route.methods).map(m => m.toUpperCase());
+          routes.push({ path, methods });
+        }
+      });
+    }
+  });
+
+  // Sort by path for readability
+  routes.sort((a, b) => a.path.localeCompare(b.path));
+  
+  routes.forEach(({ path, methods }) => {
+    methods.forEach(method => {
+      console.log(`   ${method.padEnd(6)} ${path}`);
+    });
+  });
+
+  console.log(`\n✅ POST /events/message - Exact path registered as: "/events/message"`);
+  console.log(`✅ GET  /live-messages - Exact path registered as: "/live-messages"\n`);
+}
+
+// ============================================
 // START SERVER
 // ============================================
 app.listen(PORT, '0.0.0.0', () => {
@@ -325,5 +363,8 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`   GET  /messages?conversationId=ID - Get messages for a conversation`);
   console.log(`   GET  /logs - Real-time logs (SSE)`);
   console.log(`   POST /events/message - Receive new message events`);
-  console.log(`   GET  /live-messages - Real-time message streaming (SSE)\n`);
+  console.log(`   GET  /live-messages - Real-time message streaming (SSE)`);
+  
+  // Print all routes
+  printRegisteredRoutes();
 });
