@@ -48,8 +48,12 @@ expertMode = true
 
 [deployment]
 deploymentTarget = "vm"
-run = ["bash", "-c", "cd explainer-api && npm install --silent && npm start & cd explainer20-1/explainer/WorldlyFineDiscussion && node main.js"]
+run = ["bash", "-c", "cd explainer-api && npm install --silent && cd .. && node start-production.js"]
 
 [[ports]]
 localPort = 3000
 externalPort = 3000
+
+[[ports]]
+localPort = 39003
+externalPort = 80
