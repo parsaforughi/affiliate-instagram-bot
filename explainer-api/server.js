@@ -200,6 +200,40 @@ app.get('/logs', (req, res) => {
 });
 
 // ============================================
+// HELPER: Broadcast to SSE clients safely
+// ============================================
+function broadcastToSSEClients(newMessage) {
+  const eventData = {
+    type: 'message',
+    message: newMessage
+  };
+
+  const clientsToRemove = [];
+
+  sseClients.forEach(client => {
+    // Only write if the client is still writable
+    if (!client.destroyed && !client.writableEnded) {
+      try {
+        client.write(`event: message\n`);
+        client.write(`data: ${JSON.stringify(eventData)}\n\n`);
+      } catch (error) {
+        // If write fails, mark client for removal
+        console.warn(`⚠️ Failed to write to SSE client:`, error.message);
+        clientsToRemove.push(client);
+      }
+    } else {
+      // Client is no longer writable, mark for removal
+      clientsToRemove.push(client);
+    }
+  });
+
+  // Clean up dead clients
+  clientsToRemove.forEach(client => {
+    sseClients.delete(client);
+  });
+}
+
+// ============================================
 // ENDPOINT 5: POST /events/message
 // ============================================
 app.post('/events/message', (req, res) => {
@@ -226,44 +260,30 @@ app.post('/events/message', (req, res) => {
     });
   }
 
-  try {
-    // Create new message object
-    const newMessage = {
-      id,
-      conversationId,
-      from,
-      text,
-      createdAt
-    };
+  // Create new message object
+  const newMessage = {
+    id,
+    conversationId,
+    from,
+    text,
+    createdAt
+  };
 
-    // Initialize conversation if it doesn't exist
-    if (!messagesStore[conversationId]) {
-      messagesStore[conversationId] = [];
-    }
-
-    // Append message to store
-    messagesStore[conversationId].push(newMessage);
-
-    // Broadcast to all connected SSE clients
-    const eventData = {
-      type: 'message',
-      message: newMessage
-    };
-
-    sseClients.forEach(client => {
-      client.write(`event: message\n`);
-      client.write(`data: ${JSON.stringify(eventData)}\n\n`);
-    });
-
-    console.log(`📨 Message received from ${from} in ${conversationId}`);
-
-    // Return success response
-    res.json({ ok: true });
-
-  } catch (error) {
-    console.error('❌ Error processing message:', error.message);
-    res.status(500).json({ error: 'Internal server error' });
+  // Initialize conversation if it doesn't exist
+  if (!messagesStore[conversationId]) {
+    messagesStore[conversationId] = [];
   }
+
+  // Append message to store
+  messagesStore[conversationId].push(newMessage);
+
+  // Broadcast to all connected SSE clients (with error handling)
+  broadcastToSSEClients(newMessage);
+
+  console.log(`📨 Message received from ${from} in ${conversationId}`);
+
+  // Send HTTP response (must always return 200 OK)
+  return res.status(200).json({ ok: true });
 });
 
 // ============================================
