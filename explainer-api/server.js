@@ -176,12 +176,16 @@ app.get('/stats', (req, res) => {
 // ============================================
 app.get('/conversations', (req, res) => {
   const conversations = [];
+  const EXCLUDED_USERNAMES = ['luxirana', 'Send message'];
 
   for (const conversationId in messagesStore) {
     const messages = messagesStore[conversationId];
     
     // Skip metadata entries - only process arrays
     if (!Array.isArray(messages)) continue;
+
+    // EXCLUDE system threads and self conversations
+    if (EXCLUDED_USERNAMES.includes(conversationId)) continue;
 
     let inboundCount = 0;
     let outboundCount = 0;
@@ -199,7 +203,7 @@ app.get('/conversations', (req, res) => {
       }
     });
 
-    // Return ALL conversations, even if messages.length === 0
+    // Return conversation with proper metadata
     conversations.push({
       id: conversationId,
       userId: conversationId,
@@ -210,7 +214,7 @@ app.get('/conversations', (req, res) => {
     });
   }
 
-  // Sort by lastMessageAt descending (null values go last)
+  // Sort by lastMessageAt descending (newest first, null values go last)
   conversations.sort((a, b) => {
     if (!a.lastMessageAt && !b.lastMessageAt) return 0;
     if (!a.lastMessageAt) return 1;

@@ -80,7 +80,7 @@ async function extractAllInboxConversations(page) {
   }, MY_USERNAME);
 }
 
-async function extractAllMessagesFromConversation(page, fallbackUsername) {
+async function extractAllMessagesFromConversation(page, fallbackUsername, myUsername) {
   return await page.evaluate((myUsername, fallback) => {
     let username = '';
     const headerLinks = document.querySelectorAll('header a[href^="/"]');
@@ -109,6 +109,7 @@ async function extractAllMessagesFromConversation(page, fallbackUsername) {
       const messageText = messageDiv.innerText?.trim();
       if (!messageText || messageText.length === 0 || messageText.length > 1000) return;
 
+      // Improved sender detection: check multiple CSS properties for right-alignment
       const parentDiv = container.querySelector('div[class*="x"]');
       const hasFlexEnd = container.querySelector('div[style*="justify-content: flex-end"]') !== null ||
                         container.querySelector('div[style*="flex-end"]') !== null;
@@ -121,7 +122,17 @@ async function extractAllMessagesFromConversation(page, fallbackUsername) {
       );
       
       const hasSeenIndicator = container.querySelector('img[alt*="Seen"]') !== null;
-      const isOutgoing = hasFlexEnd || isRightAligned || hasSeenIndicator;
+      
+      // Check if message is in a right-side bubble (indicates message from logged-in user / Luxirana)
+      const msgBubble = container.querySelector('div[style*="border-radius"]');
+      const bubbleStyle = msgBubble ? window.getComputedStyle(msgBubble) : null;
+      const isBubbleRight = bubbleStyle && (
+        bubbleStyle.marginLeft === 'auto' ||
+        bubbleStyle.marginInlineStart === 'auto' ||
+        container.style.justifyContent === 'flex-end'
+      );
+      
+      const isOutgoing = hasFlexEnd || isRightAligned || hasSeenIndicator || isBubbleRight;
 
       let timestamp = Date.now();
       const timeElement = container.querySelector('time');
