@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const { EventEmitter } = require('events');
 
 const app = express();
 app.use(cors());
@@ -20,6 +21,12 @@ let messagesStore = {};
 
 // Log store for SSE
 let logStore = [];
+
+// Event emitter for real-time message broadcasts
+const messageEmitter = new EventEmitter();
+
+// Track SSE clients for /live-messages
+const sseClients = new Set();
 
 // Load data from bot's user_contexts.json
 function loadBotData() {
@@ -158,7 +165,7 @@ app.get('/messages', (req, res) => {
 });
 
 // ============================================
-// ENDPOINT 4: GET /logs (SSE - Optional)
+// ENDPOINT 4: GET /logs (SSE)
 // ============================================
 app.get('/logs', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
@@ -193,13 +200,116 @@ app.get('/logs', (req, res) => {
 });
 
 // ============================================
+// ENDPOINT 5: POST /events/message
+// ============================================
+app.post('/events/message', (req, res) => {
+  const { conversationId, id, from, text, createdAt } = req.body;
+
+  // Validate required fields
+  if (!conversationId || !id || !from || !text || !createdAt) {
+    return res.status(400).json({
+      error: 'Missing required fields: conversationId, id, from, text, createdAt'
+    });
+  }
+
+  // Validate 'from' field
+  if (!['user', 'bot'].includes(from)) {
+    return res.status(400).json({
+      error: 'Invalid "from" value. Must be "user" or "bot"'
+    });
+  }
+
+  // Validate ISO timestamp
+  if (isNaN(new Date(createdAt).getTime())) {
+    return res.status(400).json({
+      error: 'Invalid "createdAt". Must be a valid ISO timestamp'
+    });
+  }
+
+  try {
+    // Create new message object
+    const newMessage = {
+      id,
+      conversationId,
+      from,
+      text,
+      createdAt
+    };
+
+    // Initialize conversation if it doesn't exist
+    if (!messagesStore[conversationId]) {
+      messagesStore[conversationId] = [];
+    }
+
+    // Append message to store
+    messagesStore[conversationId].push(newMessage);
+
+    // Broadcast to all connected SSE clients
+    const eventData = {
+      type: 'message',
+      message: newMessage
+    };
+
+    sseClients.forEach(client => {
+      client.write(`event: message\n`);
+      client.write(`data: ${JSON.stringify(eventData)}\n\n`);
+    });
+
+    console.log(`📨 Message received from ${from} in ${conversationId}`);
+
+    // Return success response
+    res.json({ ok: true });
+
+  } catch (error) {
+    console.error('❌ Error processing message:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ============================================
+// ENDPOINT 6: GET /live-messages (SSE)
+// ============================================
+app.get('/live-messages', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  // Send initial connection confirmation
+  res.write(`event: connected\n`);
+  res.write(`data: ${JSON.stringify({ type: 'connected', timestamp: new Date().toISOString() })}\n\n`);
+
+  // Register this client
+  sseClients.add(res);
+  console.log(`🔗 SSE client connected. Total clients: ${sseClients.size}`);
+
+  // Handle client disconnection
+  req.on('close', () => {
+    sseClients.delete(res);
+    console.log(`🔌 SSE client disconnected. Total clients: ${sseClients.size}`);
+    res.end();
+  });
+
+  // Keep connection alive with heartbeat
+  const heartbeat = setInterval(() => {
+    res.write(`event: heartbeat\n`);
+    res.write(`data: ${JSON.stringify({ type: 'heartbeat', timestamp: new Date().toISOString() })}\n\n`);
+  }, 30000);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+  });
+});
+
+// ============================================
 // HEALTH CHECK
 // ============================================
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    conversations: Object.keys(messagesStore).length
+    conversations: Object.keys(messagesStore).length,
+    liveClients: sseClients.size
   });
 });
 
@@ -209,9 +319,11 @@ app.get('/health', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🚀 Seylane Explainer API running on http://0.0.0.0:${PORT}`);
   console.log(`\n📊 Available Endpoints:`);
-  console.log(`   GET /health - Health check`);
-  console.log(`   GET /stats - Message statistics`);
-  console.log(`   GET /conversations - List all conversations`);
-  console.log(`   GET /messages?conversationId=ID - Get messages for a conversation`);
-  console.log(`   GET /logs - Real-time logs (SSE)\n`);
+  console.log(`   GET  /health - Health check`);
+  console.log(`   GET  /stats - Message statistics`);
+  console.log(`   GET  /conversations - List all conversations`);
+  console.log(`   GET  /messages?conversationId=ID - Get messages for a conversation`);
+  console.log(`   GET  /logs - Real-time logs (SSE)`);
+  console.log(`   POST /events/message - Receive new message events`);
+  console.log(`   GET  /live-messages - Real-time message streaming (SSE)\n`);
 });
