@@ -28,15 +28,27 @@ const messageEmitter = new EventEmitter();
 // Track SSE clients for /live-messages
 const sseClients = new Set();
 
-// Load data from bot's user_contexts.json
+// Luxirana account identifier(s) - filter to serve ONLY these
+const ALLOWED_ACCOUNTS = ['luxirana'];
+
+// Load data from bot's user_contexts.json - FILTERED TO LUXIRANA ONLY
 function loadBotData() {
   try {
     if (fs.existsSync(USER_CONTEXTS_PATH)) {
       const rawData = fs.readFileSync(USER_CONTEXTS_PATH, 'utf-8');
       const userContexts = JSON.parse(rawData);
 
-      // Convert user contexts to messages format
+      let loadedCount = 0;
+      let filteredCount = 0;
+
+      // Convert user contexts to messages format - LUXIRANA ONLY
       for (const [userId, userContext] of Object.entries(userContexts)) {
+        // Only load conversations for Luxirana account
+        if (!ALLOWED_ACCOUNTS.includes(userId.toLowerCase())) {
+          filteredCount++;
+          continue; // Skip non-Luxirana accounts
+        }
+
         const conversationId = userId; // Use username as conversation ID
         messagesStore[conversationId] = [];
 
@@ -51,9 +63,10 @@ function loadBotData() {
             });
           });
         }
+        loadedCount++;
       }
 
-      console.log(`✅ Loaded ${Object.keys(messagesStore).length} conversations`);
+      console.log(`✅ Loaded ${loadedCount} Luxirana conversations (filtered ${filteredCount} non-Luxirana accounts)`);
     } else {
       console.log('⚠️  user_contexts.json not found at', USER_CONTEXTS_PATH);
     }
