@@ -1,0 +1,22 @@
+{
+  "watch": [
+    "*.js",
+    "*.json",
+    "data/",
+    ".env"
+  ],
+  "ext": "js,json",
+  "ignore": [
+    "node_modules/",
+    "*.png",
+    "debug_*.png",
+    "user_contexts.json",
+    "message_cache.json"
+  ],
+  "delay": 2000,
+  "verbose": true,
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
+
