@@ -1,19 +1,16 @@
 services:
   - type: web
     name: affiliate-instagram-bot
-    env: node
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     plan: free
     region: oregon
-    buildCommand: cd explainer20-1/explainer/WorldlyFineDiscussion && npm install && npx puppeteer browsers install chrome
-    startCommand: cd explainer20-1/explainer/WorldlyFineDiscussion && node main.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
       - key: API_PORT
         value: 10000
-      - key: PUPPETEER_CACHE_DIR
-        value: /opt/render/.cache/puppeteer
       - key: OPENAI_API_KEY
         sync: false
       - key: INSTAGRAM_USERNAME
