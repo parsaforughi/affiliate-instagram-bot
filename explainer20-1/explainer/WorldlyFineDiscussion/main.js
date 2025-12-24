@@ -92,6 +92,17 @@ const getChromiumPath = () => {
     if (chrome && fs.existsSync(chrome)) possiblePaths.push(chrome);
   } catch (e) {}
   
+  // Check environment variable first (for Docker/Render)
+  if (process.env.CHROMIUM_PATH && fs.existsSync(process.env.CHROMIUM_PATH)) {
+    console.log(`✅ Found Chromium from CHROMIUM_PATH: ${process.env.CHROMIUM_PATH}`);
+    return process.env.CHROMIUM_PATH;
+  }
+  
+  if (process.env.PUPPETEER_EXECUTABLE_PATH && fs.existsSync(process.env.PUPPETEER_EXECUTABLE_PATH)) {
+    console.log(`✅ Found Chromium from PUPPETEER_EXECUTABLE_PATH: ${process.env.PUPPETEER_EXECUTABLE_PATH}`);
+    return process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+  
   // Check common macOS/Unix paths
   const commonPaths = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",

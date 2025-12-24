@@ -52,9 +52,10 @@ RUN npm ci --only=production
 # Copy application code
 COPY explainer20-1/explainer/WorldlyFineDiscussion/ ./
 
-# Set Chromium path
+# Set Chromium path for Puppeteer
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV CHROMIUM_PATH=/usr/bin/chromium
 
 # Expose port (Render uses PORT env var)
 EXPOSE ${PORT:-10000}
