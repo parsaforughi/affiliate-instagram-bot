@@ -1828,21 +1828,8 @@ async function runSelfTest(page) {
   // Only set executablePath if we found a system browser
   if (chromiumPath) {
     launchOptions.executablePath = chromiumPath;
-  } else {
-    // On Render, Puppeteer's bundled Chromium should be in cache
-    // Try to use Puppeteer's default cache location
-    try {
-      const puppeteerCore = require('puppeteer-core');
-      const { executablePath } = puppeteerCore;
-      if (executablePath && fs.existsSync(executablePath())) {
-        launchOptions.executablePath = executablePath();
-        console.log(`✅ Using Puppeteer's bundled Chromium at: ${executablePath()}`);
-      }
-    } catch (e) {
-      // If puppeteer-core not available, let Puppeteer handle it
-      console.log("ℹ️ Using Puppeteer's default Chromium location");
-    }
   }
+  // Otherwise, let Puppeteer use its bundled Chromium (installed during build via npx puppeteer browsers install chrome)
   
   const browser = await puppeteer.launch(launchOptions);
   const page = await browser.newPage();
