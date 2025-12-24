@@ -30,7 +30,8 @@ let botStatus = { running: true, paused: false };
 
 // Export function to start API server
 function startAPIServer(userContextManager, messageCache, port = 3001) {
-  const PORT = process.env.API_PORT || port;
+  // Render uses PORT, fallback to API_PORT, then default
+  const PORT = process.env.PORT || process.env.API_PORT || port;
   const BOT_STATUS_FILE = path.join(__dirname, '.bot-status.json');
   const PROMPT_CONFIG_PATH = path.join(__dirname, 'prompt_config.json');
 

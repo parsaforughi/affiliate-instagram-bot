@@ -99,9 +99,50 @@ affiliate-onlineshop-bot/
 5. Umbrella (دئودورانت)
 6. Pixel (ضدآفتاب)
 
+## Deploy to Render
+
+### Quick Deploy
+
+1. **Push code to GitHub** (already done: https://github.com/parsaforughi/affiliate-instagram-bot)
+
+2. **Go to Render Dashboard**: https://dashboard.render.com
+
+3. **Create New Web Service**:
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository: `parsaforughi/affiliate-instagram-bot`
+   - Render will auto-detect `render.yaml`
+
+4. **Set Environment Variables** in Render dashboard:
+   - `OPENAI_API_KEY` - Your OpenAI API key
+   - `INSTAGRAM_USERNAME` - Instagram username
+   - `INSTAGRAM_PASSWORD` - Instagram password (or use `INSTA_SESSION` instead)
+   - `INSTA_SESSION` - Instagram session cookie (optional, alternative to username/password)
+
+5. **Deploy**: Click "Create Web Service"
+
+6. **Get your bot URL**: `https://affiliate-instagram-bot.onrender.com` (or your custom name)
+
+7. **Update Railway Dashboard**:
+   - Go to Railway → Your Dashboard Project → Variables
+   - Set `AFFILIATE_BOT_API_URL` = `https://affiliate-instagram-bot.onrender.com`
+   - Save and redeploy
+
+### Render Free Tier Notes
+
+- ⚠️ **Spins down after 15 minutes of inactivity**
+- ⚠️ **First request after spin-down takes ~30 seconds** (cold start)
+- ✅ **Health check** keeps it alive (pings `/api/health` every few minutes)
+- 💰 **Paid plan ($7/month)** for 24/7 uptime without spin-downs
+
+### Using Docker (Alternative)
+
+If you prefer Docker deployment, Render will use the `Dockerfile` automatically. The `render.yaml` config is simpler and recommended.
+
 ## Documentation
 
 - `START_BOT.md`: Quick start guide
 - `SYSTEM_PROMPT.md`: Complete AI prompt documentation
 - `docs/`: Historical documentation and implementation notes
+- `INTEGRATED_API_SERVER.md`: API server integration details
+- `LOCAL_TO_RAILWAY_SETUP.md`: Local development with Railway dashboard
 

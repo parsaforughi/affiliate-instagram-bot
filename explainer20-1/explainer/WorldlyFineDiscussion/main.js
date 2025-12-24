@@ -1768,7 +1768,8 @@ async function runSelfTest(page) {
   // Start integrated API server (runs together with bot)
   try {
     const { startAPIServer } = require('./api-server');
-    const API_PORT = process.env.API_PORT || 3001;
+    // Render uses PORT, fallback to API_PORT, then default
+    const API_PORT = process.env.PORT || process.env.API_PORT || 3001;
     apiServer = startAPIServer(userContextManager, messageCache, API_PORT);
     
     // Wait a moment to see if server starts successfully

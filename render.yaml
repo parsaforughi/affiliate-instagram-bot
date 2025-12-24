@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: affiliate-instagram-bot
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: cd explainer20-1/explainer/WorldlyFineDiscussion && npm install
+    startCommand: cd explainer20-1/explainer/WorldlyFineDiscussion && node main.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PORT
+        value: 10000
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: "true"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: INSTAGRAM_USERNAME
+        sync: false
+      - key: INSTAGRAM_PASSWORD
+        sync: false
+      - key: INSTA_SESSION
+        sync: false
+
