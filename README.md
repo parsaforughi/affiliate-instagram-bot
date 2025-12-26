@@ -138,6 +138,24 @@ affiliate-onlineshop-bot/
 
 If you prefer Docker deployment, Render will use the `Dockerfile` automatically. The `render.yaml` config is simpler and recommended.
 
+### Meta App Review - Required URLs
+
+After deployment on Render, the following URLs are available and required for Meta App Review:
+
+- **Privacy Policy**: `https://affiliate-instagram-bot.onrender.com/privacy`
+- **Terms of Service**: `https://affiliate-instagram-bot.onrender.com/terms`
+
+These pages are automatically available after deployment and are required for Instagram Business Messaging approval.
+
+**To use these URLs in Meta App Review:**
+
+1. Go to [Facebook Developers](https://developers.facebook.com/)
+2. Select your app
+3. Go to **App Settings** → **Basic**
+4. Add **Privacy Policy URL**: `https://affiliate-instagram-bot.onrender.com/privacy`
+5. Add **Terms of Service URL**: `https://affiliate-instagram-bot.onrender.com/terms`
+6. Save changes
+
 ## Documentation
 
 - `START_BOT.md`: Quick start guide
