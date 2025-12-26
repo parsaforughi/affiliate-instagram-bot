@@ -96,6 +96,199 @@ function startAPIServer(userContextManager, messageCache, port = 3001) {
   // API ROUTES
   // ============================================
 
+  // Privacy Policy Page (Required for Meta App Review)
+  app.get('/privacy', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(`
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سیاست حریم خصوصی - لوکسیرانا</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      line-height: 1.8;
+      color: #333;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #E1306C;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+    h2 {
+      color: #262626;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+    p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+    ul {
+      margin: 15px 0;
+      padding-right: 30px;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    .last-updated {
+      color: #8e8e8e;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>سیاست حریم خصوصی</h1>
+    <p class="last-updated">آخرین به‌روزرسانی: ${new Date().toLocaleDateString('fa-IR')}</p>
+    
+    <h2>۱. جمع‌آوری اطلاعات</h2>
+    <p>ربات پیام‌رسان اینستاگرام لوکسیرانا برای ارائه خدمات بهتر، اطلاعات زیر را جمع‌آوری می‌کند:</p>
+    <ul>
+      <li>نام کاربری اینستاگرام</li>
+      <li>پیام‌های ارسالی و دریافتی</li>
+      <li>تاریخ و زمان مکالمات</li>
+      <li>اطلاعات پروفایل (در صورت دسترسی)</li>
+    </ul>
+    
+    <h2>۲. استفاده از اطلاعات</h2>
+    <p>اطلاعات جمع‌آوری شده صرفاً برای اهداف زیر استفاده می‌شود:</p>
+    <ul>
+      <li>ارائه پاسخ‌های شخصی‌سازی شده</li>
+      <li>بهبود کیفیت خدمات</li>
+      <li>ارسال اطلاعات محصولات مرتبط</li>
+      <li>مدیریت مکالمات و سوابق</li>
+    </ul>
+    
+    <h2>۳. محافظت از اطلاعات</h2>
+    <p>ما از تمامی اطلاعات شما با استفاده از روش‌های امنیتی استاندارد محافظت می‌کنیم. اطلاعات شما در سرورهای امن ذخیره می‌شود و به هیچ شخص ثالثی فروخته یا منتقل نمی‌شود.</p>
+    
+    <h2>۴. دسترسی به اطلاعات</h2>
+    <p>شما می‌توانید در هر زمان درخواست حذف اطلاعات خود را از طریق پیام مستقیم به ما ارسال کنید.</p>
+    
+    <h2>۵. تغییرات</h2>
+    <p>ما حق تغییر این سیاست حریم خصوصی را در هر زمان محفوظ می‌داریم. تغییرات در این صفحه منتشر خواهد شد.</p>
+    
+    <h2>تماس با ما</h2>
+    <p>در صورت هرگونه سوال یا نگرانی، می‌توانید از طریق پیام مستقیم در اینستاگرام با ما تماس بگیرید.</p>
+  </div>
+</body>
+</html>
+    `);
+  });
+
+  // Terms of Service Page (Required for Meta App Review)
+  app.get('/terms', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(`
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>شرایط استفاده از خدمات - لوکسیرانا</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      line-height: 1.8;
+      color: #333;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #E1306C;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+    h2 {
+      color: #262626;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+    p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+    ul {
+      margin: 15px 0;
+      padding-right: 30px;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    .last-updated {
+      color: #8e8e8e;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>شرایط استفاده از خدمات</h1>
+    <p class="last-updated">آخرین به‌روزرسانی: ${new Date().toLocaleDateString('fa-IR')}</p>
+    
+    <h2>۱. پذیرش شرایط</h2>
+    <p>با استفاده از ربات پیام‌رسان اینستاگرام لوکسیرانا، شما این شرایط را می‌پذیرید.</p>
+    
+    <h2>۲. استفاده از خدمات</h2>
+    <p>شما موافقت می‌کنید که:</p>
+    <ul>
+      <li>از خدمات به صورت قانونی و مطابق با قوانین استفاده کنید</li>
+      <li>از ارسال محتوای توهین‌آمیز، غیرقانونی یا مضر خودداری کنید</li>
+      <li>از ربات برای اهداف تجاری یا تبلیغاتی غیرمجاز استفاده نکنید</li>
+    </ul>
+    
+    <h2>۳. محدودیت مسئولیت</h2>
+    <p>ما تمام تلاش خود را برای ارائه خدمات با کیفیت انجام می‌دهیم، اما مسئولیتی در قبال:</p>
+    <ul>
+      <li>خطاهای فنی یا قطعی موقت سرویس نداریم</li>
+      <li>اطلاعات ارائه شده توسط ربات صرفاً جنبه راهنمایی دارد</li>
+      <li>قیمت‌ها و موجودی محصولات ممکن است تغییر کند</li>
+    </ul>
+    
+    <h2>۴. مالکیت فکری</h2>
+    <p>تمام محتوای ربات، شامل متن‌ها، لوگوها و طراحی‌ها، متعلق به لوکسیرانا است و استفاده غیرمجاز ممنوع است.</p>
+    
+    <h2>۵. تغییرات در خدمات</h2>
+    <p>ما حق تغییر، تعلیق یا توقف خدمات را در هر زمان محفوظ می‌داریم.</p>
+    
+    <h2>۶. لغو خدمات</h2>
+    <p>شما می‌توانید در هر زمان استفاده از خدمات را متوقف کنید. ما نیز می‌توانیم دسترسی شما را در صورت نقض شرایط لغو کنیم.</p>
+    
+    <h2>تماس با ما</h2>
+    <p>در صورت هرگونه سوال، از طریق پیام مستقیم در اینستاگرام با ما تماس بگیرید.</p>
+  </div>
+</body>
+</html>
+    `);
+  });
+
   // Health check
   app.get('/api/health', (req, res) => {
     const { messagesStore } = getMessagesStore();

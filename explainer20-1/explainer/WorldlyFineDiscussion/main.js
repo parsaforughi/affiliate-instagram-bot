@@ -298,10 +298,56 @@ class UserContextManager {
         firstSeen: Date.now(),
         lastSeen: Date.now(),
         lastGreetingDate: null,
+        // Product state for pagination
+        productState: {
+          lastSearchQuery: null,
+          lastSearchResults: [],
+          lastSearchBrand: null,
+          lastShownIndex: 0,
+          hasMoreProducts: false
+        }
       };
     }
     this.contexts[username].lastSeen = Date.now();
     return this.contexts[username];
+  }
+  
+  // Save product search state
+  saveProductSearchState(username, query, results, brand, shownCount = 0) {
+    const context = this.getContext(username);
+    context.productState = {
+      lastSearchQuery: query,
+      lastSearchResults: results,
+      lastSearchBrand: brand,
+      lastShownIndex: shownCount,
+      hasMoreProducts: results.length > shownCount
+    };
+    this.save();
+  }
+  
+  // Get product state
+  getProductState(username) {
+    const context = this.getContext(username);
+    return context.productState || {
+      lastSearchQuery: null,
+      lastSearchResults: [],
+      lastSearchBrand: null,
+      lastShownIndex: 0,
+      hasMoreProducts: false
+    };
+  }
+  
+  // Reset product state
+  resetProductState(username) {
+    const context = this.getContext(username);
+    context.productState = {
+      lastSearchQuery: null,
+      lastSearchResults: [],
+      lastSearchBrand: null,
+      lastShownIndex: 0,
+      hasMoreProducts: false
+    };
+    this.save();
   }
 
   hasGreetedToday(username) {
@@ -1370,10 +1416,16 @@ async function processConversation(page, conv, messageCache, userContextManager,
     console.log(`🤖 [${username}] Response ready`);
 
     // ========================================
-    // POST-PROCESSING: Best-Sellers or Product Search
+    // POST-PROCESSING: Best-Sellers or Product Search with Cards
     // ========================================
     const { searchProduct } = require('./search_product.js');
+    const { ProductHandler } = require('./product_handler.js');
+    const { ProductCardSender } = require('./product_card_sender.js');
     const fs = require('fs');
+    
+    // Initialize product handler and card sender
+    const cardSender = new ProductCardSender(process.env.INSTAGRAM_PAGE_ACCESS_TOKEN || null);
+    const productHandler = new ProductHandler(page, userContextManager, cardSender);
     
     // Check if user is asking for BEST SELLERS (all brands)
     const normalizedMsg = lastMessage.replace(/\s+/g, ' ').toLowerCase();
@@ -1432,38 +1484,61 @@ async function processConversation(page, conv, messageCache, userContextManager,
       
       console.log(`✅ Sent all 6 best-sellers with ${allBestSellers.length} product links`);
     } else {
-      // Regular product search
+      // Product handling with intelligent system and cards
       const askingForProducts = lastMessage.includes('قیمت') || 
                                 lastMessage.includes('محصول') ||
                                 lastMessage.includes('چند') ||
                                 lastMessage.includes('چقدر') ||
                                 lastMessage.includes('برام بگو') ||
                                 lastMessage.includes('نشون بده') ||
-                                lastMessage.includes('میخوام');
+                                lastMessage.includes('میخوام') ||
+                                lastMessage.includes('بیشتر') ||
+                                lastMessage.includes('باقی') ||
+                                lastMessage.includes('لینک') ||
+                                lastMessage.includes('لینک بده') ||
+                                lastMessage.includes('لینک بفرست') ||
+                                lastMessage.includes('همشونو') ||
+                                lastMessage.includes('همه') ||
+                                lastMessage.toLowerCase() === 'بله' ||
+                                lastMessage.toLowerCase() === 'آره' ||
+                                lastMessage.toLowerCase() === 'بفرست' ||
+                                lastMessage.toLowerCase() === 'ارسال کن';
       
       if (askingForProducts) {
-        console.log(`🔍 [${username}] Detected product request - searching products...`);
-        const products = searchProduct(lastMessage);
+        console.log(`🔍 [${username}] Processing product request with intelligent handler...`);
         
-        if (products && products.length > 0) {
-          console.log(`✅ Found ${products.length} products from CSV`);
+        // استفاده از ProductHandler
+        const productResult = await productHandler.handleProductRequest(
+          username,
+          lastMessage,
+          conversationHistory
+        );
+        
+        if (productResult && productResult.success) {
+          // کارت‌ها توسط ProductHandler ارسال شده‌اند
+          // فقط پیام follow-up را برای ارسال آماده کن
+          if (productResult.message) {
+            response.responses[0].message = productResult.message;
+          }
           
-          // Build proper formatted message with REAL prices
-          let productMessage = '';
-          const firstProduct = products[0];
-          
-          productMessage = `✨ محصول: ${firstProduct.name}\n`;
-          productMessage += `💰 قیمت مصرف‌کننده: ${firstProduct.price}\n`;
-          productMessage += `🔖 برای شما با ۴۰٪ تخفیف: ${firstProduct.discountPrice}\n`;
-          productMessage += `🔗 لینک خرید پایین 👇`;
-          
-          // Replace AI response with real product info
-          response.responses[0].message = productMessage;
+          // Mark that cards were sent (so we don't send links again)
           response.responses[0].sendProductInfo = true;
-          response.responses[0].productLink = firstProduct.productUrl;
           response.responses[0].sendLink = false;
+          response.responses[0].cardsWereSent = true; // Flag to indicate cards were sent
           
-          console.log(`🔗 Product link: ${firstProduct.productUrl}`);
+          if (productResult.product) {
+            response.responses[0].productLink = productResult.product.productUrl;
+          }
+          
+          // Save messages to context
+          if (productResult.message) {
+            userContextManager.addMessage(username, 'assistant', productResult.message);
+          }
+          
+          console.log(`✅ [${username}] Product handled successfully - ${productResult.productsShown || 1} card(s) sent`);
+        } else {
+          // اگر محصول پیدا نشد یا خطا بود، از AI response استفاده کن
+          console.log(`ℹ️ [${username}] No products found or error, using AI response`);
         }
       }
     }
@@ -1491,13 +1566,23 @@ async function processConversation(page, conv, messageCache, userContextManager,
     // Send replies - flatten all responses from all messages
     const textarea = await page.$('textarea[placeholder*="Message"], textarea[aria-label*="Message"], div[contenteditable="true"]');
     if (textarea) {
+      // Check if product cards were already sent (by ProductHandler)
+      const productState = userContextManager.getProductState(username);
+      const cardsWereSent = productState.lastShownIndex > 0 || 
+                           allResponses.some(r => r.responses && r.responses.some(resp => resp.cardsWereSent));
+      
       // Flatten responses from all message responses
       const allFlattenedResponses = [];
       allResponses.forEach(resp => {
         if (resp.responses && Array.isArray(resp.responses)) {
           allFlattenedResponses.push(...resp.responses);
         } else if (resp.message) {
-          allFlattenedResponses.push({ message: resp.message, sendLink: resp.sendLink });
+          allFlattenedResponses.push({ 
+            message: resp.message, 
+            sendLink: resp.sendLink,
+            sendProductInfo: resp.sendProductInfo,
+            productLink: resp.productLink
+          });
         }
       });
       
@@ -1584,35 +1669,50 @@ async function processConversation(page, conv, messageCache, userContextManager,
           } catch (err) {}
           
         } else if (resp.sendProductInfo === true && resp.productLink) {
-          // Send message first
-          await textarea.type(fullMessage, { delay: 25 });
-          await delay(300);
-          await page.keyboard.press("Enter");
-          console.log(`✅ [${username}] Message ${i + 1}/${allFlattenedResponses.length} sent!`);
-          console.log(`🔗 [${username}] Product link: ${resp.productLink}`);
-          
-          // Emit text message to dashboard
-          userContextManager.addMessage(username, 'assistant', fullMessage);
-          try {
-            dashboardEvents.emitMessage(username, uniqueId, 'bot', fullMessage, username);
-          } catch (err) {}
-          
-          await delay(1000);
-          
-          // Send product link separately
-          await textarea.click();
-          await delay(300);
-          await textarea.type(resp.productLink, { delay: 25 });
-          await delay(300);
-          await page.keyboard.press("Enter");
-          console.log(`🛍️ [${username}] Product link sent separately: ${resp.productLink}`);
-          
-          // Emit link to dashboard
-          userContextManager.addMessage(username, 'assistant', resp.productLink);
-          try {
-            const linkId = `${username}_bot_${Date.now()}_${i}_link_${Math.random().toString(36).substr(2, 9)}`;
-            dashboardEvents.emitMessage(username, linkId, 'bot', resp.productLink, username);
-          } catch (err) {}
+          // اگر کارت‌ها قبلاً ارسال شده‌اند، فقط پیام follow-up را ارسال کن
+          if (cardsWereSent) {
+            // کارت‌ها توسط ProductHandler ارسال شده‌اند
+            // فقط پیام follow-up را ارسال کن
+            if (fullMessage && fullMessage.trim().length > 0) {
+              await textarea.type(fullMessage, { delay: 25 });
+              await delay(300);
+              await page.keyboard.press("Enter");
+              console.log(`✅ [${username}] Follow-up message sent after cards!`);
+              
+              userContextManager.addMessage(username, 'assistant', fullMessage);
+              try {
+                dashboardEvents.emitMessage(username, uniqueId, 'bot', fullMessage, username);
+              } catch (err) {}
+            }
+          } else {
+            // کارت‌ها ارسال نشده‌اند، پیام و لینک را ارسال کن (fallback)
+            await textarea.type(fullMessage, { delay: 25 });
+            await delay(300);
+            await page.keyboard.press("Enter");
+            console.log(`✅ [${username}] Message ${i + 1}/${allFlattenedResponses.length} sent!`);
+            console.log(`🔗 [${username}] Product link: ${resp.productLink}`);
+            
+            userContextManager.addMessage(username, 'assistant', fullMessage);
+            try {
+              dashboardEvents.emitMessage(username, uniqueId, 'bot', fullMessage, username);
+            } catch (err) {}
+            
+            await delay(1000);
+            
+            // Send product link separately
+            await textarea.click();
+            await delay(300);
+            await textarea.type(resp.productLink, { delay: 25 });
+            await delay(300);
+            await page.keyboard.press("Enter");
+            console.log(`🛍️ [${username}] Product link sent separately: ${resp.productLink}`);
+            
+            userContextManager.addMessage(username, 'assistant', resp.productLink);
+            try {
+              const linkId = `${username}_bot_${Date.now()}_${i}_link_${Math.random().toString(36).substr(2, 9)}`;
+              dashboardEvents.emitMessage(username, linkId, 'bot', resp.productLink, username);
+            } catch (err) {}
+          }
           
         } else {
           // Just send the message
@@ -1856,24 +1956,47 @@ async function runSelfTest(page) {
 
   if (INSTA_SESSION) {
     console.log("🍪 Using session cookie...");
-    await page.setCookie({
-      name: "sessionid",
-      value: INSTA_SESSION,
-      domain: ".instagram.com",
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-    });
-    console.log("✅ Session cookie set");
+    try {
+      await page.setCookie({
+        name: "sessionid",
+        value: INSTA_SESSION,
+        domain: ".instagram.com",
+        path: "/",
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+      });
+      console.log("✅ Session cookie set");
+    } catch (cookieError) {
+      console.log("⚠️ Warning: Could not set session cookie:", cookieError.message);
+      console.log("   Will try to login with credentials if available...");
+    }
   }
 
   console.log("📱 Navigating to Instagram...");
-  await page.goto("https://www.instagram.com/", { 
-    waitUntil: "networkidle2",
-    timeout: 30000
-  });
-  await delay(5000);
+  try {
+    await page.goto("https://www.instagram.com/", { 
+      waitUntil: "domcontentloaded", // Changed from networkidle2 to domcontentloaded (faster)
+      timeout: 60000 // Increased from 30000 to 60000 (60 seconds)
+    });
+    await delay(5000);
+  } catch (error) {
+    if (error.name === 'TimeoutError') {
+      console.log("⚠️ Navigation timeout - trying with load strategy...");
+      try {
+        await page.goto("https://www.instagram.com/", { 
+          waitUntil: "load",
+          timeout: 60000
+        });
+        await delay(5000);
+      } catch (retryError) {
+        console.error("❌ Failed to load Instagram after retry:", retryError.message);
+        throw new Error(`Failed to navigate to Instagram: ${retryError.message}. Session may be expired or network issue.`);
+      }
+    } else {
+      throw error;
+    }
+  }
 
   const loggedIn = await page.evaluate(
     () => !!document.querySelector('a[href*="/direct/inbox"]'),
@@ -1895,10 +2018,24 @@ async function runSelfTest(page) {
     
     console.log("🔐 Logging in...");
     
-    await page.goto("https://www.instagram.com/accounts/login/", {
-      waitUntil: "networkidle2",
-    });
-    await delay(2000);
+    try {
+      await page.goto("https://www.instagram.com/accounts/login/", {
+        waitUntil: "domcontentloaded",
+        timeout: 60000
+      });
+      await delay(2000);
+    } catch (error) {
+      if (error.name === 'TimeoutError') {
+        console.log("⚠️ Login page timeout - trying with load strategy...");
+        await page.goto("https://www.instagram.com/accounts/login/", {
+          waitUntil: "load",
+          timeout: 60000
+        });
+        await delay(2000);
+      } else {
+        throw error;
+      }
+    }
 
     await page.waitForSelector('input[name="username"]', { visible: true, timeout: 15000 });
     await page.type('input[name="username"]', username, { delay: 40 });
@@ -1909,10 +2046,24 @@ async function runSelfTest(page) {
   }
 
   console.log("✅ Opening messages...");
-  await page.goto("https://www.instagram.com/direct/inbox/", {
-    waitUntil: "networkidle2",
-  });
-  await delay(3000);
+  try {
+    await page.goto("https://www.instagram.com/direct/inbox/", {
+      waitUntil: "domcontentloaded",
+      timeout: 60000
+    });
+    await delay(3000);
+  } catch (error) {
+    if (error.name === 'TimeoutError') {
+      console.log("⚠️ Inbox page timeout - trying with load strategy...");
+      await page.goto("https://www.instagram.com/direct/inbox/", {
+        waitUntil: "load",
+        timeout: 60000
+      });
+      await delay(3000);
+    } else {
+      throw error;
+    }
+  }
 
   // Dismiss notifications
   try {

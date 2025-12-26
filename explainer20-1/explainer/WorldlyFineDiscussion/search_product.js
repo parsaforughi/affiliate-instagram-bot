@@ -237,7 +237,7 @@ function getProductURL(productName) {
 }
 
 // Search for a product by name
-function searchProduct(productName) {
+function searchProduct(productName, contextBrand = null, conversationHistory = []) {
   try {
     console.log(`\n🔍 ========== PRODUCT SEARCH START ==========`);
     console.log(`🔎 Search Query: "${productName}"`);
@@ -259,12 +259,28 @@ function searchProduct(productName) {
     let searchingForBrand = false;
     let targetBrand = '';
     
-    for (const allowedBrand of allowedBrands) {
-      if (searchNormalized.includes(normalizePersian(allowedBrand.toLowerCase()))) {
-        searchingForBrand = true;
-        targetBrand = allowedBrand;
-        console.log(`🏷️ Brand search detected: ${targetBrand}`);
-        break;
+    // اگر contextBrand داده شده، اولویت بده
+    if (contextBrand) {
+      const normalizedContextBrand = normalizePersian(contextBrand.toLowerCase());
+      for (const allowedBrand of allowedBrands) {
+        if (normalizePersian(allowedBrand.toLowerCase()) === normalizedContextBrand) {
+          searchingForBrand = true;
+          targetBrand = allowedBrand;
+          console.log(`🏷️ Using brand from context: ${targetBrand}`);
+          break;
+        }
+      }
+    }
+    
+    // اگر از context پیدا نشد، از query جستجو کن
+    if (!searchingForBrand) {
+      for (const allowedBrand of allowedBrands) {
+        if (searchNormalized.includes(normalizePersian(allowedBrand.toLowerCase()))) {
+          searchingForBrand = true;
+          targetBrand = allowedBrand;
+          console.log(`🏷️ Brand search detected from query: ${targetBrand}`);
+          break;
+        }
       }
     }
     
@@ -311,7 +327,9 @@ function searchProduct(productName) {
             console.log(`   Discount: ${product.discountPrice} تومان (40% off)`);
             console.log(`   URL: ${productUrl}`);
             
-            if (matches.length >= 5) break;
+            // اگر برند مشخص بود، همه محصولات رو جمع کن (نه فقط 5 تا)
+            // فقط برای exact-brand matches
+            // break را حذف می‌کنیم تا همه محصولات برند جمع شوند
           }
         }
       } else {
@@ -352,7 +370,7 @@ function searchProduct(productName) {
           const brandScore = similarity(searchNormalized, brandLower);
           const maxScore = Math.max(nameScore, brandScore);
           
-          if (maxScore > 0.3) {  // 30% similarity threshold
+          if (maxScore > 0.5) {  // 50% similarity threshold (increased from 0.3)
             const productUrl = getProductURL(name);
             
             if (productUrl) {
@@ -376,7 +394,12 @@ function searchProduct(productName) {
     
     // Return exact matches if found
     if (matches.length > 0) {
-      console.log(`\n✅ Returning ${matches.length} exact match(es)`);
+      // اگر برند مشخص بود و همه محصولات برند رو جمع کردیم، همه رو برگردون
+      if (searchingForBrand && targetBrand) {
+        console.log(`\n✅ Returning ALL ${matches.length} brand products for ${targetBrand}`);
+      } else {
+        console.log(`\n✅ Returning ${matches.length} exact match(es)`);
+      }
       console.log(`🔍 ========== PRODUCT SEARCH END ==========\n`);
       return matches;
     }
@@ -409,4 +432,64 @@ function searchProduct(productName) {
   }
 }
 
-module.exports = { searchProduct, formatPersianPrice, calculateDiscount, normalizePersian };
+// ========================================
+// BRAND EXTRACTION
+// ========================================
+
+const ALL_BRANDS_MAP = {
+  'میسویک': { name: 'میسویک', englishName: 'Misswake', keywords: ['میسویک', 'misswake'] },
+  'کلامین': { name: 'کلامین', englishName: 'Collamin', keywords: ['کلامین', 'collamin'] },
+  'آیس‌بال': { name: 'آیس‌بال', englishName: 'Ice Ball', keywords: ['آیس‌بال', 'iceball', 'ice ball', 'آیس بال', 'ایس بال'] },
+  'دافی': { name: 'دافی', englishName: 'Dafi', keywords: ['دافی', 'dafi'] },
+  'آمبرلا': { name: 'آمبرلا', englishName: 'Umbrella', keywords: ['آمبرلا', 'umbrella'] },
+  'پیکسل': { name: 'پیکسل', englishName: 'Pixel', keywords: ['پیکسل', 'pixel', 'pixxel'] }
+};
+
+// Extract brand from text
+function extractBrandFromText(text, conversationHistory = []) {
+  if (!text) return null;
+  
+  const normalizedText = normalizePersian(text.toLowerCase());
+  
+  // Check current message first
+  for (const [brandKey, brandData] of Object.entries(ALL_BRANDS_MAP)) {
+    for (const keyword of brandData.keywords) {
+      const normalizedKeyword = normalizePersian(keyword.toLowerCase());
+      if (normalizedText.includes(normalizedKeyword)) {
+        console.log(`🏷️ Brand found in text: ${brandData.name}`);
+        return brandData.name;
+      }
+    }
+  }
+  
+  // Check conversation history if provided
+  if (conversationHistory && conversationHistory.length > 0) {
+    const recentMessages = conversationHistory.slice(-5);
+    const allText = recentMessages
+      .map(m => m.content || '')
+      .join(' ')
+      .toLowerCase();
+    const normalizedHistory = normalizePersian(allText);
+    
+    for (const [brandKey, brandData] of Object.entries(ALL_BRANDS_MAP)) {
+      for (const keyword of brandData.keywords) {
+        const normalizedKeyword = normalizePersian(keyword.toLowerCase());
+        if (normalizedHistory.includes(normalizedKeyword)) {
+          console.log(`🏷️ Brand found in conversation history: ${brandData.name}`);
+          return brandData.name;
+        }
+      }
+    }
+  }
+  
+  return null;
+}
+
+module.exports = { 
+  searchProduct, 
+  formatPersianPrice, 
+  calculateDiscount, 
+  normalizePersian,
+  extractBrandFromText,
+  ALL_BRANDS_MAP
+};
