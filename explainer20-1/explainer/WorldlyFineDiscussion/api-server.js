@@ -353,6 +353,102 @@ function startAPIServer(userContextManager, messageCache, port = 3001) {
   // API ROUTES
   // ============================================
 
+  // Root route - redirect to home or show info
+  app.get('/', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram Bot Platform</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+    }
+    p {
+      color: #666;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    .links {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    a {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    a:hover {
+      background: #5568d3;
+    }
+    .status {
+      margin-top: 30px;
+      padding: 15px;
+      background: #f0f0f0;
+      border-radius: 8px;
+    }
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 Instagram Bot Platform</h1>
+    <p>Welcome to the Instagram Bot Management Platform</p>
+    <div class="links">
+      <a href="/admin">Admin Dashboard</a>
+      <a href="/api/health">Health Check</a>
+      <a href="/api/pages">API: Pages</a>
+    </div>
+    <div class="status">
+      <div class="status-item">
+        <span>Status:</span>
+        <strong>✅ Online</strong>
+      </div>
+      <div class="status-item">
+        <span>API:</span>
+        <strong>Running</strong>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+    `);
+  });
+
   // Privacy Policy Page (English - Required for Meta App Review)
   app.get('/privacy', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
