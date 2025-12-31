@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const { InstagramGraphAPI } = require('./instagram_api_client.js');
 
 // Helper function for delay
 function delay(ms) {
@@ -141,16 +142,64 @@ class InstagramCardSender {
 // ========================================
 
 class ProductCardSender {
-  constructor(pageAccessToken = null) {
+  constructor(pageAccessToken = null, pageId = null) {
     this.apiSender = new InstagramCardSender(pageAccessToken);
     this.formatter = new ProductCardFormatter();
+    this.pageAccessToken = pageAccessToken;
+    this.pageId = pageId;
+    this.useAPI = !!(pageAccessToken && pageId);
   }
 
   // Send product card (tries API first, falls back to Rich Text)
-  async sendProductCard(page, username, product, useAPI = false) {
-    // For now, always use Rich Text (Puppeteer)
-    // API support can be added later when we have user IDs
+  async sendProductCard(page, username, product, useAPI = null) {
+    // If API is enabled and we have page info, use Graph API
+    const shouldUseAPI = useAPI !== null ? useAPI : this.useAPI;
+    
+    if (shouldUseAPI && this.pageAccessToken && this.pageId) {
+      try {
+        const apiClient = new InstagramGraphAPI(this.pageAccessToken, this.pageId);
+        const result = await apiClient.sendProductCard(username, product);
+        if (result.success) {
+          console.log(`✅ [${username}] Product card sent via Graph API`);
+          return { success: true, method: 'graph_api' };
+        } else {
+          console.log(`⚠️ [${username}] Graph API failed, falling back to Rich Text`);
+          return this.sendRichTextCard(page, username, product);
+        }
+      } catch (error) {
+        console.error(`❌ [${username}] Graph API error:`, error);
+        return this.sendRichTextCard(page, username, product);
+      }
+    }
+    
+    // Fallback to Puppeteer
     return this.sendRichTextCard(page, username, product);
+  }
+
+  // Send multiple product cards (tries API first, falls back to Rich Text)
+  async sendMultipleProductCards(page, username, products, useAPI = null) {
+    // If API is enabled and we have page info, use Graph API
+    const shouldUseAPI = useAPI !== null ? useAPI : this.useAPI;
+    
+    if (shouldUseAPI && this.pageAccessToken && this.pageId) {
+      try {
+        const apiClient = new InstagramGraphAPI(this.pageAccessToken, this.pageId);
+        const result = await apiClient.sendMultipleProductCards(username, products);
+        if (result.success) {
+          console.log(`✅ [${username}] ${products.length} product cards sent via Graph API`);
+          return { success: true, method: 'graph_api' };
+        } else {
+          console.log(`⚠️ [${username}] Graph API failed, falling back to Rich Text`);
+          return this.sendMultipleProductCardsRichText(page, username, products);
+        }
+      } catch (error) {
+        console.error(`❌ [${username}] Graph API error:`, error);
+        return this.sendMultipleProductCardsRichText(page, username, products);
+      }
+    }
+    
+    // Fallback to Puppeteer
+    return this.sendMultipleProductCardsRichText(page, username, products);
   }
 
   // Send Rich Text Card via Puppeteer
@@ -189,8 +238,8 @@ class ProductCardSender {
     }
   }
 
-  // Send multiple products as cards
-  async sendMultipleProductCards(page, username, products) {
+  // Send multiple products as cards (Rich Text via Puppeteer)
+  async sendMultipleProductCardsRichText(page, username, products) {
     try {
       console.log(`📤 [${username}] Looking for textarea to send ${products.length} cards...`);
       const textarea = await page.$('textarea[placeholder*="Message"], textarea[aria-label*="Message"], div[contenteditable="true"]');

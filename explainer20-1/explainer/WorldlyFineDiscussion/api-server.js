@@ -6,6 +6,11 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const { EventEmitter } = require('events');
+const fetch = require('node-fetch');
+const { PageManager } = require('./page_manager.js');
+const { InstagramGraphAPI } = require('./instagram_api_client.js');
+const { PageSettingsManager } = require('./page_settings_manager.js');
+const { AutoReplyManager } = require('./auto_reply_manager.js');
 
 // Create Express app
 const app = express();
@@ -91,6 +96,258 @@ function startAPIServer(userContextManager, messageCache, port = 3001) {
 
   // Initialize
   loadBotStatus();
+
+  // Initialize Page Manager
+  const pageManager = new PageManager();
+  const pageSettingsManager = new PageSettingsManager();
+  const autoReplyManager = new AutoReplyManager();
+  const APP_ID = process.env.APP_ID;
+  const APP_SECRET = process.env.APP_SECRET;
+  const WEBHOOK_VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'luxirana_webhook_2024';
+
+  // Auto-add default page if token provided
+  if (process.env.INSTAGRAM_PAGE_ACCESS_TOKEN && process.env.INSTAGRAM_PAGE_ID) {
+    const existingPage = pageManager.pages[process.env.INSTAGRAM_PAGE_ID];
+    if (!existingPage) {
+      pageManager.addPage(
+        process.env.INSTAGRAM_PAGE_ID,
+        process.env.INSTAGRAM_PAGE_ACCESS_TOKEN,
+        'Default Page'
+      );
+      console.log('✅ Default page added from environment variables');
+    }
+  }
+
+  // ============================================
+  // OAUTH ROUTES (برای اتصال Pages)
+  // ============================================
+
+  // صفحه Login برای اتصال Page
+  app.get('/auth/facebook', (req, res) => {
+    if (!APP_ID) {
+      return res.status(500).send('APP_ID not configured');
+    }
+    
+    const redirectURI = `${req.protocol}://${req.get('host')}/auth/facebook/callback`;
+    const scope = 'pages_show_list,pages_read_engagement,pages_manage_metadata,instagram_basic,instagram_manage_messages';
+    const authURL = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(redirectURI)}&scope=${scope}&response_type=code`;
+    
+    res.redirect(authURL);
+  });
+
+  // Callback برای دریافت Token
+  app.get('/auth/facebook/callback', async (req, res) => {
+    const code = req.query.code;
+    
+    if (!code) {
+      return res.status(400).send('Authorization code not found');
+    }
+
+    if (!APP_ID || !APP_SECRET) {
+      return res.status(500).send('APP_ID or APP_SECRET not configured');
+    }
+
+    try {
+      const redirectURI = `${req.protocol}://${req.get('host')}/auth/facebook/callback`;
+      
+      // Exchange code for access token
+      const tokenResponse = await fetch(
+        `https://graph.facebook.com/v18.0/oauth/access_token?client_id=${APP_ID}&client_secret=${APP_SECRET}&redirect_uri=${encodeURIComponent(redirectURI)}&code=${code}`
+      );
+      const tokenData = await tokenResponse.json();
+      
+      if (tokenData.error) {
+        return res.status(400).send(`Error: ${tokenData.error.message}`);
+      }
+
+      const userAccessToken = tokenData.access_token;
+
+      // Get long-lived token
+      const longLivedResponse = await fetch(
+        `https://graph.facebook.com/v18.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${APP_ID}&client_secret=${APP_SECRET}&fb_exchange_token=${userAccessToken}`
+      );
+      const longLivedData = await longLivedResponse.json();
+      
+      const longLivedToken = longLivedData.access_token || userAccessToken;
+
+      // Get user's pages
+      const pagesResponse = await fetch(
+        `https://graph.facebook.com/v18.0/me/accounts?access_token=${longLivedToken}`
+      );
+      const pagesData = await pagesResponse.json();
+      
+      if (pagesData.error) {
+        return res.status(400).send(`Error: ${pagesData.error.message}`);
+      }
+
+      // Save all pages
+      const connectedPages = [];
+      if (pagesData.data && pagesData.data.length > 0) {
+        pagesData.data.forEach(page => {
+          pageManager.addPage(
+            page.id,
+            page.access_token,
+            page.name || `Page ${page.id}`
+          );
+          connectedPages.push({ id: page.id, name: page.name || `Page ${page.id}` });
+        });
+      }
+
+      res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Success - Pages Connected</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+            h1 { color: #25D366; }
+            ul { text-align: left; display: inline-block; }
+          </style>
+        </head>
+        <body>
+          <h1>✅ Pages Connected Successfully!</h1>
+          <p>Connected ${connectedPages.length} page(s):</p>
+          <ul>
+            ${connectedPages.map(p => `<li>${p.name} (${p.id})</li>`).join('')}
+          </ul>
+          <p><a href="/">Back to Dashboard</a></p>
+        </body>
+        </html>
+      `);
+    } catch (error) {
+      console.error('OAuth error:', error);
+      res.status(500).send(`Error: ${error.message}`);
+    }
+  });
+
+  // ============================================
+  // WEBHOOK ROUTES
+  // ============================================
+
+  // Webhook verification
+  app.get('/webhook', (req, res) => {
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    if (mode === 'subscribe' && token === WEBHOOK_VERIFY_TOKEN) {
+      console.log('✅ Webhook verified');
+      res.status(200).send(challenge);
+    } else {
+      console.log('❌ Webhook verification failed');
+      res.sendStatus(403);
+    }
+  });
+
+  // Webhook message receiver
+  app.post('/webhook', async (req, res) => {
+    const body = req.body;
+    
+    if (body.object === 'instagram') {
+      const entry = body.entry?.[0];
+      const messaging = entry?.messaging?.[0];
+      
+      if (messaging) {
+        const senderId = messaging.sender?.id;
+        const pageId = entry.id; // Page ID that received the message
+        const message = messaging.message;
+        
+        if (message && message.text) {
+          console.log(`📨 [${pageId}] Received message from ${senderId}: ${message.text}`);
+          
+          // Process message with bot logic (async, don't wait)
+          processIncomingMessage(pageId, senderId, message.text, userContextManager).catch(error => {
+            console.error('Error processing message:', error);
+          });
+        }
+      }
+    }
+    
+    res.sendStatus(200);
+  });
+
+  // ============================================
+  // MESSAGE PROCESSOR (برای Webhook)
+  // ============================================
+
+  async function processIncomingMessage(pageId, senderId, messageText, userContextManager) {
+    // Get API client for this page
+    const apiClient = pageManager.getAPIClient(pageId);
+    if (!apiClient) {
+      console.error(`❌ No API client found for page ${pageId}`);
+      return;
+    }
+
+    // Get user info (username) from API
+    const userInfo = await apiClient.getUserInfo(senderId);
+    const username = userInfo?.username || senderId;
+    
+    // Get page settings
+    const settings = pageSettingsManager.getSettings(pageId);
+    
+    // Check mode and process accordingly
+    if (settings.mode === 'auto_reply') {
+      // Try auto-reply first
+      const autoReplyResult = await autoReplyManager.processMessage(
+        pageId, 
+        messageText, 
+        apiClient, 
+        senderId
+      );
+      
+      if (autoReplyResult.success) {
+        // Auto-reply sent successfully
+        userContextManager.addMessage(username, 'assistant', autoReplyResult.reply.reply);
+        return;
+      }
+      
+      // No auto-reply matched, fallback to AI
+      console.log(`⚠️ [${pageId}] No auto-reply matched, falling back to AI`);
+    }
+    
+    // AI Mode or Auto-Reply fallback
+    const context = userContextManager.getContext(username);
+    userContextManager.addMessage(username, 'user', messageText);
+    
+    try {
+      // Dynamic import to avoid circular dependency
+      const mainModule = require('./main.js');
+      const askGPT = mainModule.askGPT || (() => {
+        console.error('askGPT function not found in main.js');
+        return Promise.resolve({ responses: [{ message: 'Bot is processing...' }] });
+      });
+
+      // Use custom prompt if available
+      const customPrompt = settings.aiPrompt || null;
+
+      // Modify askGPT call to use custom prompt (you'll need to update askGPT function)
+      const response = await askGPT(messageText, userContextManager, username, false, customPrompt);
+      
+      // Send responses
+      if (response.responses && response.responses.length > 0) {
+        for (const resp of response.responses) {
+          // Send text message
+          if (resp.message) {
+            await apiClient.sendTextMessage(senderId, resp.message);
+            userContextManager.addMessage(username, 'assistant', resp.message);
+          }
+          
+          // Send product cards if needed
+          if (resp.sendProductInfo && resp.product) {
+            await apiClient.sendProductCard(senderId, resp.product);
+          } else if (resp.sendProductInfo && resp.products && resp.products.length > 0) {
+            await apiClient.sendMultipleProductCards(senderId, resp.products);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error processing message with OpenAI:', error);
+      // Send error message to user
+      await apiClient.sendTextMessage(senderId, 'متأسفانه خطایی رخ داد. لطفاً دوباره تلاش کنید.');
+    }
+  }
 
   // ============================================
   // API ROUTES
@@ -289,6 +546,226 @@ function startAPIServer(userContextManager, messageCache, port = 3001) {
     `);
   });
 
+  // ============================================
+  // PAGE MANAGEMENT API
+  // ============================================
+
+  // لیست Pages متصل شده
+  app.get('/api/pages', (req, res) => {
+    const pages = pageManager.getActivePages();
+    // Add settings for each page
+    const pagesWithSettings = pages.map(page => {
+      const settings = pageSettingsManager.getSettings(page.pageId);
+      return {
+        ...page,
+        mode: settings.mode,
+        autoRepliesCount: settings.autoReplies.length,
+        hasCustomPrompt: !!settings.aiPrompt
+      };
+    });
+    res.json({ success: true, pages: pagesWithSettings });
+  });
+
+  // دریافت اطلاعات یک Page
+  app.get('/api/pages/:pageId', (req, res) => {
+    const { pageId } = req.params;
+    const page = pageManager.pages[pageId];
+    if (!page) {
+      return res.status(404).json({ success: false, error: 'Page not found' });
+    }
+    const settings = pageSettingsManager.getSettings(pageId);
+    res.json({ success: true, page: { ...page, settings } });
+  });
+
+  // حذف/غیرفعال کردن یک Page
+  app.delete('/api/pages/:pageId', (req, res) => {
+    const { pageId } = req.params;
+    pageManager.deactivatePage(pageId);
+    res.json({ success: true, message: 'Page deactivated' });
+  });
+
+  // فعال کردن یک Page
+  app.post('/api/pages/:pageId/activate', (req, res) => {
+    const { pageId } = req.params;
+    pageManager.activatePage(pageId);
+    res.json({ success: true, message: 'Page activated' });
+  });
+
+  // ============================================
+  // PAGE SETTINGS API
+  // ============================================
+
+  // دریافت تنظیمات یک Page
+  app.get('/api/pages/:pageId/settings', (req, res) => {
+    const { pageId } = req.params;
+    const settings = pageSettingsManager.getSettings(pageId);
+    res.json({ success: true, settings });
+  });
+
+  // تغییر حالت (AI یا Auto-Reply)
+  app.post('/api/pages/:pageId/mode', (req, res) => {
+    const { pageId } = req.params;
+    const { mode } = req.body;
+    
+    if (!mode || (mode !== 'ai' && mode !== 'auto_reply')) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Mode must be "ai" or "auto_reply"' 
+      });
+    }
+    
+    try {
+      const settings = pageSettingsManager.setMode(pageId, mode);
+      res.json({ success: true, settings });
+    } catch (error) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  });
+
+  // تنظیم پرامپت سفارشی برای AI Mode
+  app.post('/api/pages/:pageId/ai-prompt', (req, res) => {
+    const { pageId } = req.params;
+    const { prompt } = req.body;
+    
+    if (prompt === undefined || prompt === null) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Prompt is required' 
+      });
+    }
+    
+    try {
+      const settings = pageSettingsManager.setAIPrompt(pageId, prompt);
+      res.json({ success: true, settings });
+    } catch (error) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  });
+
+  // ============================================
+  // AUTO-REPLY API
+  // ============================================
+
+  // دریافت لیست پاسخ‌های خودکار
+  app.get('/api/pages/:pageId/auto-replies', (req, res) => {
+    const { pageId } = req.params;
+    const replies = autoReplyManager.getAutoReplies(pageId);
+    res.json({ success: true, replies });
+  });
+
+  // اضافه کردن پاسخ خودکار
+  app.post('/api/pages/:pageId/auto-replies', (req, res) => {
+    const { pageId } = req.params;
+    const { keyword, reply, hashtags } = req.body;
+    
+    if (!keyword || !reply) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Keyword and reply are required' 
+      });
+    }
+    
+    try {
+      const settings = autoReplyManager.addAutoReply(
+        pageId, 
+        keyword, 
+        reply, 
+        hashtags || []
+      );
+      res.json({ success: true, settings });
+    } catch (error) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  });
+
+  // ویرایش پاسخ خودکار
+  app.put('/api/pages/:pageId/auto-replies/:replyId', (req, res) => {
+    const { pageId, replyId } = req.params;
+    const { keyword, reply, hashtags } = req.body;
+    
+    if (!keyword || !reply) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Keyword and reply are required' 
+      });
+    }
+    
+    try {
+      const settings = autoReplyManager.updateAutoReply(
+        pageId, 
+        replyId, 
+        keyword, 
+        reply, 
+        hashtags || []
+      );
+      res.json({ success: true, settings });
+    } catch (error) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  });
+
+  // حذف پاسخ خودکار
+  app.delete('/api/pages/:pageId/auto-replies/:replyId', (req, res) => {
+    const { pageId, replyId } = req.params;
+    
+    try {
+      const settings = autoReplyManager.removeAutoReply(pageId, replyId);
+      res.json({ success: true, settings });
+    } catch (error) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  });
+
+  // ============================================
+  // STATISTICS API
+  // ============================================
+
+  // آمار کلی
+  app.get('/api/stats/overview', (req, res) => {
+    const { messagesStore } = getMessagesStore();
+    const pages = pageManager.getActivePages();
+    const allSettings = pageSettingsManager.getAllSettings();
+    
+    let totalAutoReplies = 0;
+    let totalAIPages = 0;
+    let totalAutoReplyPages = 0;
+    
+    pages.forEach(page => {
+      const settings = allSettings[page.pageId] || pageSettingsManager.getSettings(page.pageId);
+      totalAutoReplies += settings.autoReplies.length;
+      if (settings.mode === 'ai') totalAIPages++;
+      if (settings.mode === 'auto_reply') totalAutoReplyPages++;
+    });
+    
+    let totalMessages = 0;
+    let todayMessages = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (const conversationId in messagesStore) {
+      const messages = messagesStore[conversationId];
+      totalMessages += messages.length;
+      messages.forEach(msg => {
+        const msgDate = new Date(msg.createdAt);
+        if (msgDate >= today) todayMessages++;
+      });
+    }
+    
+    res.json({
+      success: true,
+      stats: {
+        totalPages: pages.length,
+        activePages: pages.filter(p => p.active).length,
+        totalMessages,
+        todayMessages,
+        totalAutoReplies,
+        aiPages: totalAIPages,
+        autoReplyPages: totalAutoReplyPages,
+        totalConversations: Object.keys(messagesStore).length
+      }
+    });
+  });
+
   // Health check
   app.get('/api/health', (req, res) => {
     const { messagesStore } = getMessagesStore();
@@ -298,7 +775,8 @@ function startAPIServer(userContextManager, messageCache, port = 3001) {
       bot: botStatus,
       conversations: Object.keys(messagesStore).length,
       messageClients: messageSSEClients.size,
-      logClients: logSSEClients.size
+      logClients: logSSEClients.size,
+      connectedPages: pageManager.getActivePages().length
     });
   });
 

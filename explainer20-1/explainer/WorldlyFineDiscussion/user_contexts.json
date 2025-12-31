@@ -1485,11 +1485,1132 @@
         "role": "assistant",
         "content": "کاملاً اوکیه، مزاحمت هم دیگه برات ایجاد نمی‌کنم 🌿  \nاگه در آینده خواستی روی برندای معروف به‌صورت همکاری و بدون درگیرشدن با انبار کار کنی، هر وقت خواستی پیام بده، در خدمتم.",
         "timestamp": 1766387345767
+      },
+      {
+        "role": "assistant",
+        "content": "اگر فروشگاهت آنلاینِ بهت یه پلن همکاری می‌دیم که مستقیم از خود شرکت سیلانه سبز برداری، بدون واسطه، با کد onlineshops برات ۴۰٪ سود و ارسال رایگان می‌افته.",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "assistant",
+        "content": "اگر حس کردی به کارت نمیاد، راحت بگو «نمی‌خوام» تا دیگه ادامه ندم؛ اگر هم دوست داشتی بدونی چی می‌تونه برات خوب فروش بره، بگو روی کدوم دسته کار می‌کنی تا دقیق راهنماییت کنم",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "نمی خوام",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "assistant",
+        "content": "کاملاً اوکیه، مزاحمت هم دیگه برات ایجاد نمی‌کنم",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "assistant",
+        "content": "اگه در آینده خواستی روی برندای معروف به‌صورت همکاری و بدون درگیرشدن با انبار کار کنی، هر وقت خواستی پیام بده، در خدمتم.",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "سلام",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "سلام خوش اومدی",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "پیج یا سایت فروشگاهی‌ت تو چه حوزه‌ایه؟ آرایشی، بهداشتی، داروخانه‌ای یا عمومی کار می‌کنی؟",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "با توجه به نوع فروشت می‌تونم بگم کدوم برند از محصولاتمون (مثل Misswake یا Pixel و... ) برات سود و فروش بهتری میاره.",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "چطوری ؟",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "مرسی، خوبم، امیدوارم تو هم خوب باشی",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "ما اینجا به فروشگاه‌های آنلاین کمک می‌کنیم محصولات برندهای سیلانه سبز رو با قیمت همکار + ۴۰٪ سود و ارسال رایگان بردارن و مستقیم از خود شرکت تامین کنن.",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "فروشگاهت بیشتر روی چه دسته محصولاتی فعاله؟ زیبایی و مراقبت پوست، بهداشت دهان و دندان، یا چیز دیگه؟ تا همون حوزه مناسب رو بهت پیشنهاد بدم.",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "هی",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "خوش اومدی",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "فروشگاهت بیشتر روی چه محصولایی فعاله؟ اسکین‌کر، بهداشتی، دارویی یا میکس همه‌چی؟",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "تا بدونم از بین Misswake، Collamin، IceBall، Dafi، Umbrella و Pixel کدوم برات بهتره برای همکاری معرفی کنم.",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "user",
+        "content": "هلو",
+        "timestamp": 1766735857738
+      },
+      {
+        "role": "assistant",
+        "content": "سلام 😊  \nخوش اومدی 🌿  \nفروشگاهت بیشتر روی چه محصولاتی فعاله؟ آرایشی، بهداشتی یا دارویی که بدونم چی برات به‌صرفه‌تره برای همکاری؟",
+        "timestamp": 1766735866063
+      },
+      {
+        "role": "user",
+        "content": "با توجه به نوع فروشت می‌تونم بگم کدوم برند از محصولاتمون (مثل Misswake یا Pixel و... ) برات سود و فروش بهتری میاره.",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "چطوری ؟",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "مرسی، خوبم، امیدوارم تو هم خوب باشی",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "ما اینجا به فروشگاه‌های آنلاین کمک می‌کنیم محصولات برندهای سیلانه سبز رو با قیمت همکار + ۴۰٪ سود و ارسال رایگان بردارن و مستقیم از خود شرکت تامین کنن.",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "فروشگاهت بیشتر روی چه دسته محصولاتی فعاله؟ زیبایی و مراقبت پوست، بهداشت دهان و دندان، یا چیز دیگه؟ تا همون حوزه مناسب رو بهت پیشنهاد بدم.",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "هی",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "سلام",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "خوش اومدی",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "فروشگاهت بیشتر روی چه محصولایی فعاله؟ اسکین‌کر، بهداشتی، دارویی یا میکس همه‌چی؟",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "تا بدونم از بین Misswake، Collamin، IceBall، Dafi، Umbrella و Pixel کدوم برات بهتره برای همکاری معرفی کنم.",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "هلو",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "پیجت بیشتر تو حوزه آرایشی‌بهداشتی فعاله یا جنرال همه‌چی می‌ذاری؟",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "assistant",
+        "content": "فروشگاهت بیشتر روی چه محصولاتی فعاله؟ آرایشی، بهداشتی یا دارویی که بدونم چی برات به‌صرفه‌تره برای همکاری؟",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "بگیا تا ببینیم کدوم برندمون بیشتر به کارت میاد که برات توضیح بدم",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "user",
+        "content": "اول بهم بگو میسویک چه محصولاتی داره ؟",
+        "timestamp": 1766735904178
+      },
+      {
+        "role": "assistant",
+        "content": "کاملاً حق داری، اول خود برند 👌  \nMisswake تخصصش محصولات دهان و دندونه:  \n- خمیردندان (ضدحساسیت، پروتکتیو، وایتنینگ، مینرال، مخصوص لثه و...)  \n- دهان‌شویه (روزانه، تخصصی، مخصوص ایمپلنت و ارتودنسی و...)  \n- مسواک و نخ دندان در چند مدل مختلف  \n\nاگر بگی مشتری‌هات بیشتر چی می‌خرن (ضدحساسیت، سفیدکننده یا روزانه)، می‌تونم ۲–۳ تا مدل پرفروش دقیقاً برای فروشت پیشنهاد بدم 🌿",
+        "timestamp": 1766735919806
+      },
+      {
+        "role": "user",
+        "content": "خوش اومدی",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "user",
+        "content": "فروشگاهت بیشتر روی چه محصولایی فعاله؟ اسکین‌کر، بهداشتی، دارویی یا میکس همه‌چی؟",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "user",
+        "content": "تا بدونم از بین Misswake، Collamin، IceBall، Dafi، Umbrella و Pixel کدوم برات بهتره برای همکاری معرفی کنم.",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "user",
+        "content": "هلو",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "user",
+        "content": "سلام",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "user",
+        "content": "پیجت بیشتر تو حوزه آرایشی‌بهداشتی فعاله یا جنرال همه‌چی می‌ذاری؟",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "assistant",
+        "content": "فروشگاهت بیشتر روی چه محصولاتی فعاله؟ آرایشی، بهداشتی یا دارویی که بدونم چی برات به‌صرفه‌تره برای همکاری؟",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "user",
+        "content": "بگیا تا ببینیم کدوم برندمون بیشتر به کارت میاد که برات توضیح بدم",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "user",
+        "content": "اول بهم بگو میسویک چه محصولاتی داره ؟",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "assistant",
+        "content": "کاملاً حق داری، اول خود برند",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "assistant",
+        "content": "Misswake تخصصش محصولات دهان و دندونه:",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "assistant",
+        "content": "- خمیردندان (ضدحساسیت، پروتکتیو، وایتنینگ، مینرال، مخصوص لثه و...)",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "assistant",
+        "content": "- دهان‌شویه (روزانه، تخصصی، مخصوص ایمپلنت و ارتودنسی و...)",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "assistant",
+        "content": "- مسواک و نخ دندان در چند مدل مختلف",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "assistant",
+        "content": "اگر بگی مشتری‌هات بیشتر چی می‌خرن (ضدحساسیت، سفیدکننده یا روزانه)، می‌تونم ۲–۳ تا مدل پرفروش دقیقاً برای فروشت پیشنهاد بدم",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "user",
+        "content": "لینک محصولاتشو برام بفرست",
+        "timestamp": 1766736226790
+      },
+      {
+        "role": "assistant",
+        "content": "🔗 لینک محصولات پیشنهادی:\nhttps://luxirana.com",
+        "timestamp": 1766736231843
+      },
+      {
+        "role": "assistant",
+        "content": "https://luxirana.com",
+        "timestamp": 1766736234076
+      },
+      {
+        "role": "assistant",
+        "content": "https://luxirana.com",
+        "timestamp": 1766736968986
+      },
+      {
+        "role": "user",
+        "content": "محصولای میسویک رو برام میفرستی",
+        "timestamp": 1766736968986
+      },
+      {
+        "role": "assistant",
+        "content": "محصول: خمیردندان توتال 8 100 میل میسویک",
+        "timestamp": 1766736968986
+      },
+      {
+        "role": "assistant",
+        "content": "قیمت مصرف‌کننده: ۲۴۰٬۰۰۰",
+        "timestamp": 1766736968986
+      },
+      {
+        "role": "assistant",
+        "content": "برای شما با ۴۰٪ تخفیف: ۱۴۴٬۰۰۰",
+        "timestamp": 1766736968986
+      },
+      {
+        "role": "assistant",
+        "content": "لینک خرید پایین",
+        "timestamp": 1766736968986
+      },
+      {
+        "role": "assistant",
+        "content": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86-%d8%aa%d9%88%d8%aa%d8%a7%d9%84-8-100-%d9%85%db%8c%d9%84-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+        "timestamp": 1766736968986
+      },
+      {
+        "role": "user",
+        "content": "دیگه چی داری ازش",
+        "timestamp": 1766736968986
+      },
+      {
+        "role": "assistant",
+        "content": "اگر منظورت همون Misswake هست، چندتا گزینه دیگه که برای فروشگاه‌های آنلاین خوب می‌فروشه ایناست 👇  \n\n1️⃣ خمیر دندان میسویک مخصوص دندان‌های حساس (Sensitive) – مناسب کسایی که از سرما و گرما اذیت می‌شن  \n2️⃣ خمیر دندان میسویک وایتنینگ (Whitening) – مناسب کسایی که دنبال روشن‌تر شدن دندون‌ها هستن  \n3️⃣ دهانشویه میسویک – برای کامل کردن روتین بهداشت دهان و دندان کنار خمیر دندان  \n\nاگر بگی روی کدوم دسته بیشتر تمرکز داری (حساس، وایتنینگ، روزانه)، همون‌ها رو برات دقیق‌تر انتخاب می‌کنم برای فروشگاهت 🌿",
+        "timestamp": 1766736988973
+      },
+      {
+        "role": "assistant",
+        "content": "لینک خرید پایین",
+        "timestamp": 1766737003876
+      },
+      {
+        "role": "assistant",
+        "content": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86-%d8%aa%d9%88%d8%aa%d8%a7%d9%84-8-100-%d9%85%db%8c%d9%84-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+        "timestamp": 1766737003876
+      },
+      {
+        "role": "user",
+        "content": "دیگه چی داری ازش",
+        "timestamp": 1766737003876
+      },
+      {
+        "role": "assistant",
+        "content": "اگر منظورت همون Misswake هست، چندتا گزینه دیگه که برای فروشگاه‌های آنلاین خوب می‌فروشه ایناست",
+        "timestamp": 1766737003876
+      },
+      {
+        "role": "assistant",
+        "content": "خمیر دندان میسویک مخصوص دندان‌های حساس (Sensitive) – مناسب کسایی که از سرما و گرما اذیت می‌شن",
+        "timestamp": 1766737003876
+      },
+      {
+        "role": "assistant",
+        "content": "خمیر دندان میسویک وایتنینگ (Whitening) – مناسب کسایی که دنبال روشن‌تر شدن دندون‌ها هستن",
+        "timestamp": 1766737003876
+      },
+      {
+        "role": "assistant",
+        "content": "دهانشویه میسویک – برای کامل کردن روتین بهداشت دهان و دندان کنار خمیر دندان",
+        "timestamp": 1766737003876
+      },
+      {
+        "role": "assistant",
+        "content": "اگر بگی روی کدوم دسته بیشتر تمرکز داری (حساس، وایتنینگ، روزانه)، همون‌ها رو برات دقیق‌تر انتخاب می‌کنم برای فروشگاهت",
+        "timestamp": 1766737003876
+      },
+      {
+        "role": "user",
+        "content": "همشونو بعم لینک بده",
+        "timestamp": 1766737003876
+      },
+      {
+        "role": "assistant",
+        "content": "باشه، چون گفتی «همشونو»، من لینک صفحه اصلی هر برند رو می‌ذارم که خودت راحت بچرخی و انتخاب کنی 👇\n\nMisswake  \nCollamin  \nIceBall  \nDafi  \nUmbrella  \nPixel  \n\nهمین الان شروع کن 👇  \nhttps://luxirana.com",
+        "timestamp": 1766737013159
+      },
+      {
+        "role": "assistant",
+        "content": "https://luxirana.com",
+        "timestamp": 1766737015414
       }
     ],
     "firstSeen": 1764195914647,
-    "lastSeen": 1766387345767,
-    "lastGreetingDate": 1766387273783
+    "lastSeen": 1766737015414,
+    "lastGreetingDate": 1766735866064,
+    "productState": {
+      "lastSearchQuery": "میسویک",
+      "lastSearchResults": [
+        {
+          "name": "خمیردندان توتال 8 100 میل میسویک",
+          "rawPrice": "240000",
+          "price": "۲۴۰٬۰۰۰",
+          "discountPrice": "۱۴۴٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86-%d8%aa%d9%88%d8%aa%d8%a7%d9%84-8-100-%d9%85%db%8c%d9%84-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "401110",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان زیرو و ضد حساسیت 100 میل میسویک",
+          "rawPrice": "230000",
+          "price": "۲۳۰٬۰۰۰",
+          "discountPrice": "۱۳۸٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d8%b2%db%8c%d8%b1%d9%88-%d8%b6%d8%af-%d8%ad%d8%b3%d8%a7%d8%b3%db%8c%d8%aa-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "401111",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان سفید کننده روزانه 100 میل میسویک",
+          "rawPrice": "237000",
+          "price": "۲۳۷٬۰۰۰",
+          "discountPrice": "۱۴۲٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d8%b3%d9%81%db%8c%d8%af-%da%a9%d9%86%d9%86%d8%af%d9%87-%d8%b1%d9%88%d8%b2%d8%a7%d9%86%d9%87-100-%d9%85%db%8c%d9%84-%d9%85%db%8c/",
+          "productId": "401112",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان سفید کننده میسویک مدل Just In 5 Minutes حجم 50 میل",
+          "rawPrice": "185000",
+          "price": "۱۸۵٬۰۰۰",
+          "discountPrice": "۱۱۱٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان کودک, دهان و دندان, محصولات بهداشتی مادر و کودک, محصولات بهداشتی مردانه, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d8%b3%d9%81%db%8c%d8%af-%da%a9%d9%86%d9%86%d8%af%d9%87-%d8%b1%d9%88%d8%b2%d8%a7%d9%86%d9%87-100-%d9%85%db%8c%d9%84-%d9%85%db%8c/",
+          "productId": "401113",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان کودک میسویک مدل Sponge Bob حجم 50 میلی لیتر",
+          "rawPrice": "92000",
+          "price": "۹۲٬۰۰۰",
+          "discountPrice": "۵۵٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان کودک, دهان و دندان, محصولات بهداشتی مادر و کودک, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%da%a9%d9%88%d8%af%da%a9-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-bob-sponje-%d8%ad%d8%ac%d9%85-50-%d9%85%db%8c%d9%84%db%8c/",
+          "productId": "401114",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان کودک میسویک مدل Kitty حجم 50 میلی لیتر",
+          "rawPrice": "92000",
+          "price": "۹۲٬۰۰۰",
+          "discountPrice": "۵۵٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان کودک, دهان و دندان, محصولات بهداشتی مادر و کودک, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%da%a9%d9%88%d8%af%da%a9-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-bob-sponje-%d8%ad%d8%ac%d9%85-50-%d9%85%db%8c%d9%84%db%8c/",
+          "productId": "401115",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان میسویک مدل Total 8 حجم 75 میلی لیتر",
+          "rawPrice": "195000",
+          "price": "۱۹۵٬۰۰۰",
+          "discountPrice": "۱۱۷٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-8-%d8%ad%d8%ac%d9%85-75-%d9%85%db%8c%d9%84%db%8c-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "401140",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان میسویک مدل Daily Whitening حجم 75 میلی لیتر",
+          "rawPrice": "189000",
+          "price": "۱۸۹٬۰۰۰",
+          "discountPrice": "۱۱۳٬۴۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-8-%d8%ad%d8%ac%d9%85-75-%d9%85%db%8c%d9%84%db%8c-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "401141",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان میسویک مدل Complete حجم 75 میلی لیتر",
+          "rawPrice": "29700",
+          "price": "۲۹٬۷۰۰",
+          "discountPrice": "۱۷٬۸۲۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-8-%d8%ad%d8%ac%d9%85-75-%d9%85%db%8c%d9%84%db%8c-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "401142",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان میسویک مدل آنتی پلاک حجم 75 میلی لیتر",
+          "rawPrice": "29700",
+          "price": "۲۹٬۷۰۰",
+          "discountPrice": "۱۷٬۸۲۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-8-%d8%ad%d8%ac%d9%85-75-%d9%85%db%8c%d9%84%db%8c-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "401143",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیر دندان میسویک مدل ZERO SENSITIVE حجم 75 میلی لیتر",
+          "rawPrice": "189000",
+          "price": "۱۸۹٬۰۰۰",
+          "discountPrice": "۱۱۳٬۴۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-8-%d8%ad%d8%ac%d9%85-75-%d9%85%db%8c%d9%84%db%8c-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "401144",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه میسویک مدل Total Care حجم 400 میل لیتر",
+          "rawPrice": "235000",
+          "price": "۲۳۵٬۰۰۰",
+          "discountPrice": "۱۴۱٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > دهان شویه, محصولات بهداشتی مادر و کودک, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-care-%d8%ad%d8%ac%d9%85-400-%d9%85%db%8c%d9%84-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "402010",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه میسویک مدل Sensitive حجم 400 میلی لیتر",
+          "rawPrice": "235000",
+          "price": "۲۳۵٬۰۰۰",
+          "discountPrice": "۱۴۱٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > دهان شویه, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-care-%d8%ad%d8%ac%d9%85-400-%d9%85%db%8c%d9%84-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "402011",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه میسویک Dental Plaque حجم 400 میل لیتر",
+          "rawPrice": "197000",
+          "price": "۱۹۷٬۰۰۰",
+          "discountPrice": "۱۱۸٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-anti-plaque-%d8%ad%d8%ac%d9%85-400-%d9%85%db%8c%d9%84-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "402016",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه میسویک مدل Total Care حجم 200 میل لیتر",
+          "rawPrice": "157000",
+          "price": "۱۵۷٬۰۰۰",
+          "discountPrice": "۹۴٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان, محصولات بهداشتی مادر و کودک, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-care-%d8%ad%d8%ac%d9%85-400-%d9%85%db%8c%d9%84-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "402050",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه میسویک مدل Sensitive حجم 200 میلی لیتر",
+          "rawPrice": "157000",
+          "price": "۱۵۷٬۰۰۰",
+          "discountPrice": "۹۴٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > دهان شویه, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-care-%d8%ad%d8%ac%d9%85-400-%d9%85%db%8c%d9%84-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "402051",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه میسویک مدل Dental Plaque حجم 200 میل لیتر",
+          "rawPrice": "159000",
+          "price": "۱۵۹٬۰۰۰",
+          "discountPrice": "۹۵٬۴۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان > دهان شویه > دهان شویه کودک, دهان و دندان, محصولات بهداشتی مادر و کودک, محصولات بهداشتی مردانه, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-care-%d8%ad%d8%ac%d9%85-400-%d9%85%db%8c%d9%84-%d9%84%db%8c%d8%aa%d8%b1/",
+          "productId": "402056",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه کودک دخترانه میسویک مدل سگ نگهبان",
+          "rawPrice": "127000",
+          "price": "۱۲۷٬۰۰۰",
+          "discountPrice": "۷۶٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان > دهان شویه > دهان شویه کودک, محصولات بهداشتی مادر و کودک, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%da%a9%d9%88%d8%af%da%a9-%d8%af%d8%ae%d8%aa%d8%b1%d8%a7%d9%86%d9%87-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-%d8%b3%da%af-%d9%86%da%af/",
+          "productId": "402018",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه کودک پسرانه میسویک مدل سگ نگهبان",
+          "rawPrice": "127000",
+          "price": "۱۲۷٬۰۰۰",
+          "discountPrice": "۷۶٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان > دهان شویه > دهان شویه کودک, دهان و دندان, محصولات بهداشتی مادر و کودک, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%da%a9%d9%88%d8%af%da%a9-%d9%be%d8%b3%d8%b1%d8%a7%d9%86%d9%87-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-%d8%b3%da%af-%d9%86%da%af%d9%87/",
+          "productId": "402017",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "نخ دندان میسویک مدل TOTAL CARE 8",
+          "rawPrice": "165000",
+          "price": "۱۶۵٬۰۰۰",
+          "discountPrice": "۹۹٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > نخ دندان, دهان و دندان, محصولات بهداشتی مردانه, میسویک",
+          "productUrl": "https://luxirana.com/product/%d9%86%d8%ae-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-care-8/",
+          "productId": "403010",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "نخ دندان میسویک مدل ضد حساسیت Pro Sense",
+          "rawPrice": "165000",
+          "price": "۱۶۵٬۰۰۰",
+          "discountPrice": "۹۹٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > نخ دندان, دهان و دندان, محصولات بهداشتی مادر و کودک, میسویک",
+          "productUrl": "https://luxirana.com/product/%d9%86%d8%ae-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-care-8/",
+          "productId": "403011",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "نخ دندان میسویک مدل سفیدکننده Whitening",
+          "rawPrice": "165000",
+          "price": "۱۶۵٬۰۰۰",
+          "discountPrice": "۹۹٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, میسویک, دهان و دندان > نخ دندان",
+          "productUrl": "https://luxirana.com/product/%d9%86%d8%ae-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9-%d9%85%d8%af%d9%84-total-care-8/",
+          "productId": "403012",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خميردندان کودک آدم برفی میسویک",
+          "rawPrice": "135000",
+          "price": "۱۳۵٬۰۰۰",
+          "discountPrice": "۸۱٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان > خمیر دندان کودک, دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%d9%8a%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86-%da%a9%d9%88%d8%af%da%a9-%d8%a2%d8%af%d9%85-%d8%a8%d8%b1%d9%81%db%8c-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "401116",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خميردندان کودک اسپایدر من میسویک",
+          "rawPrice": "135000",
+          "price": "۱۳۵٬۰۰۰",
+          "discountPrice": "۸۱٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان > خمیر دندان کودک, دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%d9%8a%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86-%da%a9%d9%88%d8%af%da%a9-%d8%a7%d8%b3%d9%be%d8%a7%db%8c%d8%af%d8%b1-%d9%85%d9%86-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "401117",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خميردندان کودک توت فرنگی میسویک",
+          "rawPrice": "92000",
+          "price": "۹۲٬۰۰۰",
+          "discountPrice": "۵۵٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان > خمیر دندان کودک, دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%d9%8a%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86-%da%a9%d9%88%d8%af%da%a9-%d8%aa%d9%88%d8%aa-%d9%81%d8%b1%d9%86%da%af%db%8c-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "401118",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک هدیه کودک میسویک",
+          "rawPrice": "433000",
+          "price": "۴۳۳٬۰۰۰",
+          "discountPrice": "۲۵۹٬۸۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, پک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=71345",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان حساس پمپی ۱۸۵ میل میسویک",
+          "rawPrice": "250000",
+          "price": "۲۵۰٬۰۰۰",
+          "discountPrice": "۱۵۰٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان پمپی میسویک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=71387",
+          "productId": "401186",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان توتال پمپی ۱۸۵ میل میسویک",
+          "rawPrice": "250000",
+          "price": "۲۵۰٬۰۰۰",
+          "discountPrice": "۱۵۰٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان پمپی میسویک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=71129",
+          "productId": "401188",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خميردندان سفید کننده روزانه ۱۸۵ میل میسویک",
+          "rawPrice": "315000",
+          "price": "۳۱۵٬۰۰۰",
+          "discountPrice": "۱۸۹٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "پبشنهادهای لوکس, دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان پمپی میسویک, دهان و دندان, محصولات بهداشتی مادر و کودک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=82",
+          "productId": "401189",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان کودک پمپی سونیک ۱۸۵ میل میسویک",
+          "rawPrice": "260000",
+          "price": "۲۶۰٬۰۰۰",
+          "discountPrice": "۱۵۶٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان پمپی میسویک, دهان و دندان > خمیر دندان > خمیر دندان کودک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=71131",
+          "productId": "401192",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان کودک پمپی تک شاخ ۱۸۵ میل میسویک",
+          "rawPrice": "260000",
+          "price": "۲۶۰٬۰۰۰",
+          "discountPrice": "۱۵۶٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان پمپی میسویک, دهان و دندان > خمیر دندان > خمیر دندان کودک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=71131",
+          "productId": "401193",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک دهانشویه و خمیردندان میسویک",
+          "rawPrice": "412000",
+          "price": "۴۱۲٬۰۰۰",
+          "discountPrice": "۲۴۷٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, پک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=76403",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه گیاهی میسویک",
+          "rawPrice": "237000",
+          "price": "۲۳۷٬۰۰۰",
+          "discountPrice": "۱۴۲٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > دهان شویه, محصولات جدید, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%da%af%db%8c%d8%a7%d9%87%db%8c-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "402020",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه خوشبوکننده میسویک",
+          "rawPrice": "237000",
+          "price": "۲۳۷٬۰۰۰",
+          "discountPrice": "۱۴۲٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > دهان شویه, محصولات جدید, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86-%d8%b4%d9%88%db%8c%d9%87-%d8%ae%d9%88%d8%b4%d8%a8%d9%88%da%a9%d9%86%d9%86%d8%af%d9%87-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "402021",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک اینفلوئنسرشو",
+          "rawPrice": "670000",
+          "price": "۶۷۰٬۰۰۰",
+          "discountPrice": "۴۰۲٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, پک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=79885",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک اینفلوئنسرشو کودک",
+          "rawPrice": "867000",
+          "price": "۸۶۷٬۰۰۰",
+          "discountPrice": "۵۲۰٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "پک, دسته بندی نشده, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=79885",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان پمپی ۱۸۵ میل گیاهی بدون فلوراید میسویک",
+          "rawPrice": "325000",
+          "price": "۳۲۵٬۰۰۰",
+          "discountPrice": "۱۹۵٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان پمپی میسویک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=92934",
+          "productId": "401194",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خميردندان گياهي بدون فلورايد 75 میل ميسويک",
+          "rawPrice": "189000",
+          "price": "۱۸۹٬۰۰۰",
+          "discountPrice": "۱۱۳٬۴۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, محصولات جدید, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%d9%8a%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86_%da%af%d9%8a%d8%a7%d9%87%d9%8a_%d8%a8%d8%af%d9%88%d9%86_%d9%81%d9%84%d9%88%d8%b1%d8%a7%d9%8a%d8%af_75_%d9%85%db%8c%d9%84_%d9%85%d9%8a%d8%b3%d9%88/",
+          "productId": "401145",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک دهانشویه توتال و خمیردندان گیاهی میسویک",
+          "rawPrice": "460000",
+          "price": "۴۶۰٬۰۰۰",
+          "discountPrice": "۲۷۶٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "پک, دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان پمپی میسویک, دهان و دندان > دهان شویه, دهان و دندان > دهان شویه > دهان شویه کودک, دهان و دندان, محصولات جدید, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=105456",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "اسپری خوشبو کننده دهان اکالیپتوس میسویک",
+          "rawPrice": "97000",
+          "price": "۹۷٬۰۰۰",
+          "discountPrice": "۵۸٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%a7%d8%b3%d9%be%d8%b1%db%8c-%d9%85%d8%ad%d8%a7%d9%81%d8%b8%d8%aa-%da%a9%d9%86%d9%86%d8%af%d9%87-%d8%af%d9%87%d8%a7%d9%86-%d9%88-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d8%a7%da%a9%d8%a7%d9%84%db%8c%d9%be/",
+          "productId": "404010",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "اسپری خوشبو کننده دهان نعناع میسویک",
+          "rawPrice": "97000",
+          "price": "۹۷٬۰۰۰",
+          "discountPrice": "۵۸٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%a7%d8%b3%d9%be%d8%b1%db%8c-%d9%85%d8%ad%d8%a7%d9%81%d8%b8%d8%aa-%da%a9%d9%86%d9%86%d8%af%d9%87-%d8%af%d9%87%d8%a7%d9%86-%d9%88-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d8%a7%da%a9%d8%a7%d9%84%db%8c%d9%be/",
+          "productId": "404011",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "مسواک بزرگسال نرم کلینیکال میسویک",
+          "rawPrice": "",
+          "price": "تماس بگیرید",
+          "discountPrice": "تماس بگیرید",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > مسواک, میسویک",
+          "productUrl": "https://luxirana.com/product/clinical-soft-adult-toothbrush/",
+          "productId": "405010",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "مسواک نرم کودک کلینیکال میسویک",
+          "rawPrice": "",
+          "price": "تماس بگیرید",
+          "discountPrice": "تماس بگیرید",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > مسواک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=120163",
+          "productId": "405011",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهانشویه کلروهگزیدین 200 میل میسویک",
+          "rawPrice": "207000",
+          "price": "۲۰۷٬۰۰۰",
+          "discountPrice": "۱۲۴٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > دهان شویه, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%af%d9%87%d8%a7%d9%86%d8%b4%d9%88%db%8c%d9%87-%da%a9%d9%84%d8%b1%d9%88%d9%87%da%af%d8%b2%db%8c%d8%af%db%8c%d9%86-200-%d9%85%db%8c%d9%84-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "402057",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "مسواک بزرگسالان مدیوم کلینیکال میسویک",
+          "rawPrice": "",
+          "price": "تماس بگیرید",
+          "discountPrice": "تماس بگیرید",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > مسواک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=138721",
+          "productId": "400271103",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان مخصوص دندان لمینیت و کامپوزیت ۷۵ میلی میسویک",
+          "rawPrice": "210000",
+          "price": "۲۱۰٬۰۰۰",
+          "discountPrice": "۱۲۶٬۰۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > خمیر دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%85%d8%ae%d8%b5%d9%88%d8%b5-%d8%af%d9%86%d8%af%d8%a7%d9%86-%d9%84%d9%85%db%8c%d9%86%db%8c%d8%aa-%d9%88-%da%a9%d8%a7%d9%85%d9%be%d9%88%d8%b2/",
+          "productId": "400142208",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک دندان های کامپوزیت و لمینت",
+          "rawPrice": "244700",
+          "price": "۲۴۴٬۷۰۰",
+          "discountPrice": "۱۴۶٬۸۲۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, پک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=76403",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک هدیه کودک پسرانه",
+          "rawPrice": "371000",
+          "price": "۳۷۱٬۰۰۰",
+          "discountPrice": "۲۲۲٬۶۰۰",
+          "brand": "میسویک",
+          "categories": "پک, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=176633",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک هدیه کودک دخترانه",
+          "rawPrice": "371000",
+          "price": "۳۷۱٬۰۰۰",
+          "discountPrice": "۲۲۲٬۶۰۰",
+          "brand": "میسویک",
+          "categories": "پک, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=176634",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان توتال ۱۲ کاره ۷۵ میل میسویک",
+          "rawPrice": "217000",
+          "price": "۲۱۷٬۰۰۰",
+          "discountPrice": "۱۳۰٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > خمیر دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86-%d8%aa%d9%88%d8%aa%d8%a7%d9%84-%db%b1%db%b2-%da%a9%d8%a7%d8%b1%d9%87-%db%b7%db%b5-%d9%85%db%8c%d9%84-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "400142209",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک هدیه کودک دخترانه",
+          "rawPrice": "387000",
+          "price": "۳۸۷٬۰۰۰",
+          "discountPrice": "۲۳۲٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "پک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=176634",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پک هدیه کودک پسرانه",
+          "rawPrice": "387000",
+          "price": "۳۸۷٬۰۰۰",
+          "discountPrice": "۲۳۲٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "پک, میسویک",
+          "productUrl": "https://luxirana.com/?post_type=product&#038;p=176633",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان کودک کفشدوزکی میسویک",
+          "rawPrice": "92000",
+          "price": "۹۲٬۰۰۰",
+          "discountPrice": "۵۵٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان کودک, میسویک",
+          "productUrl": "https://luxirana.com/product/%d8%ae%d9%85%db%8c%d8%b1%d8%af%d9%86%d8%af%d8%a7%d9%86-%da%a9%d9%88%d8%af%da%a9-%da%a9%d9%81%d8%b4%d8%af%d9%88%d8%b2%da%a9%db%8c-%d9%85%db%8c%d8%b3%d9%88%db%8c%da%a9/",
+          "productId": "400147106",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان بلیچینگ دانه آبی با اسانس سنسیتیو مینت",
+          "rawPrice": "287000",
+          "price": "۲۸۷٬۰۰۰",
+          "discountPrice": "۱۷۲٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/blue-seed-bleaching-toothpaste-with-sensitive-mint/",
+          "productId": "400142210",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان ضد زردی 75 میل میسویک",
+          "rawPrice": "327000",
+          "price": "۳۲۷٬۰۰۰",
+          "discountPrice": "۱۹۶٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/purple-white-misswake/",
+          "productId": "400142211",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان بلیچینگ + خمیردندان ضد زردی میسویک",
+          "rawPrice": "614000",
+          "price": "۶۱۴٬۰۰۰",
+          "discountPrice": "۳۶۸٬۴۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/bleaching-anti-yellowing-toothpaste/",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "اسپری دهان هندوانه میسویک",
+          "rawPrice": "187000",
+          "price": "۱۸۷٬۰۰۰",
+          "discountPrice": "۱۱۲٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/watermelon-mouth-spray/",
+          "productId": "400186105",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "اسپری دهان نعناع یخ میسویک",
+          "rawPrice": "187000",
+          "price": "۱۸۷٬۰۰۰",
+          "discountPrice": "۱۱۲٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/ice-mint-mouth-spray/",
+          "productId": "400186104",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان کودک پسرانه آبی لبوبو میسویک",
+          "rawPrice": "179000",
+          "price": "۱۷۹٬۰۰۰",
+          "discountPrice": "۱۰۷٬۴۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان کودک, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/blue-labubu-baby-boy-toothpaste/",
+          "productId": "400147107",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان کودک دخترانه صورتی لبوبو میسویک",
+          "rawPrice": "179000",
+          "price": "۱۷۹٬۰۰۰",
+          "discountPrice": "۱۰۷٬۴۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > خمیر دندان, دهان و دندان > خمیر دندان > خمیر دندان کودک, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/baby-girl-toothpaste-pink-labubu/",
+          "productId": "400147108",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهانشویه کودک پسرانه آبی لبوبو میسویک",
+          "rawPrice": "147000",
+          "price": "۱۴۷٬۰۰۰",
+          "discountPrice": "۸۸٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان > دهان شویه > دهان شویه کودک, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/blue-baby-boy-mouthwash-by-labubu/",
+          "productId": "400171104",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهانشویه کودک دخترانه صورتی لبوبو میسویک",
+          "rawPrice": "147000",
+          "price": "۱۴۷٬۰۰۰",
+          "discountPrice": "۸۸٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان > دهان شویه > دهان شویه کودک, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/pink-baby-girl-mouthwash-by-labubu/",
+          "productId": "400171103",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهانشویه توتال زایلیتول 400 میل میسویک",
+          "rawPrice": "247000",
+          "price": "۲۴۷٬۰۰۰",
+          "discountPrice": "۱۴۸٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/xylitol-400-ml/",
+          "productId": "400166106",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "دهان شویه  لمینیتی کامپوزیت 400 میل میسویک",
+          "rawPrice": "247000",
+          "price": "۲۴۷٬۰۰۰",
+          "discountPrice": "۱۴۸٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/laminate-composite-mouthwash-400-ml/",
+          "productId": "400166107",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "اسپری دهانشویه لبوبو میسویک",
+          "rawPrice": "187000",
+          "price": "۱۸۷٬۰۰۰",
+          "discountPrice": "۱۱۲٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان > دهان شویه, دهان و دندان > دهان شویه > دهان شویه کودک, دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/labubu-mouthwash-spray/",
+          "productId": "400186107",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "خمیردندان مخصوص لمینیت و کامپوزیت + دهان شویه لمینیت و کامپوزیت",
+          "rawPrice": "457000",
+          "price": "۴۵۷٬۰۰۰",
+          "discountPrice": "۲۷۴٬۲۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/laminate-and-composite/",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پکیج لبوبو صورتی",
+          "rawPrice": "513000",
+          "price": "۵۱۳٬۰۰۰",
+          "discountPrice": "۳۰۷٬۸۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/pink-labubu-package/",
+          "productId": "",
+          "matchType": "exact-brand"
+        },
+        {
+          "name": "پکیج لبوبو آبی",
+          "rawPrice": "513000",
+          "price": "۵۱۳٬۰۰۰",
+          "discountPrice": "۳۰۷٬۸۰۰",
+          "brand": "میسویک",
+          "categories": "دهان و دندان, میسویک",
+          "productUrl": "https://luxirana.com/product/blue-labubu-package/",
+          "productId": "",
+          "matchType": "exact-brand"
+        }
+      ],
+      "lastSearchBrand": "میسویک",
+      "lastShownIndex": 0,
+      "hasMoreProducts": true
+    }
   },
   "Dorsa": {
     "username": "Dorsa",

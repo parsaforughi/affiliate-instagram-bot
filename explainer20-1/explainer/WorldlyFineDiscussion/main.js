@@ -531,7 +531,7 @@ class PerformanceMonitor {
 // ========================================
 // OPENAI DIRECT INTEGRATION
 // ========================================
-async function askGPT(userMessages, userContext, conversationHistory = [], hasGreetedToday = false) {
+async function askGPT(userMessages, userContext, conversationHistory = [], hasGreetedToday = false, customPrompt = null) {
   // Support both single message (string) and multiple messages (array)
   const messages = Array.isArray(userMessages) ? userMessages : [userMessages];
   const userMessage = messages.length === 1 ? messages[0] : messages.join('\n');
@@ -621,8 +621,8 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
     console.log('⚠️ Could not load prompt config, using defaults');
   }
 
-  // Use config prompt if available, otherwise use default
-  let systemPrompt = configPrompt || `🧠 Seylane Intelligent Personality — Luxirana Affiliate Engine v3.1
+  // Use custom prompt if provided, then config prompt, otherwise use default
+  let systemPrompt = customPrompt || configPrompt || `🧠 Seylane Intelligent Personality — Luxirana Affiliate Engine v3.1
 📦 Project: affiliate instagram bot
 
 🎯 Role:
