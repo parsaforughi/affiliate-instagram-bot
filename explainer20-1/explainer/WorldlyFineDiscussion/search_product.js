@@ -152,6 +152,12 @@ function getProductURL(productName) {
   try {
     console.log(`   📎 Looking up URL in product_slugs.csv for: "${productName}"`);
     
+    // Check if file exists
+    if (!fs.existsSync('data/product_slugs.csv')) {
+      console.log('   ⚠️ product_slugs.csv not found - returning null');
+      return null;
+    }
+    
     const csvContent = fs.readFileSync('data/product_slugs.csv', 'utf-8');
     const lines = csvContent.split('\n');
     
@@ -241,6 +247,13 @@ function searchProduct(productName, contextBrand = null, conversationHistory = [
   try {
     console.log(`\n🔍 ========== PRODUCT SEARCH START ==========`);
     console.log(`🔎 Search Query: "${productName}"`);
+    
+    // Check if file exists
+    if (!fs.existsSync('data/products.csv')) {
+      console.log('⚠️ products.csv not found - returning empty array');
+      console.log(`🔍 ========== PRODUCT SEARCH END ==========\n`);
+      return [];
+    }
     
     const csvContent = fs.readFileSync('data/products.csv', 'utf-8');
     const rows = parseCSV(csvContent);

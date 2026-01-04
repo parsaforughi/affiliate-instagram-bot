@@ -1449,8 +1449,17 @@ async function processConversation(page, conv, messageCache, userContextManager,
       console.log(`⭐ [${username}] User wants best-sellers from ALL brands`);
       
       // Load best-sellers
-      const bestSellersData = JSON.parse(fs.readFileSync('./data/best_sellers.json', 'utf8'));
-      const allBestSellers = bestSellersData.bestSellers;
+      let allBestSellers = [];
+      if (fs.existsSync('./data/best_sellers.json')) {
+        try {
+          const bestSellersData = JSON.parse(fs.readFileSync('./data/best_sellers.json', 'utf8'));
+          allBestSellers = bestSellersData.bestSellers || [];
+        } catch (error) {
+          console.log(`⚠️ Error loading best_sellers.json: ${error.message}`);
+        }
+      } else {
+        console.log('⚠️ best_sellers.json not found - skipping best sellers');
+      }
       
       // Build message with all 6 best-sellers
       let bestSellerMessage = '✨ پرفروش‌ترین محصولات برندهامون:\n\n';
