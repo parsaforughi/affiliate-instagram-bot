@@ -531,10 +531,25 @@ class PerformanceMonitor {
 // ========================================
 // OPENAI DIRECT INTEGRATION
 // ========================================
-async function askGPT(userMessages, userContext, conversationHistory = [], hasGreetedToday = false, customPrompt = null) {
+async function askGPT(userMessages, userContext, conversationHistory = [], hasGreetedToday = false, customPrompt = null, products = null) {
   // Support both single message (string) and multiple messages (array)
   const messages = Array.isArray(userMessages) ? userMessages : [userMessages];
   const userMessage = messages.length === 1 ? messages[0] : messages.join('\n');
+  
+  // GPT Guardrail: If products were requested but none found, return fallback immediately
+  if (products !== null && Array.isArray(products) && products.length === 0) {
+    console.log('⚠️ No products found from API - returning fallback message (not calling GPT)');
+    return {
+      responses: [{
+        message: 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.',
+        sendLink: false,
+        sendProductInfo: false,
+        productLink: null
+      }],
+      detectedTone: 'casual',
+      userName: null,
+    };
+  }
   
   // If multiple messages, create a combined context for OpenAI
   let multiMessageContext = '';
@@ -759,6 +774,16 @@ ${greetingContext}
     const messages = [
       { role: "system", content: systemPrompt }
     ];
+
+    // Add products data if provided (CRITICAL: Only API-fetched data)
+    if (products !== null && Array.isArray(products) && products.length > 0) {
+      const productsData = JSON.stringify(products, null, 2);
+      messages.push({
+        role: "system",
+        content: `Website Data:\n${productsData}\n\nUse ONLY the product data provided above. Do not invent or guess product information.`
+      });
+      console.log(`📦 Added ${products.length} product(s) to GPT context`);
+    }
 
     // Only keep last 2 conversation messages to prevent token overflow
     if (conversationHistory.length > 0) {
@@ -1409,14 +1434,8 @@ async function processConversation(page, conv, messageCache, userContextManager,
     // Process ONLY the last message to avoid duplicates
     console.log(`📝 [${username}] Processing last message only...`);
     
-    // Generate AI response for the last message only
-    const response = await askGPT([lastMessage], userContext, conversationHistory, hasGreetedToday);
-    const allResponses = [response];
-    
-    console.log(`🤖 [${username}] Response ready`);
-
     // ========================================
-    // POST-PROCESSING: Best-Sellers or Product Search with Cards
+    // PRE-PROCESSING: Check for product requests first
     // ========================================
     const { searchProduct } = require('./search_product.js');
     const { ProductHandler } = require('./product_handler.js');
@@ -1427,8 +1446,180 @@ async function processConversation(page, conv, messageCache, userContextManager,
     const cardSender = new ProductCardSender(process.env.INSTAGRAM_PAGE_ACCESS_TOKEN || null);
     const productHandler = new ProductHandler(page, userContextManager, cardSender);
     
-    // Check if user is asking for BEST SELLERS (all brands)
+    // Check if user is asking about products
     const normalizedMsg = lastMessage.replace(/\s+/g, ' ').toLowerCase();
+    const askingForProducts = lastMessage.includes('قیمت') || 
+                              lastMessage.includes('محصول') ||
+                              lastMessage.includes('چند') ||
+                              lastMessage.includes('چقدر') ||
+                              lastMessage.includes('برام بگو') ||
+                              lastMessage.includes('نشون بده') ||
+                              lastMessage.includes('میخوام') ||
+                              lastMessage.includes('بیشتر') ||
+                              lastMessage.includes('باقی') ||
+                              lastMessage.includes('لینک') ||
+                              lastMessage.includes('لینک بده') ||
+                              lastMessage.includes('لینک بفرست') ||
+                              lastMessage.includes('همشونو') ||
+                              lastMessage.includes('همه') ||
+                              lastMessage.toLowerCase() === 'بله' ||
+                              lastMessage.toLowerCase() === 'آره' ||
+                              lastMessage.toLowerCase() === 'بفرست' ||
+                              lastMessage.toLowerCase() === 'ارسال کن';
+    
+    let fetchedProducts = null;
+    let productResult = null;
+    
+    // If asking for products, handle via ProductHandler first
+    if (askingForProducts) {
+      console.log(`🔍 [${username}] Processing product request with intelligent handler...`);
+      
+      productResult = await productHandler.handleProductRequest(
+        username,
+        lastMessage,
+        conversationHistory
+      );
+      
+      // If products were found and handled successfully, use that result
+      if (productResult && productResult.success) {
+        // Products were sent via cards, use the follow-up message
+        const response = {
+          responses: [{
+            message: productResult.message,
+            sendLink: false,
+            sendProductInfo: true,
+            cardsWereSent: true,
+            productLink: null
+          }],
+          detectedTone: 'casual',
+          userName: null,
+        };
+        
+        // Save messages to context
+        if (productResult.message) {
+          userContextManager.addMessage(username, 'assistant', productResult.message);
+        }
+        
+        console.log(`✅ [${username}] Product handled successfully - ${productResult.productsShown || 1} card(s) sent`);
+        
+        // Continue with response processing (skip GPT call)
+        // We'll handle the rest of the flow below
+        const allResponses = [response];
+        
+        // Update context and send response (continue with existing flow)
+        const lastResponse = allResponses[allResponses.length - 1];
+        if (lastResponse.userName && !userContext.name) {
+          userContextManager.updateContext(username, { name: lastResponse.userName });
+        }
+        if (lastResponse.detectedTone) {
+          userContextManager.updateContext(username, { tone: lastResponse.detectedTone });
+        }
+        
+        // Save the processed message to context
+        userContextManager.addMessage(username, 'user', lastMessage);
+        
+        // Emit to dashboard
+        try {
+          const messageId = `${username}_user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          dashboardEvents.emitMessage(username, messageId, 'user', lastMessage, username);
+        } catch (err) {
+          // Silently ignore - dashboard is optional
+        }
+        
+        // Send replies
+        const textarea = await page.$('textarea[placeholder*="Message"], textarea[aria-label*="Message"], div[contenteditable="true"]');
+        if (textarea) {
+          // Flatten responses
+          const allFlattenedResponses = [];
+          allResponses.forEach(resp => {
+            if (resp.responses && Array.isArray(resp.responses)) {
+              allFlattenedResponses.push(...resp.responses);
+            }
+          });
+          
+          // Send the message
+          if (allFlattenedResponses.length > 0 && !allFlattenedResponses[0].cardsWereSent) {
+            const finalMessage = allFlattenedResponses[0].message;
+            await textarea.click();
+            await page.keyboard.type(finalMessage, { delay: 50 });
+            await page.keyboard.press('Enter');
+            await delay(1000);
+            console.log(`✅ [${username}] Message sent: ${finalMessage.substring(0, 50)}...`);
+          }
+        }
+        
+        return; // Exit early - product handling complete
+      } else if (productResult && !productResult.success) {
+        // Products not found - return fallback message
+        const fallbackResponse = {
+          responses: [{
+            message: productResult.message || 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.',
+            sendLink: false,
+            sendProductInfo: false,
+            productLink: null
+          }],
+          detectedTone: 'casual',
+          userName: null,
+        };
+        
+        const allResponses = [fallbackResponse];
+        
+        // Update context and send response
+        const lastResponse = allResponses[allResponses.length - 1];
+        if (lastResponse.userName && !userContext.name) {
+          userContextManager.updateContext(username, { name: lastResponse.userName });
+        }
+        if (lastResponse.detectedTone) {
+          userContextManager.updateContext(username, { tone: lastResponse.detectedTone });
+        }
+        
+        // Save the processed message to context
+        userContextManager.addMessage(username, 'user', lastMessage);
+        
+        // Emit to dashboard
+        try {
+          const messageId = `${username}_user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          dashboardEvents.emitMessage(username, messageId, 'user', lastMessage, username);
+        } catch (err) {
+          // Silently ignore - dashboard is optional
+        }
+        
+        // Send replies
+        const textarea = await page.$('textarea[placeholder*="Message"], textarea[aria-label*="Message"], div[contenteditable="true"]');
+        if (textarea) {
+          const allFlattenedResponses = [];
+          allResponses.forEach(resp => {
+            if (resp.responses && Array.isArray(resp.responses)) {
+              allFlattenedResponses.push(...resp.responses);
+            }
+          });
+          
+          if (allFlattenedResponses.length > 0) {
+            const finalMessage = allFlattenedResponses[0].message;
+            await textarea.click();
+            await page.keyboard.type(finalMessage, { delay: 50 });
+            await page.keyboard.press('Enter');
+            await delay(1000);
+            console.log(`✅ [${username}] Fallback message sent: ${finalMessage.substring(0, 50)}...`);
+          }
+        }
+        
+        return; // Exit early - fallback message sent
+      }
+    }
+    
+    // Generate AI response for the last message
+    // Pass fetchedProducts if we have them (null = not product-related, [] = no products found, [products] = products found)
+    const response = await askGPT([lastMessage], userContext, conversationHistory, hasGreetedToday, null, fetchedProducts);
+    const allResponses = [response];
+    
+    console.log(`🤖 [${username}] Response ready`);
+
+    // ========================================
+    // POST-PROCESSING: Best-Sellers (if not already handled)
+    // ========================================
+    
+    // Check if user is asking for BEST SELLERS (all brands)
     const askingForBestSellers = (
       // With "برند"
       (normalizedMsg.includes('بهترین') && normalizedMsg.includes('برند')) ||
@@ -1465,9 +1656,9 @@ async function processConversation(page, conv, messageCache, userContextManager,
       let bestSellerMessage = '✨ پرفروش‌ترین محصولات برندهامون:\n\n';
       let allProductLinks = '';
       
-      allBestSellers.forEach((item, index) => {
+      for (const [index, item] of allBestSellers.entries()) {
         // Search for this specific product to get price and URL
-        const products = searchProduct(item.productName);
+        const products = await searchProduct(item.productName);
         
         if (products && products.length > 0) {
           const product = products[0];
@@ -1492,65 +1683,8 @@ async function processConversation(page, conv, messageCache, userContextManager,
       response.responses[0].productLink = allProductLinks.trim(); // Send all product links
       
       console.log(`✅ Sent all 6 best-sellers with ${allBestSellers.length} product links`);
-    } else {
-      // Product handling with intelligent system and cards
-      const askingForProducts = lastMessage.includes('قیمت') || 
-                                lastMessage.includes('محصول') ||
-                                lastMessage.includes('چند') ||
-                                lastMessage.includes('چقدر') ||
-                                lastMessage.includes('برام بگو') ||
-                                lastMessage.includes('نشون بده') ||
-                                lastMessage.includes('میخوام') ||
-                                lastMessage.includes('بیشتر') ||
-                                lastMessage.includes('باقی') ||
-                                lastMessage.includes('لینک') ||
-                                lastMessage.includes('لینک بده') ||
-                                lastMessage.includes('لینک بفرست') ||
-                                lastMessage.includes('همشونو') ||
-                                lastMessage.includes('همه') ||
-                                lastMessage.toLowerCase() === 'بله' ||
-                                lastMessage.toLowerCase() === 'آره' ||
-                                lastMessage.toLowerCase() === 'بفرست' ||
-                                lastMessage.toLowerCase() === 'ارسال کن';
-      
-      if (askingForProducts) {
-        console.log(`🔍 [${username}] Processing product request with intelligent handler...`);
-        
-        // استفاده از ProductHandler
-        const productResult = await productHandler.handleProductRequest(
-          username,
-          lastMessage,
-          conversationHistory
-        );
-        
-        if (productResult && productResult.success) {
-          // کارت‌ها توسط ProductHandler ارسال شده‌اند
-          // فقط پیام follow-up را برای ارسال آماده کن
-          if (productResult.message) {
-            response.responses[0].message = productResult.message;
-          }
-          
-          // Mark that cards were sent (so we don't send links again)
-          response.responses[0].sendProductInfo = true;
-          response.responses[0].sendLink = false;
-          response.responses[0].cardsWereSent = true; // Flag to indicate cards were sent
-          
-          if (productResult.product) {
-            response.responses[0].productLink = productResult.product.productUrl;
-          }
-          
-          // Save messages to context
-          if (productResult.message) {
-            userContextManager.addMessage(username, 'assistant', productResult.message);
-          }
-          
-          console.log(`✅ [${username}] Product handled successfully - ${productResult.productsShown || 1} card(s) sent`);
-        } else {
-          // اگر محصول پیدا نشد یا خطا بود، از AI response استفاده کن
-          console.log(`ℹ️ [${username}] No products found or error, using AI response`);
-        }
-      }
     }
+    // Note: Product handling is now done BEFORE GPT call (see above)
 
     // Update context from last response
     const lastResponse = allResponses[allResponses.length - 1];

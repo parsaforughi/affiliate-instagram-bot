@@ -155,11 +155,14 @@ class ProductHandler {
     console.log(`✅ [${username}] Valid brand detected: ${brand}`);
     
     // جستجوی محصولات برند
-    const products = searchProduct(brand, brand, conversationHistory);
+    const products = await searchProduct(brand, brand, conversationHistory);
     
     if (!products || products.length === 0) {
       console.log(`❌ [${username}] No products found for brand: ${brand}`);
-      return null;
+      return {
+        success: false,
+        message: 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.'
+      };
     }
     
     console.log(`📦 [${username}] Found ${products.length} products for ${brand}`);
@@ -321,10 +324,13 @@ class ProductHandler {
     const brand = extractBrandFromText(message, conversationHistory);
     
     // جستجوی محصول
-    const products = searchProduct(message, brand, conversationHistory);
+    const products = await searchProduct(message, brand, conversationHistory);
     
     if (!products || products.length === 0) {
-      return null;
+      return {
+        success: false,
+        message: 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.'
+      };
     }
     
     // فقط محصولات با کیفیت بالا
@@ -381,10 +387,13 @@ class ProductHandler {
     console.log(`🔍 [${username}] Handling general product query...`);
     
     const brand = extractBrandFromText(message, conversationHistory);
-    const products = searchProduct(message, brand, conversationHistory);
+    const products = await searchProduct(message, brand, conversationHistory);
     
     if (!products || products.length === 0) {
-      return null;
+      return {
+        success: false,
+        message: 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.'
+      };
     }
     
     const qualityProducts = products.filter(p => {
