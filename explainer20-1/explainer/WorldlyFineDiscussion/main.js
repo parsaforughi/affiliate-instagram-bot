@@ -1672,7 +1672,7 @@ async function processConversation(page, conv, messageCache, userContextManager,
         } else {
           bestSellerMessage += `${index + 1}. ${item.brand}: ${item.productName}\n\n`;
         }
-      });
+      }
       
       bestSellerMessage += `🔗 لینک‌های خرید رو پایین می‌فرستم 👇`;
       
