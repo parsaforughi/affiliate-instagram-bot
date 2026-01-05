@@ -157,11 +157,12 @@ class ProductHandler {
     // جستجوی محصولات برند
     const products = await searchProduct(brand, brand, conversationHistory);
     
-    if (!products || products.length === 0) {
-      console.log(`❌ [${username}] No products found for brand: ${brand}`);
+    // MANDATORY GUARDRAIL: If products missing, not array, or empty, return fallback immediately - DO NOT call GPT
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      console.log(`❌ [${username}] No products found for brand: ${brand} - BLOCKING GPT CALL`);
       return {
         success: false,
-        message: 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.'
+        message: 'برای این برند یا محصول، اطلاعاتی داخل سایت موجود نیست. اگر خواستید پشتیبانی راهنمایی‌تون می‌کنه.'
       };
     }
     
@@ -326,10 +327,12 @@ class ProductHandler {
     // جستجوی محصول
     const products = await searchProduct(message, brand, conversationHistory);
     
-    if (!products || products.length === 0) {
+    // MANDATORY GUARDRAIL: If products missing, not array, or empty, return fallback immediately - DO NOT call GPT
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      console.log(`❌ [${username}] No products found - BLOCKING GPT CALL`);
       return {
         success: false,
-        message: 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.'
+        message: 'برای این برند یا محصول، اطلاعاتی داخل سایت موجود نیست. اگر خواستید پشتیبانی راهنمایی‌تون می‌کنه.'
       };
     }
     
@@ -389,10 +392,12 @@ class ProductHandler {
     const brand = extractBrandFromText(message, conversationHistory);
     const products = await searchProduct(message, brand, conversationHistory);
     
-    if (!products || products.length === 0) {
+    // MANDATORY GUARDRAIL: If products missing, not array, or empty, return fallback immediately - DO NOT call GPT
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      console.log(`❌ [${username}] No products found - BLOCKING GPT CALL`);
       return {
         success: false,
-        message: 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.'
+        message: 'برای این برند یا محصول، اطلاعاتی داخل سایت موجود نیست. اگر خواستید پشتیبانی راهنمایی‌تون می‌کنه.'
       };
     }
     

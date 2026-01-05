@@ -536,12 +536,29 @@ async function askGPT(userMessages, userContext, conversationHistory = [], hasGr
   const messages = Array.isArray(userMessages) ? userMessages : [userMessages];
   const userMessage = messages.length === 1 ? messages[0] : messages.join('\n');
   
-  // GPT Guardrail: If products were requested but none found, return fallback immediately
+  // MANDATORY GUARDRAIL: If products is explicitly an empty array (searched but found nothing), block GPT
+  // products === null means not a product query, allow GPT
+  // products === [] means searched but found nothing, BLOCK GPT
   if (products !== null && Array.isArray(products) && products.length === 0) {
-    console.log('⚠️ No products found from API - returning fallback message (not calling GPT)');
+    console.log('🚫 BLOCKING GPT CALL - API returned empty array (no products found)');
     return {
       responses: [{
-        message: 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.',
+        message: 'برای این برند یا محصول، اطلاعاتی داخل سایت موجود نیست. اگر خواستید پشتیبانی راهنمایی‌تون می‌کنه.',
+        sendLink: false,
+        sendProductInfo: false,
+        productLink: null
+      }],
+      detectedTone: 'casual',
+      userName: null,
+    };
+  }
+  
+  // If products is not null but not an array, something is wrong - block GPT
+  if (products !== null && !Array.isArray(products)) {
+    console.log('🚫 BLOCKING GPT CALL - Invalid products data (not an array)');
+    return {
+      responses: [{
+        message: 'برای این برند یا محصول، اطلاعاتی داخل سایت موجود نیست. اگر خواستید پشتیبانی راهنمایی‌تون می‌کنه.',
         sendLink: false,
         sendProductInfo: false,
         productLink: null
@@ -771,22 +788,36 @@ ${greetingContext}
 `;
 
   try {
+    // MANDATORY GPT INVOCATION FORMAT (EXACT ORDER):
+    // 1) system: SYSTEM_PROMPT
+    // 2) system: Website Data (JSON stringified products) - ONLY if products exist
+    // 3) user: original user message
+    // NO other context, memory, or product info allowed
+    
     const messages = [
       { role: "system", content: systemPrompt }
     ];
 
-    // Add products data if provided (CRITICAL: Only API-fetched data)
+    // MANDATORY: Add products data ONLY if provided and non-empty (CRITICAL: Only API-fetched data)
+    // If products is null, this is not a product query - allow GPT without product data
+    // If products is empty array, guardrail above should have blocked this call
     if (products !== null && Array.isArray(products) && products.length > 0) {
       const productsData = JSON.stringify(products, null, 2);
       messages.push({
         role: "system",
-        content: `Website Data:\n${productsData}\n\nUse ONLY the product data provided above. Do not invent or guess product information.`
+        content: `Website Data:\n${productsData}\n\nABSOLUTE RULES:\n- You must ONLY restate facts explicitly present in Website Data above.\n- You are NOT allowed to infer, guess, expand, interpret, or explain.\n- You are forbidden from mentioning product variations, bundles, ranges, profit margins, discounts, internal cooperation terms, or recommendations unless explicitly written in Website Data.\n- If Website Data does not contain an answer, respond that the information is not available.`
       });
-      console.log(`📦 Added ${products.length} product(s) to GPT context`);
+      console.log(`📦 Added ${products.length} product(s) to GPT context (STRICT MODE: facts only)`);
+    } else if (products !== null && Array.isArray(products) && products.length === 0) {
+      // This should never happen due to guardrail above, but double-check
+      console.error('🚫 CRITICAL: Attempted to call GPT with empty products array - this should be blocked by guardrail');
+      throw new Error('GPT call blocked: Empty products array');
     }
+    // If products is null, continue normally (not a product query)
 
-    // Only keep last 2 conversation messages to prevent token overflow
-    if (conversationHistory.length > 0) {
+    // Add user message (NO conversation history when products are involved - strict mode)
+    // Only keep last 2 conversation messages if NO products (general conversation)
+    if (products === null && conversationHistory.length > 0) {
       const recentHistory = conversationHistory.slice(-2);
       recentHistory.forEach(msg => {
         messages.push({ role: msg.role, content: msg.content });
@@ -1550,10 +1581,10 @@ async function processConversation(page, conv, messageCache, userContextManager,
         
         return; // Exit early - product handling complete
       } else if (productResult && !productResult.success) {
-        // Products not found - return fallback message
+        // Products not found - return fallback message (EXACT TEXT REQUIRED)
         const fallbackResponse = {
           responses: [{
-            message: productResult.message || 'این اطلاعات داخل سایت موجود نیست. در صورت نیاز پشتیبانی راهنمایی‌تون می‌کنه.',
+            message: productResult.message || 'برای این برند یا محصول، اطلاعاتی داخل سایت موجود نیست. اگر خواستید پشتیبانی راهنمایی‌تون می‌کنه.',
             sendLink: false,
             sendProductInfo: false,
             productLink: null
