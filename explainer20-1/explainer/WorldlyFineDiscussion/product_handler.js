@@ -168,15 +168,13 @@ class ProductHandler {
     
     console.log(`📦 [${username}] Found ${products.length} products for ${brand}`);
     
-    // فیلتر محصولات با کیفیت
+    // WordPress products are already filtered by API - just validate URLs
     const qualityProducts = products.filter(p => {
-      const hasGoodMatch = p.matchType === 'exact-brand' || 
-                          p.matchType === 'brand-name' ||
-                          (p.similarity && p.similarity > 0.6);
-      const hasValidUrl = p.productUrl && 
-                         (p.productUrl.startsWith('http://') || 
-                          p.productUrl.startsWith('https://'));
-      return hasGoodMatch && hasValidUrl;
+      const hasValidUrl = (p.url || p.productUrl) && 
+                         ((p.url || p.productUrl).startsWith('http://') || 
+                          (p.url || p.productUrl).startsWith('https://'));
+      const hasName = p.name || p.title;
+      return hasValidUrl && hasName;
     });
     
     if (qualityProducts.length === 0) {
@@ -206,11 +204,11 @@ class ProductHandler {
       this.page,
       username,
       productsToShow.map(p => ({
-        name: p.name,
+        name: p.name || p.title,
         price: p.price,
         discountPrice: p.discountPrice,
-        brand: p.brand || brand,
-        productUrl: p.productUrl
+        brand: (p.brand && typeof p.brand === 'object' ? p.brand.name : p.brand) || brand,
+        productUrl: p.url || p.productUrl
       }))
     );
     
@@ -275,11 +273,11 @@ class ProductHandler {
       this.page,
       username,
       productsToShow.map(p => ({
-        name: p.name,
+        name: p.name || p.title,
         price: p.price,
         discountPrice: p.discountPrice,
-        brand: p.brand || productState.lastSearchBrand,
-        productUrl: p.productUrl
+        brand: (p.brand && typeof p.brand === 'object' ? p.brand.name : p.brand) || productState.lastSearchBrand,
+        productUrl: p.url || p.productUrl
       }))
     );
     
@@ -336,16 +334,13 @@ class ProductHandler {
       };
     }
     
-    // فقط محصولات با کیفیت بالا
+    // WordPress products are already filtered by API - just validate URLs
     const qualityProducts = products.filter(p => {
-      const hasGoodMatch = p.matchType === 'exact-name' ||
-                          p.matchType === 'exact-brand' ||
-                          p.matchType === 'brand-name' ||
-                          (p.similarity && p.similarity > 0.6);
-      const hasValidUrl = p.productUrl && 
-                         (p.productUrl.startsWith('http://') || 
-                          p.productUrl.startsWith('https://'));
-      return hasGoodMatch && hasValidUrl;
+      const hasValidUrl = (p.url || p.productUrl) && 
+                         ((p.url || p.productUrl).startsWith('http://') || 
+                          (p.url || p.productUrl).startsWith('https://'));
+      const hasName = p.name || p.title;
+      return hasValidUrl && hasName;
     });
     
     if (qualityProducts.length === 0) {
@@ -362,11 +357,11 @@ class ProductHandler {
       this.page,
       username,
       {
-        name: product.name,
+        name: product.name || product.title,
         price: product.price,
         discountPrice: product.discountPrice,
-        brand: product.brand,
-        productUrl: product.productUrl
+        brand: (product.brand && typeof product.brand === 'object' ? product.brand.name : product.brand),
+        productUrl: product.url || product.productUrl
       },
       false // use Rich Text
     );
@@ -401,15 +396,13 @@ class ProductHandler {
       };
     }
     
+    // WordPress products are already filtered by API - just validate URLs
     const qualityProducts = products.filter(p => {
-      const hasGoodMatch = p.matchType === 'exact-name' ||
-                          p.matchType === 'exact-brand' ||
-                          p.matchType === 'brand-name' ||
-                          (p.similarity && p.similarity > 0.6);
-      const hasValidUrl = p.productUrl && 
-                         (p.productUrl.startsWith('http://') || 
-                          p.productUrl.startsWith('https://'));
-      return hasGoodMatch && hasValidUrl;
+      const hasValidUrl = (p.url || p.productUrl) && 
+                         ((p.url || p.productUrl).startsWith('http://') || 
+                          (p.url || p.productUrl).startsWith('https://'));
+      const hasName = p.name || p.title;
+      return hasValidUrl && hasName;
     });
     
     if (qualityProducts.length === 0) {

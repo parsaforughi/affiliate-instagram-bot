@@ -1,9 +1,9 @@
 /**
  * Automated API Test for Ultra-Strict Guardrails
- * Tests that GPT is blocked when API returns zero products
+ * Tests that GPT is blocked when WordPress API returns zero products
  */
 
-const { searchProduct } = require('./product-engine');
+const { searchProduct } = require('./search_product');
 
 async function testAPIGuardrails() {
   console.log('\n🧪 ========== API GUARDRAIL TEST START ==========\n');
