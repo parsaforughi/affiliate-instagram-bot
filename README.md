@@ -5,27 +5,27 @@
 <h1 align="center">Affiliate Instagram Bot</h1>
 
 <p align="center">
-  <em>Seylane personality. Luxirana inbox. Persian DMs.</em>
+  <em>Seylane voice. Luxirana inbox. Affiliate DMs.</em>
 </p>
 
 <p align="center">
   This repository stays <strong>affiliate-instagram-bot</strong>.<br>
-  It is the Seylane affiliate Instagram bot for Luxirana — not a rename, not a new product.
+  Seylane affiliate bot for Luxirana. Not a rename. Not a new product.
 </p>
 
 ---
 
-The bot sits in the Luxirana Instagram inbox and talks like a human page admin. It recruits online shop owners into the Seylane Sabz affiliate program (`onlineshops`), answers in Persian, and will not invent product facts.
+The bot sits in the Luxirana Instagram inbox and writes as a page admin. It recruits online shop owners into the Seylane affiliate program (`onlineshops`) and will not invent product facts.
 
-Product names, prices, and links come from the WordPress REST API on [luxirana.com](https://luxirana.com) (`wp/v2`). GPT may only restate what that payload contains.
+Names, prices, and links come from the WordPress REST API on [luxirana.com](https://luxirana.com) (`wp/v2`). GPT may only restate that payload.
 
 ## How a message moves
 
 <p align="center">
-  <img src="docs/flow.png" alt="Inbox to unread thread to WordPress facts to GPT to Persian reply" width="100%">
+  <img src="docs/flow.png" alt="Inbox to unread thread to WordPress facts to GPT to reply" width="100%">
 </p>
 
-Puppeteer (stealth) opens `instagram.com/direct/inbox`, keeps the unread threads, and processes **one** conversation at a time. If the message looks like a product question, `search_product.js` queries WordPress. GPT then writes a short Persian reply. Collaboration intent sends `https://luxirana.com` on its own line.
+Puppeteer (stealth) opens `instagram.com/direct/inbox`, keeps unread threads, and processes **one** conversation at a time. Product questions go through `search_product.js` to WordPress. GPT writes a short reply. Collaboration intent sends `https://luxirana.com` on its own line.
 
 An Instagram Graph API client exists for webhooks and product cards. It is not the inbox loop.
 
