@@ -22,7 +22,7 @@ Product names, prices, and links come from the WordPress REST API on [luxirana.c
 ## How a message moves
 
 <p align="center">
-  <img src="docs/flow.svg" alt="Inbox to unread thread to WordPress facts to GPT to Persian reply" width="100%">
+  <img src="docs/flow.png" alt="Inbox to unread thread to WordPress facts to GPT to Persian reply" width="100%">
 </p>
 
 Puppeteer (stealth) opens `instagram.com/direct/inbox`, keeps the unread threads, and processes **one** conversation at a time. If the message looks like a product question, `search_product.js` queries WordPress. GPT then writes a short Persian reply. Collaboration intent sends `https://luxirana.com` on its own line.
