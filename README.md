@@ -1,23 +1,23 @@
 <p align="center">
-  <img src="docs/og.png" alt="Seylane — Affiliate Instagram Bot" width="100%">
+  <img src="docs/og.png" alt="Affiliate Instagram Bot" width="100%">
 </p>
 
 <h1 align="center">Affiliate Instagram Bot</h1>
 
 <p align="center">
-  <em>Seylane voice. Luxirana inbox. Affiliate DMs.</em>
+  <em>Instagram DMs. WordPress facts. Affiliate inbox.</em>
 </p>
 
 <p align="center">
   This repository stays <strong>affiliate-instagram-bot</strong>.<br>
-  Seylane affiliate bot for Luxirana. Not a rename. Not a new product.
+  Same product. Not a rename.
 </p>
 
 ---
 
-The bot sits in the Luxirana Instagram inbox and writes as a page admin. It recruits online shop owners into the Seylane affiliate program (`onlineshops`) and will not invent product facts.
+The bot sits in an Instagram inbox and writes as a page admin. It recruits online shop owners into the affiliate program (`onlineshops`) and will not invent product facts.
 
-Names, prices, and links come from the WordPress REST API on [luxirana.com](https://luxirana.com) (`wp/v2`). GPT may only restate that payload.
+Names, prices, and links come from the WordPress REST API (`wp/v2`) at `WC_API_URL` (default `https://luxirana.com`). GPT may only restate that payload.
 
 ## How a message moves
 
@@ -25,13 +25,13 @@ Names, prices, and links come from the WordPress REST API on [luxirana.com](http
   <img src="docs/flow.png" alt="Inbox to unread thread to WordPress facts to GPT to reply" width="100%">
 </p>
 
-Puppeteer (stealth) opens `instagram.com/direct/inbox`, keeps unread threads, and processes **one** conversation at a time. Product questions go through `search_product.js` to WordPress. GPT writes a short reply. Collaboration intent sends `https://luxirana.com` on its own line.
+Puppeteer (stealth) opens `instagram.com/direct/inbox`, keeps unread threads, and processes **one** conversation at a time. Product questions go through `search_product.js` to WordPress. GPT writes a short reply. Collaboration intent sends the store URL on its own line.
 
 An Instagram Graph API client exists for webhooks and product cards. It is not the inbox loop.
 
 ## What it actually does
 
-- Speaks as the Luxirana admin. Never admits it is a model.
+- Speaks as the page admin. Never admits it is a model.
 - Assumes the other person runs an online shop, not a personal cart.
 - Names six conversation brands: Misswake, Collamin, IceBall, Dafi, Umbrella, Pixel.
 - Resolves WordPress brand IDs for Misswake (`2113`), Collamin (`2112`), and Comeon (`2110`). IceBall, Dafi, Umbrella, and Pixel have no brand ID in the search map.
