@@ -1,166 +1,142 @@
-# Affiliate Instagram Bot
+<p align="center">
+  <img src="docs/og.png" alt="Seylane — Affiliate Instagram Bot" width="100%">
+</p>
 
-Persian-language Instagram DM bot for affiliate marketing, supporting Luxirana's affiliate program. Provides automated responses to product inquiries and guides users through the affiliate registration process.
+<h1 align="center">Affiliate Instagram Bot</h1>
 
-## What This Bot Does
+<p align="center">
+  <em>Seylane personality. Luxirana inbox. Persian DMs.</em>
+</p>
 
-The bot monitors Instagram direct messages, responds to user inquiries about products in Persian, and guides online shop owners through the affiliate program registration. It uses OpenAI GPT for natural language processing and Puppeteer for Instagram automation.
+<p align="center">
+  This repository stays <strong>affiliate-instagram-bot</strong>.<br>
+  It is the Seylane affiliate Instagram bot for Luxirana — not a rename, not a new product.
+</p>
 
-## How to Run
+---
 
-### Prerequisites
-- Node.js installed
-- OpenAI API key
-- Instagram credentials or session cookie
+The bot sits in the Luxirana Instagram inbox and talks like a human page admin. It recruits online shop owners into the Seylane Sabz affiliate program (`onlineshops`), answers in Persian, and will not invent product facts.
 
-### Setup
+Product names, prices, and links come from the WordPress REST API on [luxirana.com](https://luxirana.com) (`wp/v2`). GPT may only restate what that payload contains.
 
-1. Install dependencies:
+## How a message moves
+
+<p align="center">
+  <img src="docs/flow.svg" alt="Inbox to unread thread to WordPress facts to GPT to Persian reply" width="100%">
+</p>
+
+Puppeteer (stealth) opens `instagram.com/direct/inbox`, keeps the unread threads, and processes **one** conversation at a time. If the message looks like a product question, `search_product.js` queries WordPress. GPT then writes a short Persian reply. Collaboration intent sends `https://luxirana.com` on its own line.
+
+An Instagram Graph API client exists for webhooks and product cards. It is not the inbox loop.
+
+## What it actually does
+
+- Speaks as the Luxirana admin. Never admits it is a model.
+- Assumes the other person runs an online shop, not a personal cart.
+- Names six conversation brands: Misswake, Collamin, IceBall, Dafi, Umbrella, Pixel.
+- Resolves WordPress brand IDs for Misswake (`2113`), Collamin (`2112`), and Comeon (`2110`). IceBall, Dafi, Umbrella, and Pixel have no brand ID in the search map.
+- States consumer price and the 40% affiliate figure **only** when the shop asks for price.
+- Deduplicates with `message_cache.json`. Keeps thread memory in `user_contexts.json`.
+- Accepts message requests every 20 inbox loops.
+- Runs a short self-test on startup (greeting, affiliate intent, tone).
+- Starts an Express API in the same process (`PORT` → `API_PORT` → `3001`).
+- Can pause / resume / stop from that API.
+- Serves `/privacy` and `/terms` for Meta App Review.
+
+The Next.js dashboard under `dashboard/` reads conversations, logs, prompt/model settings, pages, auto-replies, and overview stats from the integrated API. It does not run the inbox.
+
+## Layout
+
+```
+affiliate-instagram-bot/
+├── explainer20-1/explainer/WorldlyFineDiscussion/
+│   ├── main.js                 # Inbox loop, GPT, integrated API boot
+│   ├── search_product.js       # WordPress wp/v2 search
+│   ├── product-engine/wp/      # Client, cache, price scrape, normalize
+│   ├── api-server.js           # Health, conversations, SSE, settings, webhook
+│   ├── instagram_api_client.js # Optional Graph API
+│   └── SYSTEM_PROMPT.md        # Live personality text
+├── dashboard/                  # Next.js monitor
+├── explainer-api/              # Older standalone API (unused when main.js runs)
+├── docs/                       # OG + flow
+├── Dockerfile
+└── render.yaml
+```
+
+`attached_assets/` is leftover source material, not runtime.
+
+## Run
+
+Node.js, Chromium (or Puppeteer's bundled Chrome), an OpenAI key, and either an Instagram session cookie or username/password.
+
 ```bash
 cd explainer20-1/explainer/WorldlyFineDiscussion
 npm install
 ```
 
-2. Create `.env` file with:
+`.env` in that directory:
+
 ```
-OPENAI_API_KEY=your-key-here
-INSTAGRAM_USERNAME=your-username
-INSTAGRAM_PASSWORD=your-password
-INSTA_SESSION=your-session-cookie (optional)
-GOOGLE_SHEETS_ENABLED=false
+OPENAI_API_KEY=
+INSTAGRAM_USERNAME=
+INSTAGRAM_PASSWORD=
+INSTA_SESSION=
 ```
 
-3. Run the bot:
+`INSTA_SESSION` is the `sessionid` cookie. Prefer it over password login.
+
 ```bash
-# Development mode (auto-restart on changes)
+npm run dev    # nodemon
+npm start      # node main.js
+```
+
+Optional: `PORT` / `API_PORT`, `WC_API_URL` (defaults to `https://luxirana.com`), `CHROMIUM_PATH` / `PUPPETEER_EXECUTABLE_PATH`, `DASHBOARD_API_URL`.
+
+Graph-related, only if you wire the optional client: `INSTAGRAM_PAGE_ACCESS_TOKEN`, `INSTAGRAM_PAGE_ID`, `APP_ID`, `APP_SECRET`, `WEBHOOK_VERIFY_TOKEN`.
+
+GPT defaults in `main.js`: model `gpt-5.1`, temperature `0.9`, `max_completion_tokens` `700`. Override via `prompt_config.json` or `POST /api/settings/prompt` and `POST /api/settings/model`.
+
+## API
+
+Same process as the bot.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/health` | Liveness |
+| `GET` | `/api/stats` | Conversation / message counts |
+| `GET` | `/api/stats/overview` | Dashboard overview |
+| `GET` | `/api/conversations` | Threads |
+| `GET` | `/api/conversations/:id` | One thread |
+| `GET` | `/api/sse/live-messages` | Message stream |
+| `GET` | `/api/sse/logs` | Log stream |
+| `POST` | `/api/bot/pause` · `/resume` · `/stop` | Control |
+| `GET`/`POST` | `/api/settings/prompt` · `/model` | Prompt and model |
+| `GET` | `/privacy` · `/terms` | Meta review pages |
+| `GET`/`POST` | `/webhook` | Graph webhook verify / receive |
+
+## Dashboard
+
+```bash
+cd dashboard
+npm install
 npm run dev
-
-# Production mode
-npm start
 ```
 
-## Folder Structure
+Defaults to `http://localhost:3000`. It expects the bot API on port `3001` locally. Production builds in this repo currently point at the existing Railway API host; that wiring is left as-is.
 
-```
-affiliate-onlineshop-bot/
-├── explainer-api/           # Express API server for message streaming
-│   ├── server.js
-│   └── package.json
-│
-├── explainer20-1/           # Main bot code
-│   └── explainer/
-│       └── WorldlyFineDiscussion/
-│           ├── main.js              # Main bot entry point
-│           ├── search_product.js    # Product search logic
-│           ├── data/                # Product data (CSV, JSON)
-│           ├── scripts/             # Utility scripts (not runtime)
-│           ├── docs/                # Documentation
-│           ├── seylane-instagram-explainer/  # Sub-module
-│           ├── user_contexts.json   # Runtime: user conversation history
-│           ├── message_cache.json   # Runtime: message deduplication
-│           └── package.json
-│
-└── attached_assets/         # Legacy assets (can be cleaned)
+## Deploy
 
-```
+`Dockerfile` and `render.yaml` already define the Render web service: Chromium image, `node main.js`, health check `/api/health`. Set the same secrets in the host. Do not treat the free-tier spin-down as 24/7 inbox uptime.
 
-## Core Files
+Meta review URLs after that host is live:
 
-- **main.js**: Instagram automation, message processing, OpenAI integration
-- **search_product.js**: Product search with Persian character normalization
-- **data/products.csv**: Product database (571 products)
-- **data/product_slugs.csv**: Product URLs
-- **data/best_sellers.json**: Best-selling products per brand
+- Privacy: `https://<your-host>/privacy`
+- Terms: `https://<your-host>/terms`
 
-## Runtime Files (Auto-generated)
+## Notes
 
-- `user_contexts.json`: User conversation history
-- `message_cache.json`: Prevents duplicate message processing
-- `.env`: Environment variables (create manually)
-
-## Important Notes
-
-⚠️ **Warning**: Do not modify core logic (main.js, search_product.js) without understanding the bot flow. The bot uses relative imports and expects files in specific locations.
-
-## Configuration
-
-- **Model**: GPT-5.1
-- **Temperature**: 0.9
-- **Max Tokens**: 700
-- **Polling Interval**: 12 seconds
-- **Response Time Target**: < 3 seconds
-
-## Supported Brands
-
-1. Misswake (دهان و دندان)
-2. Collamin (کلاژن و امگا۳)
-3. IceBall (آبرسان و لیفت)
-4. Dafi (پاک‌کننده و دستمال مرطوب)
-5. Umbrella (دئودورانت)
-6. Pixel (ضدآفتاب)
-
-## Deploy to Render
-
-### Quick Deploy
-
-1. **Push code to GitHub** (already done: https://github.com/parsaforughi/affiliate-instagram-bot)
-
-2. **Go to Render Dashboard**: https://dashboard.render.com
-
-3. **Create New Web Service**:
-   - Click "New +" → "Web Service"
-   - Connect your GitHub repository: `parsaforughi/affiliate-instagram-bot`
-   - Render will auto-detect `render.yaml`
-
-4. **Set Environment Variables** in Render dashboard:
-   - `OPENAI_API_KEY` - Your OpenAI API key
-   - `INSTAGRAM_USERNAME` - Instagram username
-   - `INSTAGRAM_PASSWORD` - Instagram password (or use `INSTA_SESSION` instead)
-   - `INSTA_SESSION` - Instagram session cookie (optional, alternative to username/password)
-
-5. **Deploy**: Click "Create Web Service"
-
-6. **Get your bot URL**: `https://affiliate-instagram-bot.onrender.com` (or your custom name)
-
-7. **Update Railway Dashboard**:
-   - Go to Railway → Your Dashboard Project → Variables
-   - Set `AFFILIATE_BOT_API_URL` = `https://affiliate-instagram-bot.onrender.com`
-   - Save and redeploy
-
-### Render Free Tier Notes
-
-- ⚠️ **Spins down after 15 minutes of inactivity**
-- ⚠️ **First request after spin-down takes ~30 seconds** (cold start)
-- ✅ **Health check** keeps it alive (pings `/api/health` every few minutes)
-- 💰 **Paid plan ($7/month)** for 24/7 uptime without spin-downs
-
-### Using Docker (Alternative)
-
-If you prefer Docker deployment, Render will use the `Dockerfile` automatically. The `render.yaml` config is simpler and recommended.
-
-### Meta App Review - Required URLs
-
-After deployment on Render, the following URLs are available and required for Meta App Review:
-
-- **Privacy Policy**: `https://affiliate-instagram-bot.onrender.com/privacy`
-- **Terms of Service**: `https://affiliate-instagram-bot.onrender.com/terms`
-
-These pages are automatically available after deployment and are required for Instagram Business Messaging approval.
-
-**To use these URLs in Meta App Review:**
-
-1. Go to [Facebook Developers](https://developers.facebook.com/)
-2. Select your app
-3. Go to **App Settings** → **Basic**
-4. Add **Privacy Policy URL**: `https://affiliate-instagram-bot.onrender.com/privacy`
-5. Add **Terms of Service URL**: `https://affiliate-instagram-bot.onrender.com/terms`
-6. Save changes
-
-## Documentation
-
-- `START_BOT.md`: Quick start guide
-- `SYSTEM_PROMPT.md`: Complete AI prompt documentation
-- `docs/`: Historical documentation and implementation notes
-- `INTEGRATED_API_SERVER.md`: API server integration details
-- `LOCAL_TO_RAILWAY_SETUP.md`: Local development with Railway dashboard
-
+- Do not edit `main.js` or `search_product.js` without following the inbox → search → GPT order. Imports are relative and location-sensitive.
+- GPT is blocked from answering product questions against an empty product array.
+- `GOOGLE_SHEETS_ENABLED` is read in `main.js` and is unused there.
+- Older notes under `explainer20-1/explainer/WorldlyFineDiscussion/docs/` describe CSV catalogs. The live search path is WordPress, not those files.
+- `SYSTEM_PROMPT.md` is the personality document. The same text is the default string in `main.js`.

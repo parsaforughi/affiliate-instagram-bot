@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 220" role="img" aria-label="Message path from Instagram inbox to Persian reply">
+  <rect width="1120" height="220" fill="#0B0B0C"/>
+  <rect x="1" y="1" width="1118" height="218" fill="none" stroke="#2A2A28" stroke-width="1"/>
+
+  <defs>
+    <style>
+      .label { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; fill: #E8E6E3; font-size: 15px; }
+      .meta { font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #8A8782; font-size: 10px; letter-spacing: 0.18em; }
+      .rule { stroke: #2A2A28; stroke-width: 1; }
+      .sage { fill: #8B9A7D; }
+    </style>
+  </defs>
+
+  <!-- connectors -->
+  <line class="rule" x1="214" y1="108" x2="246" y2="108"/>
+  <line class="rule" x1="430" y1="108" x2="462" y2="108"/>
+  <line class="rule" x1="646" y1="108" x2="678" y2="108"/>
+  <line class="rule" x1="862" y1="108" x2="894" y2="108"/>
+
+  <!-- nodes -->
+  <g>
+    <rect x="36" y="64" width="178" height="88" fill="#12110F" stroke="#2A2A28"/>
+    <text class="meta" x="125" y="92" text-anchor="middle">01</text>
+    <text class="label" x="125" y="118" text-anchor="middle">Inbox</text>
+    <text class="meta" x="125" y="138" text-anchor="middle">PUPPETEER</text>
+  </g>
+  <g>
+    <rect x="246" y="64" width="184" height="88" fill="#12110F" stroke="#2A2A28"/>
+    <text class="meta" x="338" y="92" text-anchor="middle">02</text>
+    <text class="label" x="338" y="118" text-anchor="middle">Unread thread</text>
+    <text class="meta" x="338" y="138" text-anchor="middle">CONTEXT</text>
+  </g>
+  <g>
+    <rect x="462" y="64" width="184" height="88" fill="#12110F" stroke="#2A2A28"/>
+    <text class="meta" x="554" y="92" text-anchor="middle">03</text>
+    <text class="label" x="554" y="118" text-anchor="middle">WordPress</text>
+    <text class="meta" x="554" y="138" text-anchor="middle">WP / V2 FACTS</text>
+  </g>
+  <g>
+    <rect x="678" y="64" width="184" height="88" fill="#12110F" stroke="#2A2A28"/>
+    <text class="meta" x="770" y="92" text-anchor="middle">04</text>
+    <text class="label" x="770" y="118" text-anchor="middle">GPT</text>
+    <text class="meta" x="770" y="138" text-anchor="middle">FACTS ONLY</text>
+  </g>
+  <g>
+    <rect x="894" y="64" width="190" height="88" fill="#12110F" stroke="#2A2A28"/>
+    <text class="meta sage" x="989" y="92" text-anchor="middle">05</text>
+    <text class="label" x="989" y="118" text-anchor="middle">Persian reply</text>
+    <text class="meta" x="989" y="138" text-anchor="middle">LUXIRANA</text>
+  </g>
+</svg>

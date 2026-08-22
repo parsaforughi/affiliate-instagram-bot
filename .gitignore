@@ -38,6 +38,8 @@ logs/
 **/*.jpeg
 !dashboard/public/*.png
 !dashboard/public/*.jpg
+!docs/**/*.png
+!docs/**/*.svg
 
 # Temporary files
 tmp/
